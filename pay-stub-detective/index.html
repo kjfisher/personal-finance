@@ -1,0 +1,324 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pay Stub Detective</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: case-file game. Left: the question card for this case. Right: an earnings statement laid out like the My First Paycheck stub (this period + YTD), with "?" where students must work it out. Stacks on narrow screens. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --paper:#FFFFFF; --paper-line:#D4DAE3; --band:#E8EEF7; --q:#2F5FB8;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --paper:#18233F; --paper-line:#33426A; --band:#1F2C4D; --q:#7FA6F5; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --paper:#18233F; --paper-line:#33426A; --band:#1F2C4D; --q:#7FA6F5; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1180px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; align-items:center; }
+.bar .stats b { color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); padding:8px 14px; }
+.wrap { max-width:1180px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.15fr); gap:20px; align-items:start; }
+@media (max-width:860px) { .game { grid-template-columns:1fr; } }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; grid-column:1/-1; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+.work { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 28px); display:grid; gap:14px; min-width:0; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.case { display:flex; flex-wrap:wrap; gap:6px; }
+.case i { width:28px; height:8px; border-radius:4px; background:var(--line); }
+.case i.on { background:var(--gold); } .case i.done { background:var(--ok); }
+.prompt { font-family:var(--display); font-weight:600; font-size:clamp(22px, 2.8vw, 30px); line-height:1.2; margin:0; text-wrap:balance; }
+.hint { font-family:var(--mono); font-size:15px; background:var(--bg); border-radius:10px; padding:10px 12px; line-height:1.5; }
+.answer-row { display:flex; gap:10px; flex-wrap:wrap; }
+.money { flex:1 1 200px; display:flex; align-items:center; border:2px solid var(--line); border-radius:12px; background:var(--bg); padding:0 12px; min-width:0; }
+.money:focus-within { border-color:var(--gold); }
+.money span { font-family:var(--mono); font-size:22px; color:var(--muted); }
+.money input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:24px; padding:12px 8px; outline:none; }
+.opts { display:grid; gap:8px; }
+.opt { font:inherit; font-weight:700; text-align:left; padding:12px 14px; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; line-height:1.3; }
+.opt.right { border-color:var(--ok); background:var(--ok-soft); } .opt.wrong { border-color:var(--bad); background:var(--bad-soft); }
+.opt:disabled { cursor:default; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn:focus-visible, input:focus-visible, .opt:focus-visible, tr[tabindex]:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.fb { border-radius:12px; padding:12px 14px; line-height:1.45; }
+.fb.ok { background:var(--ok-soft); } .fb.no { background:var(--bad-soft); }
+.fb b { font-family:var(--display); }
+.tip { color:var(--muted); font-size:15px; margin:0; }
+/* the stub */
+.stub { background:var(--paper); border:1px solid var(--paper-line); border-radius:10px; overflow:hidden; font-size:15px; min-width:0; box-shadow:0 8px 22px rgba(20,33,61,.08); }
+.stub .top { padding:14px 16px; display:grid; gap:4px; border-bottom:2px solid var(--ink); }
+.stub .co { font-family:var(--display); font-weight:800; font-size:20px; }
+.stub .es { font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.stub .meta { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:2px 14px; font-size:14px; }
+.stub .meta b { font-weight:700; }
+.stub .scroll { overflow-x:auto; }
+.stub table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; min-width:340px; }
+.stub th { text-align:right; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 16px 4px; font-weight:600; }
+.stub th:first-child { text-align:left; }
+.stub td { padding:6px 16px; border-top:1px solid var(--paper-line); font-family:var(--mono); text-align:right; white-space:nowrap; }
+.stub td:first-child { font-family:var(--body); text-align:left; white-space:normal; }
+.stub tr.sec td { background:var(--band); font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:5px 16px; font-weight:600; }
+.stub tr.tot td { font-weight:700; }
+.stub tr.net td { font-weight:700; border-top:2px solid var(--ink); font-size:16px; }
+.stub .qm { color:var(--q); font-weight:700; }
+.stub .found { color:var(--ok); font-weight:700; }
+.stub.tapping tr[data-k] { cursor:pointer; }
+.stub.tapping tr[data-k]:hover td { background:rgba(224,168,0,.14); }
+.stub tr.hit td { background:var(--ok-soft); } .stub tr.miss td { background:var(--bad-soft); }
+.stub .rate { color:var(--muted); font-size:12px; font-family:var(--mono); }
+/* start/end */
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.rules { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px 20px; font-family:var(--mono); font-size:14px; line-height:1.5; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 68px); line-height:1; color:var(--ok); }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Pay Stub <span>Detective</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const SCHED={weekly:{n:52,label:"Weekly"}, biweekly:{n:26,label:"Bi-weekly"}, semi:{n:24,label:"Semi-monthly"}, monthly:{n:12,label:"Monthly"}};
+const COST={basic:{52:34.62,26:69.23,24:75,12:150}, premium:{52:57.69,26:115.38,24:125,12:250}, life:{52:2.31,26:4.62,24:5,12:10}};
+const CAREERS=[["Medical Assistant",41600],["Marketing Coordinator",45500],["Elementary Teacher",48360],["HR Specialist",58500],["Graphic Designer",54600],["Electrician",61880],["Police Officer",70200],["Registered Nurse",78000],["Dental Hygienist",83200],["Software Developer",96200]];
+const HJOBS=["Warehouse Associate","Line Cook","Retail Associate","Delivery Driver","Stock Clerk","Hotel Front Desk"];
+const WAGES=[16.50,17.00,18.00,19.50,20.00,21.50,23.00,25.00];
+const PEOPLE=["Maya Torres","Jordan Lee","Priya Shah","Andre Wallace","Lily Chen","Mateo Ruiz","Grace Kim","Isaiah Brooks","Sofia Novak","Ben Adeyemi","Chloe Martin","Owen Patel"];
+const COS=["Prairie Health Partners","Lakeshore Logistics","Summit Engineering","Maple Grove Schools","Riverbend Hotel","Northgate Market","Cedar Point Dental","Bluestem Tech"];
+const SKILL={ded:"Deductions & net pay", ot:"Overtime on a stub", ytd:"Year to date", err:"Find the error", con:"Pay stub ideas"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const num=s=>{ s=String(s).replace(/[$,\s]/g,""); return s===""||isNaN(s)?NaN:+s; };
+function fedRate(y){ return y<16100?0:y<=25000?2:y<=35000?5:y<=45000?7:y<=60000?8:y<=70000?9:y<=85000?11:12; }
+const D=(y,m,d)=>new Date(Date.UTC(y,m-1,d));
+const ds=d=>(d.getUTCMonth()+1)+"/"+d.getUTCDate()+"/"+d.getUTCFullYear();
+const addDays=(d,n)=>new Date(d.getTime()+n*864e5);
+const lastDay=(m)=>new Date(Date.UTC(2026,m,0)).getUTCDate();
+
+function payInfo(sk){
+  if(sk==="monthly"){ const m=rnd(2,11), nextMonth=Math.random()<.5; return {num:m, period:`${m}/1/2026 – ${m}/${lastDay(m)}/2026`, pay:nextMonth?`${m+1}/1/2026`:`${m}/${lastDay(m)}/2026`, showNum:false, nextMonth}; }
+  if(sk==="semi"){ const m=rnd(2,11), second=Math.random()<.5; return {num:second?2*m:2*m-1, period:second?`${m}/16/2026 – ${m}/${lastDay(m)}/2026`:`${m}/1/2026 – ${m}/15/2026`, pay:second?`${m}/${lastDay(m)}/2026`:`${m}/15/2026`, showNum:false}; }
+  const step=sk==="weekly"?7:14, n=sk==="weekly"?rnd(8,44):rnd(4,22), pay=addDays(D(2026,1,9),step*(n-1));
+  return {num:n, period:`${ds(addDays(pay,-5-step))} – ${ds(addDays(pay,-6))}`, pay:ds(pay), showNum:true};
+}
+function mkStub(hourly){
+  const S={emp:pick(PEOPLE), co:pick(COS), hourly};
+  if(hourly){ S.sk="weekly"; S.job=pick(HJOBS); S.w=pick(WAGES); S.hrs=rnd(43,49); S.otHrs=S.hrs-40;
+    S.reg=r2(S.w*40); S.otRate=r2(S.w*1.5); S.ot=r2(S.otRate*S.otHrs); S.gross=r2(S.reg+S.ot); S.annual=S.w*2080; }
+  else { const c=pick(CAREERS); S.job=c[0]; S.annual=c[1]; S.sk=pick(["weekly","biweekly","semi","monthly","monthly","semi"]); S.gross=r2(c[1]/SCHED[S.sk].n); }
+  const n=SCHED[S.sk].n; Object.assign(S,payInfo(S.sk));
+  S.pct=pick(hourly?[0,3,5]:[3,5,8,5]); S.k401=r2(S.gross*S.pct/100); S.taxable=r2(S.gross-S.k401);
+  S.rate=fedRate(S.annual); S.fed=r2(S.taxable*S.rate/100); S.state=r2(S.taxable*.0495); S.ss=r2(S.gross*.062); S.med=r2(S.gross*.0145);
+  S.plan=pick(["basic","premium","basic","none"]); S.medical=S.plan==="none"?0:COST[S.plan][n]; S.life=Math.random()<.6?COST.life[n]:0;
+  total(S); S.ytdOverride={}; return S;
+}
+function total(S){ S.tot=r2(S.k401+S.fed+S.state+S.ss+S.med+S.medical+S.life); S.net=r2(S.gross-S.tot); }
+function lines(S){
+  const L=[{sec:"Money in"}];
+  if(S.hourly){ L.push({k:"reg",l:`Regular pay`,r:`40 hrs × ${fmt(S.w)}`,v:S.reg}); L.push({k:"ot",l:"Overtime pay",r:`${S.otHrs} hrs × ${fmt(S.otRate)}`,v:S.ot}); }
+  L.push({k:"gross",l:"Gross pay",v:S.gross,cls:"tot"});
+  L.push({sec:"Money out · taxes"});
+  L.push({k:"fed",l:"Federal income tax",r:S.rate+"% of taxable",v:S.fed},{k:"state",l:"State income tax (IL)",r:"4.95% of taxable",v:S.state},{k:"ss",l:"Social Security (FICA)",r:"6.2%",v:S.ss},{k:"med",l:"Medicare (FICA)",r:"1.45%",v:S.med});
+  L.push({sec:"Money out · benefits"});
+  if(S.medical) L.push({k:"medical",l:"Medical insurance",r:S.plan==="basic"?"Basic":"Premium",v:S.medical});
+  if(S.life) L.push({k:"life",l:"Life insurance",v:S.life});
+  if(S.k401) L.push({k:"k401",l:"401(k) · pre-tax",r:S.pct+"%",v:S.k401});
+  L.push({k:"tot",l:"Total deductions",v:S.tot,cls:"tot"},{k:"net",l:"Take-home pay (net pay)",v:S.net,cls:"net"});
+  return L;
+}
+// ---------- cases ----------
+function mcPeriod(S){ return {mc:true, sk:"con", q:"Which dates does this paycheck pay you for?", opts:[S.period, "Only "+S.pay, "1/1/2026 – "+S.pay, "All of 2026"], why:`The pay period is ${S.period}. The pay date (${S.pay}) is the day the money arrives.`}; }
+function mcGross(){ return {mc:true, sk:"con", q:"Which two lines are figured from GROSS pay, not taxable pay?", opts:["Social Security and Medicare","Federal and state income tax","Medical and life insurance","Net pay and total deductions"], why:"FICA (Social Security 6.2% + Medicare 1.45%) uses gross pay. Income taxes use taxable pay, after the pre-tax 401(k)."}; }
+function mcPretax(S){ return {mc:true, sk:"con", q:`Federal and state tax use taxable pay (${fmt(S.taxable)}), not gross pay. Why is it lower?`, opts:["The 401(k) comes out before income tax","Social Security is taken out first","Medical insurance is added back","The company match is subtracted"], why:`Gross ${fmt(S.gross)} − 401(k) ${fmt(S.k401)} = taxable ${fmt(S.taxable)}. Pre-tax savings lower your income tax.`}; }
+function normalSalary(){
+  const S=mkStub(false), hide=["tot","net"], Q=[];
+  Q.push({k:"tot", sk:"ded", q:"Find the total deductions for this pay period.", hint:"Add every line under Money out (taxes + benefits).", a:S.tot,
+    miss:[[S.tot-S.k401,"Include the 401(k). It's money out of this check too."],[S.fed+S.state+S.ss+S.med,"That's only the taxes. Add the benefits too."],[S.tot-S.medical,"Include medical insurance."]], reveal:["tot"]});
+  Q.push({k:"net", sk:"ded", q:"What is the take-home (net) pay?", hint:"Gross pay − total deductions", a:S.net,
+    miss:[[S.gross-S.fed-S.state-S.ss-S.med,"Subtract the benefits too, not just taxes."],[S.taxable,"That's taxable pay. Subtract ALL deductions from gross."]], reveal:["net"]});
+  const opts=["ytd","yearGross","period","grossLines"]; if(!S.showNum) opts.push("count","count"); if(S.k401) opts.push("pretax");
+  const t=pick(opts);
+  if(t==="count"){ Q.push({k:"count", sk:"ytd", unit:true, q:`${S.emp.split(" ")[0]} started on January 1. How many paychecks are included in the YTD column?`, hint:`${SCHED[S.sk].label} pay. Count from January through this pay period (${S.period}).`, a:S.num,
+      miss:S.nextMonth?[[S.num+1,"Count by the pay PERIOD, not the pay date. This check pays for work in month "+S.num+"."]]:[[S.num-1,"Count this paycheck too."],[S.sk==="semi"?Math.ceil(S.num/2):S.num*2,S.sk==="semi"?"Semi-monthly means TWO paychecks each month.":"Monthly means one paycheck each month."]]}); hide.push("ytd-all"); }
+  else if(t==="ytd"){ Q.push({k:"ytd", sk:"ytd", q:`This is paycheck #${S.num}. What should YTD gross pay be?`, hint:"YTD = this paycheck × paycheck #", a:r2(S.gross*S.num),
+      miss:[[S.gross*(S.num-1),"Include this paycheck: multiply by "+S.num+"."],[S.gross*SCHED[S.sk].n,"That's the whole year. YTD only goes up to this paycheck."]], reveal:["ytd-gross"]}); hide.push("ytd-gross"); S.forceNum=true; }
+  else if(t==="yearGross") Q.push({k:"yr", sk:"ytd", q:`If ${S.emp.split(" ")[0]} earns the same every paycheck, what is the gross pay for the whole year?`, hint:`${SCHED[S.sk].label}: ${SCHED[S.sk].n} paychecks a year`, a:r2(S.gross*SCHED[S.sk].n),
+      miss:[[S.gross*12,SCHED[S.sk].label+" pay means "+SCHED[S.sk].n+" paychecks, not 12."],[S.gross*S.num,"That's YTD so far. Find the full year."]]});
+  else if(t==="period") Q.push(mcPeriod(S));
+  else if(t==="pretax") Q.push(mcPretax(S));
+  else Q.push(mcGross());
+  return {S, Q, hide, kind:"Case file"};
+}
+function normalHourly(){
+  const S=mkStub(true), first=S.emp.split(" ")[0];
+  return {S, hide:["ot","gross","net"], kind:"Case file · hourly", Q:[
+   {k:"ot", sk:"ot", q:`${first} worked ${S.hrs} hours this week at ${fmt(S.w)} an hour. What is the overtime pay?`, hint:"Overtime hours × (hourly rate × 1.5)", a:S.ot,
+     miss:[[S.w*S.otHrs,"That's the regular rate. Overtime is 1.5× the rate."],[S.otRate*S.hrs,"Only hours over 40 get the overtime rate."],[S.w*.5*S.otHrs,"That's just the extra half. Use the full overtime rate."]], reveal:["ot"]},
+   {k:"gross", sk:"ot", q:"What is the gross pay for the week?", hint:"Regular pay + overtime pay", a:S.gross,
+     miss:[[S.w*S.hrs,"That pays every hour at the regular rate."],[S.otRate*S.hrs,"Only hours over 40 get overtime."]], reveal:["gross"]},
+   {k:"net", sk:"ded", q:"What is the take-home (net) pay?", hint:"Gross pay − total deductions", a:S.net,
+     miss:[[S.gross-S.fed-S.state-S.ss-S.med,"Subtract every deduction, not just taxes."]], reveal:["net"]}]};
+}
+const ERRS=["ss","ytd","total","netmath","ot"];
+function errorCase(){
+  const type=pick(ERRS); const hourly=type==="ot";
+  let S=mkStub(hourly), Q=[], kind="Case file · something's wrong";
+  const ask={mc:true, sk:"con", q:"You found a mistake on your real pay stub. Who should you ask first?", opts:["Payroll or HR at work","The IRS","A bank teller","No one. It will fix itself."], why:"Payroll or HR fixes pay stub mistakes. Check every stub, every payday."};
+  if(type==="ss"){ const right=S.ss; S.ss=r2(S.gross*.0062); total(S); const rightNet=r2(S.net-(right-S.ss));
+    Q=[{tap:true, sk:"err", q:"One line on this stub was figured wrong. Tap it.", accept:["ss"], why:`Social Security should be 6.2% of gross. ${fmt(S.gross)} × 0.0062 is a decimal slip.`},
+       {k:"fix", sk:"err", q:"What should Social Security be?", hint:"Gross pay × 0.062", a:right, miss:[[S.taxable*.062,"Social Security uses GROSS pay, not taxable pay."]]},
+       {k:"fixnet", sk:"err", q:"With Social Security fixed, what is the correct take-home pay?", hint:"Net pay goes DOWN by the extra Social Security.", a:rightNet, miss:[[S.net+(right-S.ss),"More tax taken out means LESS take-home pay."]]}]; }
+  if(type==="ytd"){ S.forceNum=true; const bad=r2(S.gross*(S.num-1)); S.ytdOverride.gross=bad;
+    Q=[{tap:true, sk:"err", q:`This is paycheck #${S.num}. One YTD amount doesn't add up. Tap that line.`, accept:["gross"], why:`YTD gross shows ${fmt(bad)}, which is only ${S.num-1} paychecks. It should include this one too.`},
+       {k:"fix", sk:"err", q:"What should YTD gross pay be?", hint:"This paycheck × paycheck #", a:r2(S.gross*S.num), miss:[[bad,"That's the number already on the stub."]]},
+       {mc:true, sk:"ytd", q:"What does YTD mean on a pay stub?", opts:["The total from January 1 until now","This paycheck only","What you'll earn the rest of the year","The last 12 months"], why:"Year to date: from January 1 through this pay period."}]; }
+  if(type==="total"){ if(!S.medical){ S.plan="basic"; S.medical=COST.basic[SCHED[S.sk].n]; total(S); }
+    const right=S.tot, rightNet=S.net; S.tot=r2(S.tot-S.medical); S.net=r2(S.gross-S.tot);
+    Q=[{tap:true, sk:"err", q:"The deductions don't add up. Tap the line that's wrong.", accept:["tot"], why:`Total deductions left out medical insurance (${fmt(S.medical)}).`},
+       {k:"fix", sk:"err", q:"What should total deductions be?", hint:"Add every line under Money out.", a:right, miss:[[S.tot,"That's the number already on the stub."]]},
+       {k:"fixnet", sk:"err", q:"What is the correct take-home pay?", hint:"Gross − correct total deductions", a:rightNet, miss:[[S.net,"That's the number already on the stub."]]}]; }
+  if(type==="netmath"){ const right=S.net, off=pick([100,10,-100,90]); S.net=r2(right+off);
+    Q=[{tap:true, sk:"err", q:"Check the math. Which line is wrong?", accept:["net"], why:`${fmt(S.gross)} − ${fmt(S.tot)} = ${fmt(right)}, not ${fmt(S.net)}.`},
+       {k:"fix", sk:"err", q:"What should the take-home pay be?", hint:"Gross pay − total deductions", a:right, miss:[[S.net,"That's the number already on the stub."]]}, ask]; }
+  if(type==="ot"){ const rightOT=S.ot, rightGross=S.gross; S.ot=r2(S.w*S.otHrs); S.otRate=S.w; S.gross=r2(S.reg+S.ot);
+    S.k401=r2(S.gross*S.pct/100); S.taxable=r2(S.gross-S.k401); S.fed=r2(S.taxable*S.rate/100); S.state=r2(S.taxable*.0495); S.ss=r2(S.gross*.062); S.med=r2(S.gross*.0145); total(S);
+    Q=[{tap:true, sk:"err", q:`${S.emp.split(" ")[0]} worked ${S.hrs} hours. One earnings line is wrong. Tap it.`, accept:["ot"], why:`Overtime was paid at the regular rate (${fmt(S.w)}). It should be ${fmt(S.w)} × 1.5 = ${fmt(r2(S.w*1.5))}.`},
+       {k:"fix", sk:"err", q:"What should the overtime pay be?", hint:"Overtime hours × (rate × 1.5)", a:rightOT, miss:[[S.ot,"That's the number already on the stub."]]},
+       {k:"fixg", sk:"err", q:"What should the gross pay be?", hint:"Regular pay + correct overtime pay", a:rightGross, miss:[[S.gross,"That's the number already on the stub."]]}]; }
+  return {S, Q, hide:[], kind};
+}
+function makeGame(){ return [normalSalary(), ...shuffle([normalHourly(), normalSalary(), errorCase(), normalSalary(), errorCase()])]; }
+
+// ---------- state + render ----------
+let G=null, best=null;
+try{ best=+localStorage.getItem("pay-stub-detective-best")||null; }catch(e){}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 2: Reading a Pay Stub</span>`; return; }
+  el.innerHTML=`<span>Case <b>${Math.min(G.ci+1,G.cases.length)}</b>/${G.cases.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
+  $("quit")&&($("quit").onclick=intro); }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow">Unit 2 · How to Read a Pay Stub + My First Paycheck</div>
+    <h2>Six pay stubs. Find what's missing. Catch what's wrong.</h2>
+    <p>Every case is a new pay stub. Work out the blue <b style="color:var(--q)">?</b> amounts, read the YTD column, and in two cases find the line someone got wrong. Use a calculator and round to the cent.</p>
+    <div class="rules"><span>Social Security = gross × 0.062</span><span>Medicare = gross × 0.0145</span><span>401(k) is pre-tax</span><span>Taxable = gross − 401(k)</span><span>IL state tax = taxable × 0.0495</span><span>YTD = this check × check #</span></div>
+    <p>Typed answers: 10 points first try, 5 on the second. Tap answers: one try.${best?` <b>Your best: ${best}.</b>`:""}</p>
+    <div class="row"><button class="btn go" id="go">Open the first case</button></div></div>`;
+  $("go").onclick=()=>{ G={cases:makeGame(), ci:0, qi:0, score:0, by:{}, phase:"play", tries:0, fb:null, locked:false, revealed:[]}; draw(); };
+}
+function cell(S,L,ytd){
+  const C=G.cases[G.ci], hidden=C.hide.filter(h=>!G.revealed.includes(h));
+  const hid=ytd?(hidden.includes("ytd-all")||hidden.includes(L.k)||(L.k==="gross"&&hidden.includes("ytd-gross"))):hidden.includes(L.k);
+  if(hid) return `<span class="qm">?</span>`;
+  const v=ytd?(S.ytdOverride[L.k]!=null?S.ytdOverride[L.k]:r2(L.v*S.num)):L.v;
+  const found=!ytd&&G.revealed.includes(L.k)&&C.hide.includes(L.k) || ytd&&L.k==="gross"&&C.hide.includes("ytd-gross")&&G.revealed.includes("ytd-gross");
+  return `<span class="${found?"found":""}">${fmt(v)}</span>`;
+}
+function stub(C){
+  const S=C.S, Q=C.Q[G.qi], tapping=Q&&Q.tap&&!G.locked, sched=SCHED[S.sk];
+  const rows=lines(S).map(L=>{ if(L.sec) return `<tr class="sec"><td colspan="3">${L.sec}</td></tr>`;
+    let cls=L.cls||""; if(Q&&Q.tap&&G.locked){ if(Q.accept.includes(L.k)) cls+=" hit"; else if(G.tapPick===L.k) cls+=" miss"; }
+    return `<tr class="${cls}" data-k="${L.k}" ${tapping?`tabindex="0" role="button" aria-label="${esc(L.l)}"`:""}><td>${esc(L.l)}${L.r?` <span class="rate">${esc(L.r)}</span>`:""}</td><td>${cell(S,L,false)}</td><td>${cell(S,L,true)}</td></tr>`; }).join("");
+  const showNum=S.showNum||S.forceNum;
+  return `<aside class="stub ${tapping?"tapping":""}" aria-label="Pay stub">
+    <div class="top"><div class="es">Earnings statement</div><div class="co">${esc(S.co)}</div>
+      <div class="meta"><span>Employee: <b>${esc(S.emp)}</b></span><span>Job: <b>${esc(S.job)}</b></span>
+      <span>Pay schedule: <b>${sched.label}</b></span><span>Pay period: <b>${S.period}</b></span><span>Pay date: <b>${S.pay}</b></span>
+      ${showNum?`<span>Paycheck #: <b>${S.num}</b></span>`:""}${S.hourly?`<span>Hours: <b>${S.hrs}</b> · Rate: <b>${fmt(S.w)}</b></span>`:""}<span>Filing: <b>Single</b></span></div></div>
+    <div class="scroll"><table><tr><th>Line</th><th>This period</th><th>Year to date</th></tr>${rows}</table></div></aside>`;
+}
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const C=G.cases[G.ci], Q=C.Q[G.qi], nC=G.cases.length;
+  const dots=G.cases.map((_,i)=>`<i class="${i<G.ci?"done":i===G.ci?"on":""}"></i>`).join("");
+  let body="";
+  if(Q.mc){ if(!Q.order){ Q.order=shuffle(Q.opts.map((_,i)=>i)); }
+    body=`<div class="opts">${Q.order.map(i=>{ let c="opt"; if(G.locked&&i===0) c+=" right"; else if(G.locked&&G.mcPick===i) c+=" wrong"; return `<button class="${c}" data-i="${i}" ${G.locked?"disabled":""}>${esc(Q.opts[i])}</button>`; }).join("")}</div>`; }
+  else if(Q.tap) body=`<p class="tip">${G.locked?"":"Tap a line on the pay stub."}</p>`;
+  else body=`${Q.hint?`<div class="hint">${esc(Q.hint)}</div>`:""}<form id="af" class="answer-row" novalidate>
+      <label class="money" for="ans">${Q.unit?"":"<span>$</span>"}<input id="ans" inputmode="decimal" autocomplete="off" aria-label="Your answer" ${G.locked?"disabled":""}></label>
+      ${G.locked?"":`<button class="btn go" type="submit">Check</button>`}</form>`;
+  const fb=G.fb?`<div class="fb ${G.fb.ok?"ok":"no"}" role="status"><b>${esc(G.fb.title)}</b> ${esc(G.fb.msg)}</div>`:"";
+  const last=G.qi+1>=C.Q.length;
+  $("root").innerHTML=`<div class="game">
+    <div class="progress" aria-hidden="true"><i style="width:${(G.ci+(G.qi+(G.locked?1:0))/C.Q.length)/nC*100}%"></i></div>
+    <section class="work">
+      <div class="case" aria-hidden="true">${dots}</div>
+      <div class="eyebrow">${esc(C.kind)} · question ${G.qi+1} of ${C.Q.length}</div>
+      <p class="prompt">${esc(Q.q)}</p>
+      ${body}${fb}
+      ${G.locked?`<div><button class="btn go" id="next">${last?(G.ci+1<nC?"Next case":"Close the file"):"Next question"}</button></div>`:""}
+    </section>
+    ${stub(C)}</div>`;
+  if(G.locked){ $("next").onclick=advance; $("next").focus({preventScroll:true}); return; }
+  if(Q.mc) document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(+b.dataset.i));
+  else if(Q.tap) document.querySelectorAll(".stub tr[data-k]").forEach(tr=>{ tr.onclick=()=>tapLine(tr.dataset.k); tr.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tapLine(tr.dataset.k); } }; });
+  else { $("ans").focus({preventScroll:true}); $("af").onsubmit=e=>{ e.preventDefault(); typed($("ans").value); }; }
+}
+function tally(sk,ok){ const b=G.by[sk]||(G.by[sk]=[0,0]); b[1]++; if(ok) b[0]++; }
+function choose(i){ const Q=G.cases[G.ci].Q[G.qi]; G.mcPick=i; G.locked=true; const ok=i===0; if(ok) G.score+=10; tally(Q.sk,ok); G.fb={ok, title:ok?"+10.":"Not this one.", msg:Q.why}; draw(); }
+function tapLine(k){ const Q=G.cases[G.ci].Q[G.qi]; G.tapPick=k; G.locked=true; const ok=Q.accept.includes(k); if(ok) G.score+=10; tally(Q.sk,ok); G.fb={ok, title:ok?"Good eye. +10.":"Not that line.", msg:Q.why}; draw(); }
+function typed(raw){
+  const C=G.cases[G.ci], Q=C.Q[G.qi], v=num(raw), fmtA=Q.unit?String(Q.a):fmt(Q.a);
+  if(isNaN(v)){ G.fb={ok:false,title:"Type a number.",msg:""}; return draw(); }
+  if(Math.abs(v-Q.a)<=.015){ const pts=G.tries?5:10; G.score+=pts; tally(Q.sk,!G.tries); G.locked=true; G.fb={ok:true,title:`+${pts}.`,msg:(Q.unit?"":"")+fmtA+" is right."}; (Q.reveal||[]).forEach(r=>G.revealed.push(r)); return draw(); }
+  const hit=(Q.miss||[]).find(([x])=>Math.abs(v-r2(x))<=.02&&Math.abs(r2(x)-Q.a)>.015);
+  G.tries++;
+  if(G.tries<2){ G.fb={ok:false,title:"Not quite.",msg:(hit?hit[1]:"Check the hint and the stub.")+" Try again."}; return draw(); }
+  tally(Q.sk,false); G.locked=true; (Q.reveal||[]).forEach(r=>G.revealed.push(r)); G.fb={ok:false,title:"Here's the answer: "+fmtA+".",msg:hit?hit[1]:(Q.hint||"")}; draw();
+}
+function advance(){ const C=G.cases[G.ci]; G.fb=null; G.locked=false; G.tries=0; G.mcPick=null; G.tapPick=null;
+  if(G.qi+1<C.Q.length){ G.qi++; return draw(); }
+  if(C.hide.includes("ytd-all")) G.revealed.push("ytd-all");
+  G.ci++; G.qi=0; G.revealed=[];
+  if(G.ci>=G.cases.length){ G.phase="end"; if(!best||G.score>best){ best=G.score; try{ localStorage.setItem("pay-stub-detective-best",String(best)); }catch(e){} } }
+  draw(); }
+function end(){
+  stats();
+  const max=G.cases.reduce((s,c)=>s+c.Q.length*10,0);
+  const rows=Object.keys(SKILL).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    return `<div class="skill"><b>${SKILL[k]}</b><span class="v">${a} of ${t} first try</span>${p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel"><div class="eyebrow">Case closed</div>
+    <div class="big">${G.score} <span style="font-size:.45em;color:var(--muted)">/ ${max}</span></div>
+    <div class="skills">${rows}</div>
+    <p>Check before you spend: take-home + total deductions should equal gross pay, and YTD should equal this paycheck × paycheck #.</p>
+    <div class="row"><button class="btn go" id="again">New cases</button></div></div>`;
+  $("again").onclick=intro;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

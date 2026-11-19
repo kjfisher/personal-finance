@@ -1,0 +1,235 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Climb to 850</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: two-column projector screen. Left = live FICO gauge, score and move history; right = the life event card and the class's choices. Stacks on phones. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800;
+  --up:#0F8B6C; --down:#C23B3B;
+  --b1:#D64545; --b2:#EE8A2E; --b3:#E7C33A; --b4:#6BBF59; --b5:#1F9E6E; --track:#DCE1E8;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --up:#3CCB9F; --down:#F07070; --track:#22304F; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --up:#3CCB9F; --down:#F07070; --track:#22304F; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
+.wrap { max-width:1400px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:10px; }
+h1 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 48px); line-height:1; margin:0; }
+header p { margin:4px 0 0; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:15px; }
+.btn { font:inherit; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn:hover { border-color:var(--ink); }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, .choice:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.grid { display:grid; grid-template-columns:minmax(0, 5fr) minmax(0, 7fr); gap:16px; align-items:start; }
+@media (max-width:860px) { .grid { grid-template-columns:minmax(0, 1fr); } }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:clamp(14px, 2vw, 24px); min-width:0; }
+.gauge svg { width:100%; height:auto; display:block; max-width:520px; margin:0 auto; }
+.gauge .tick { fill:var(--muted); font-size:13px; font-family:var(--body); }
+.readout { text-align:center; margin-top:-6px; }
+.readout .num { font-family:var(--display); font-weight:800; font-size:clamp(56px, 8vw, 104px); line-height:1; font-variant-numeric:tabular-nums; }
+.readout .band { display:inline-block; margin-top:6px; padding:4px 14px; border-radius:999px; font-weight:700; color:#14213D; letter-spacing:.04em; }
+.readout .age { color:var(--muted); margin-top:6px; }
+.hist { margin-top:14px; border-top:1px solid var(--line); padding-top:10px; display:grid; gap:4px; max-height:260px; overflow:auto; font-size:15px; }
+.hist div { display:flex; justify-content:space-between; gap:8px; }
+.hist .d { font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.up { color:var(--up); } .down { color:var(--down); } .zero { color:var(--muted); }
+.step { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:14px; font-weight:700; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.progress { height:6px; background:var(--track); border-radius:99px; overflow:hidden; margin:8px 0 14px; }
+.progress span { display:block; height:100%; background:var(--accent); transition:width .3s; }
+.event h2 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3vw, 40px); margin:0 0 8px; line-height:1.1; text-wrap:balance; }
+.event .text { font-size:clamp(19px, 1.9vw, 25px); line-height:1.4; margin:0 0 16px; }
+.tag { display:inline-block; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 10px; border-radius:999px; border:1px solid var(--gold); color:var(--ink); margin-bottom:10px; }
+.choices { display:grid; gap:10px; }
+.choice { font:inherit; text-align:left; display:flex; gap:14px; align-items:center; padding:14px 16px; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; font-size:clamp(17px, 1.7vw, 22px); line-height:1.3; }
+.choice:hover:not(:disabled) { border-color:var(--accent); }
+.choice .k { font-family:var(--display); font-weight:800; font-size:1.3em; width:1.6em; flex:none; text-align:center; }
+.choice:disabled { cursor:default; opacity:.55; }
+.choice.picked { opacity:1; border-color:var(--ink); }
+.choice.right { opacity:1; border-color:var(--up); }
+.result { margin-top:16px; border-radius:12px; padding:16px; background:var(--bg); border:1px solid var(--line); display:grid; gap:8px; }
+.result .delta { font-family:var(--display); font-weight:800; font-size:clamp(34px, 4vw, 54px); line-height:1; }
+.result .cat { font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+.result p { margin:0; font-size:clamp(17px, 1.7vw, 22px); line-height:1.4; }
+.row { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.end ul { margin:8px 0 0 20px; padding:0; font-size:clamp(17px, 1.7vw, 22px); line-height:1.45; }
+.legend { display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; font-size:13px; color:var(--muted); margin-top:10px; }
+.legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+@media (prefers-reduced-motion: reduce) { .progress span { transition:none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div><h1>Climb to 850</h1><p>Personal Finance - Unit 4 Credit Review</p></div>
+    <button class="btn" id="restart">Restart game</button>
+  </header>
+  <div class="grid">
+    <section class="panel gauge" aria-label="Credit score">
+      <svg viewBox="-26 -8 452 233" id="gauge" role="img" aria-labelledby="scoreNum"></svg>
+      <div class="readout">
+        <div class="num" id="scoreNum">—</div>
+        <div class="band" id="band" style="background:var(--track)">No score yet</div>
+        <div class="age" id="age">Age 18</div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--b1)"></i>Very Poor 300–579</span><span><i style="background:var(--b2)"></i>Fair 580–669</span>
+        <span><i style="background:var(--b3)"></i>Good 670–739</span><span><i style="background:var(--b4)"></i>Very Good 740–799</span>
+        <span><i style="background:var(--b5)"></i>Exceptional 800–850</span>
+      </div>
+      <div class="hist" id="hist" aria-label="Move history"></div>
+    </section>
+    <section class="panel event" id="event" aria-live="polite"></section>
+  </div>
+</div>
+
+<script>
+const BANDS=[[300,579,"Very Poor","--b1"],[580,669,"Fair","--b2"],[670,739,"Good","--b3"],[740,799,"Very Good","--b4"],[800,850,"Exceptional","--b5"]];
+const ROUNDS=[
+ {age:18, title:"Your first step", text:"You just turned 18 and have never borrowed money. You want a credit score before you buy a car in a few years. What do you do?",
+  choices:[
+   {t:"Open a secured credit card with a $300 deposit", set:660, cat:"Establishing credit", why:"A secured card reports to the bureaus like any credit card. Your first score shows up at 660."},
+   {t:"Get added as an authorized user on a parent's card they always pay on time", set:680, cat:"Establishing credit", why:"You get credit for their good history. Your first score shows up at 680. (Their mistakes would hurt you too.)"},
+   {t:"Apply for 4 store credit cards in one week to get the discounts", set:600, cat:"New credit (10%)", why:"Four hard inquiries and four brand-new accounts at once look risky. Your first score is only 600."},
+   {t:"Just use your debit card. That builds credit, right?", set:640, cat:"Establishing credit", why:"Debit cards spend your own money and do NOT build credit. A year later you finally open a secured card and start at 640, with a year of history lost."}]},
+ {age:18, title:"Your first statement", text:"Your first credit card statement shows a $180 balance on a $300 limit. The minimum payment is $25.",
+  choices:[
+   {t:"Pay the full $180 before the due date", d:15, cat:"Payment history (35%)", why:"On time and in full. No interest, and your balance drops back to $0."},
+   {t:"Pay the $25 minimum", d:-5, cat:"Amounts owed (30%)", why:"On time, but the balance stays at 60% of your limit and starts building interest."},
+   {t:"Forget about it and pay 35 days late", d:-60, cat:"Payment history (35%)", why:"A 30+ day late payment can stay on your report for 7 years. That's the biggest hit in the game."}]},
+ {age:19, title:"Concert tickets", text:"Tickets for a concert you really want cost $280. Your card limit is still $300.",
+  choices:[
+   {t:"Save for a few weeks and pay cash", d:5, cat:"Amounts owed (30%)", why:"Your utilization stays near 0%, and you keep paying on time."},
+   {t:"Put it all on the card", d:-30, cat:"Amounts owed (30%)", why:"$280 ÷ $300 = 93% utilization. Way over the 30% guideline."},
+   {t:"Put half on the card and pay the rest in cash", d:-10, cat:"Amounts owed (30%)", why:"$140 ÷ $300 = 47%. Better, but still over 30%."}]},
+ {age:19, quiz:true, title:"Credit Check", text:"Answer correctly for a +10 bonus.",
+  q:"Which website is the ONLY one authorized by federal law to give you free credit reports?",
+  opts:["creditkarma.com","annualcreditreport.com","experian.com","bankrate.com"], c:1, bonus:10, cat:"Credit reports",
+  why:"annualcreditreport.com gives you free reports from all 3 bureaus: Experian, Equifax and TransUnion."},
+ {age:19, title:"Checkout offer", text:"At the mall, the cashier says: \"Open a store card today and save 20% on this $60 purchase!\"",
+  choices:[
+   {t:"No thanks, pay with what you planned", d:0, cat:"New credit (10%)", why:"No change. Saving $12 isn't worth a hard inquiry and another account to manage."},
+   {t:"Sure, sign me up", d:-10, cat:"New credit (10%)", why:"A hard inquiry plus a brand-new account lowers your score a little for a while."}]},
+ {age:20, title:"Car trouble", text:"Your car needs a $900 repair. Your card limit is now $1,000, and you have $400 in savings.",
+  choices:[
+   {t:"Pay $400 from savings, charge $500, and pay the card off in 2 months", d:-10, cat:"Amounts owed (30%)", why:"Utilization jumps to 50% for a bit, then drops as you pay it down on time."},
+   {t:"Charge all $900 and pay only the minimum", d:-35, cat:"Amounts owed (30%)", why:"90% utilization that stays high for months, plus a lot of interest. Remember Matt's 24 years?"},
+   {t:"Charge all $900 and pay it off the next month", d:-15, cat:"Amounts owed (30%)", why:"Utilization hits 90% for one statement, then you bounce back. Paying in full saves you the interest."}]},
+ {age:20, title:"Something looks wrong", text:"You check your credit report and see a credit card you never opened, with $1,200 owed.",
+  choices:[
+   {t:"Dispute it with the credit bureaus and freeze your credit", d:20, cat:"Credit reports", why:"The fraud account is removed and no one can open new credit in your name. Checking your report paid off."},
+   {t:"Ignore it. It isn't your card.", d:-70, cat:"Payment history (35%)", why:"The thief's bills go unpaid and the account is sent to collections on YOUR report."}]},
+ {age:21, quiz:true, title:"Credit Check", text:"Answer correctly for a +10 bonus.",
+  q:"Which part of the FICO score is worth 35%?",
+  opts:["Amounts owed","Credit mix","Payment history","New credit"], c:2, bonus:10, cat:"The FICO pie",
+  why:"Payment history is 35%, the biggest slice. Amounts owed is 30%, length of history 15%, new credit and credit mix 10% each."},
+ {age:21, title:"A friend asks for a favor", text:"Your friend wants you to cosign a car loan. They've paid bills late before.",
+  choices:[
+   {t:"Say no, and suggest they start with a secured card", d:0, cat:"Cosigning", why:"No change. Cosigning means YOU are responsible if they don't pay."},
+   {t:"Cosign to help them out", d:-50, cat:"Payment history (35%)", why:"Your friend misses two payments. Because you cosigned, those late payments land on your report too."}]},
+ {age:21, title:"A shiny new card", text:"You're approved for a rewards card. Your old secured card (your oldest account) has no annual fee.",
+  choices:[
+   {t:"Keep the old card open with one small bill on autopay", d:10, cat:"Length of history (15%)", why:"Your oldest account keeps aging, and your total limit stays higher."},
+   {t:"Close the old card. Who needs two?", d:-20, cat:"Length of history (15%)", why:"Closing your oldest account shortens your history and lowers your total limit, so utilization goes up."}]},
+ {age:22, quiz:true, title:"Credit Check", text:"Answer correctly for a +15 bonus.",
+  q:"Your new card has a $2,500 limit. What is the MOST you should owe to stay at 30% utilization?",
+  opts:["$250","$750","$1,750","$2,500"], c:1, bonus:15, cat:"Utilization math",
+  why:"$2,500 × 0.30 = $750."},
+ {age:22, auto:true, title:"Time passes", text:"Two years of history go by. Every account you still have is paid on time, every month.", d:55, cat:"Payment history (35%)",
+  why:"Time plus on-time payments is how scores climb. Older accounts and a clean payment history add up."}
+];
+const $=id=>document.getElementById(id);
+let G;
+function fresh(){ return {i:0, score:null, hist:[], answered:false, last:null}; }
+function bandOf(s){ return BANDS.find(b=>s>=b[0]&&s<=b[1]); }
+function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function ang(s){ return Math.PI*(1-(s-300)/550); }
+function pt(s,r){ const a=ang(s); return [200+r*Math.cos(a), 205-r*Math.sin(a)]; }
+function arc(s1,s2,r){ const [x1,y1]=pt(s1,r),[x2,y2]=pt(s2,r); return `M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 0 1 ${x2.toFixed(1)},${y2.toFixed(1)}`; }
+function drawGauge(){
+  const g=$("gauge"); let h="";
+  BANDS.forEach((b,i)=>{ h+=`<path d="${arc(b[0]+(i?0.6:0), b[1]+(i<4?0.4:0), 160)}" stroke="var(${b[3]})" stroke-width="34" fill="none"/>`; });
+  [300,580,670,740,800,850].forEach(v=>{ const [x,y]=pt(v,198); h+=`<text class="tick" x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle">${v}</text>`; });
+  if(G.score!=null){ const [x,y]=pt(G.score,138);
+    h+=`<line x1="200" y1="205" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>`; }
+  h+=`<circle cx="200" cy="205" r="11" fill="var(--ink)"/>`;
+  g.innerHTML=h;
+  $("scoreNum").textContent = G.score==null ? "—" : G.score;
+  const b=$("band");
+  if(G.score==null){ b.textContent="No score yet"; b.style.background="var(--track)"; b.style.color="var(--ink)"; }
+  else { const bd=bandOf(G.score); b.textContent=bd[2]; b.style.background=`var(${bd[3]})`; b.style.color="#14213D"; }
+  const r=ROUNDS[Math.min(G.i, ROUNDS.length-1)]; $("age").textContent="Age "+(G.i>=ROUNDS.length?22:r.age);
+  $("hist").innerHTML = G.hist.map(h=>`<div><span>${h.label}</span><span class="d ${h.d>0?'up':h.d<0?'down':'zero'}">${h.set!=null?'Start '+h.set:(h.d>0?'+':'')+h.d}</span></div>`).join("") || '<div class="zero">Moves will show up here.</div>';
+}
+function clamp(s){ return Math.max(300, Math.min(850, s)); }
+function apply(entry){ if(entry.set!=null) G.score=entry.set; else G.score=clamp(G.score+entry.d); G.hist.push(entry); }
+function render(){
+  drawGauge(); const ev=$("event");
+  if(G.i>=ROUNDS.length) return renderEnd();
+  const r=ROUNDS[G.i], pct=Math.round(G.i/ROUNDS.length*100);
+  let h=`<div class="step"><span>Round ${G.i+1} of ${ROUNDS.length}</span><span>Age ${r.age}</span></div><div class="progress"><span style="width:${pct}%"></span></div>`;
+  h+= r.quiz ? `<span class="tag">Bonus question</span>` : "";
+  h+=`<h2>${r.title}</h2><p class="text">${r.text}</p>`;
+  if(r.auto){
+    if(!G.answered){ h+=`<div class="row"><button class="btn primary" id="go">See what happens</button></div>`; }
+  } else if(r.quiz){
+    h+=`<p class="text"><b>${r.q}</b></p><div class="choices">`+r.opts.map((o,k)=>`<button class="choice ${G.answered&&k===r.c?'right':''} ${G.answered&&G.last===k?'picked':''}" data-k="${k}" ${G.answered?'disabled':''}><span class="k">${"ABCD"[k]}</span><span>${o}</span></button>`).join("")+`</div>`;
+  } else {
+    h+=`<div class="choices">`+r.choices.map((c,k)=>`<button class="choice ${G.answered&&G.last===k?'picked':''}" data-k="${k}" ${G.answered?'disabled':''}><span class="k">${"ABCD"[k]}</span><span>${c.t}</span></button>`).join("")+`</div>`;
+  }
+  if(G.answered){
+    let d,cat,why,set=null;
+    if(r.auto){ d=r.d; cat=r.cat; why=r.why; }
+    else if(r.quiz){ const ok=G.last===r.c; d=ok?r.bonus:0; cat=r.cat; why=(ok?"Correct! ":"Not quite. The answer is "+"ABCD"[r.c]+". ")+r.why; }
+    else { const c=r.choices[G.last]; cat=c.cat; why=c.why; if(c.set!=null) set=c.set; else d=c.d; }
+    const cls = set!=null ? 'zero' : d>0?'up':d<0?'down':'zero';
+    h+=`<div class="result"><div class="delta ${cls}">${set!=null?'First score: '+set:(d>0?'+':'')+d+' points'}</div><div class="cat">${cat}</div><p>${why}</p></div>
+        <div class="row"><button class="btn primary" id="next">${G.i===ROUNDS.length-1?'See final score':'Next round'}</button></div>`;
+  }
+  ev.innerHTML=h;
+  ev.querySelectorAll(".choice").forEach(b=>b.onclick=()=>choose(+b.dataset.k));
+  $("go")&&($("go").onclick=()=>choose(0));
+  $("next")&&($("next").onclick=()=>{ G.i++; G.answered=false; G.last=null; render(); $("event").querySelector("button")?.focus(); });
+}
+function choose(k){
+  const r=ROUNDS[G.i]; G.answered=true; G.last=k;
+  if(r.auto) apply({label:"Age "+r.age+": "+r.title, d:r.d});
+  else if(r.quiz) apply({label:"Age "+r.age+": Credit Check", d:k===r.c?r.bonus:0});
+  else { const c=r.choices[k]; apply(c.set!=null?{label:"Age "+r.age+": "+r.title, set:c.set}:{label:"Age "+r.age+": "+r.title, d:c.d}); }
+  render(); $("next")?.focus();
+}
+const OUTCOME={
+ "Exceptional":["Best interest rates available","Least amount of paperwork to get approved"],
+ "Very Good":["Likely approved with competitive interest rates","Low paperwork requirements"],
+ "Good":["Qualifies for most loans, possibly at higher interest","Often needs proof of income and residence"],
+ "Fair":["Seen as a subprime borrower","Only qualifies for certain loans, at higher interest","More paperwork required"],
+ "Very Poor":["May not qualify for a loan at all","May need to pay a fee or deposit","Much higher interest rates and full documentation"]};
+function renderEnd(){
+  const bd=bandOf(G.score), best=G.hist.filter(h=>h.d!=null).sort((a,b)=>a.d-b.d)[0];
+  $("event").innerHTML=`<div class="step"><span>Game over</span><span>Age 22</span></div><div class="progress"><span style="width:100%"></span></div>
+    <div class="end"><span class="tag">Car loan application</span>
+    <h2>You finished at ${G.score}: ${bd[2]}</h2>
+    <p class="text">You walk into the dealership to finance your first car. With a ${bd[2]} score, here's what lenders will do:</p>
+    <ul>${OUTCOME[bd[2]].map(x=>`<li>${x}</li>`).join("")}</ul>
+    ${best&&best.d<0?`<p class="text" style="margin-top:14px">Biggest drop: <b>${best.label.replace(/^Age \d+: /,"")}</b> (${best.d}). What would you change?</p>`:""}
+    <div class="row"><button class="btn primary" id="again">Play again</button></div></div>`;
+  $("again").onclick=()=>{ G=fresh(); render(); };
+}
+$("restart").onclick=()=>{ const b=$("restart");
+  if(b.dataset.c){ G=fresh(); render(); b.textContent="Restart game"; delete b.dataset.c; }
+  else { b.dataset.c=1; b.textContent="Click again to restart"; setTimeout(()=>{ b.textContent="Restart game"; delete b.dataset.c; },3000); } };
+function start(d){ G=(d&&d.G)||fresh(); render(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

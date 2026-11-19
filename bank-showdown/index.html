@@ -1,0 +1,216 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bank Showdown</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: projector-first game board, 6 category columns over a team scoreboard; modal takes the full screen for each question. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --tile:#1F5577; --tile-hover:#286A93; --tile-ink:#F5C542; --used:#DCE1E8; --used-ink:#A3ADBD;
+  --accent:#0F8B6C; --accent-ink:#FFFFFF; --bad:#C23B3B; --overlay:rgba(14,22,40,.72);
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --tile:#1A4664; --tile-hover:#22597E; --tile-ink:#F5C542; --used:#141C30; --used-ink:#3B4868;
+  --accent:#3CCB9F; --accent-ink:#06261D; --bad:#F07070; --overlay:rgba(3,6,14,.8); color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --tile:#1A4664; --tile-hover:#22597E; --tile-ink:#F5C542; --used:#141C30; --used-ink:#3B4868;
+  --accent:#3CCB9F; --accent-ink:#06261D; --bad:#F07070; --overlay:rgba(3,6,14,.8); color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; }
+.wrap { max-width:1400px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+header { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px; }
+.brand h1 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 48px); line-height:1; margin:0; letter-spacing:-.01em; }
+.brand p { margin:4px 0 0; color:var(--muted); font-size:15px; letter-spacing:.06em; text-transform:uppercase; }
+.controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+label.inline { display:flex; gap:6px; align-items:center; color:var(--muted); font-size:14px; }
+select, button, input { font:inherit; }
+select { padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink); }
+.btn { padding:8px 14px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn:hover { border-color:var(--ink); }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, .tile:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--tile-ink); outline-offset:2px; }
+.board-scroll { overflow-x:auto; }
+.board { display:grid; grid-template-columns:repeat(6, minmax(130px, 1fr)); gap:8px; min-width:820px; }
+.cat { background:var(--ink); color:var(--bg); font-family:var(--display); font-weight:800; text-align:center; padding:14px 8px; border-radius:10px; font-size:clamp(15px, 1.5vw, 21px); line-height:1.15; display:flex; align-items:center; justify-content:center; min-height:76px; text-wrap:balance; }
+.tile { background:var(--tile); color:var(--tile-ink); border:none; border-radius:10px; font-family:var(--display); font-weight:800; font-size:clamp(28px, 3.4vw, 52px); min-height:clamp(70px, 10vh, 110px); cursor:pointer; font-variant-numeric:tabular-nums; transition:transform .12s, background .12s; }
+.tile:hover:not(:disabled) { background:var(--tile-hover); transform:translateY(-2px); }
+.tile:disabled { background:var(--used); color:var(--used-ink); cursor:default; font-size:clamp(14px, 1.3vw, 18px); font-family:var(--body); }
+.teams { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; }
+.team { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:grid; gap:6px; }
+.team input { border:none; background:transparent; color:var(--muted); font-weight:700; font-size:15px; text-transform:uppercase; letter-spacing:.05em; width:100%; padding:2px 0; border-bottom:1px dashed var(--line); }
+.team .score { font-family:var(--display); font-weight:800; font-size:clamp(30px, 3.2vw, 46px); line-height:1; font-variant-numeric:tabular-nums; }
+.team .score.neg { color:var(--bad); }
+.team .adj { display:flex; gap:6px; }
+.team .adj button { flex:1; padding:4px 0; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; font-weight:700; }
+.foot { color:var(--muted); font-size:13px; }
+.overlay { position:fixed; inset:0; background:var(--overlay); display:flex; align-items:center; justify-content:center; padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); z-index:20; }
+.card { background:var(--surface); color:var(--ink); border-radius:16px; width:min(1100px, 100%); max-height:100%; overflow:auto; padding:clamp(18px, 3vw, 40px); display:grid; gap:18px; }
+.card .meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:14px; font-weight:700; }
+.dd { background:var(--tile-ink); color:#14213D; padding:3px 10px; border-radius:999px; letter-spacing:.06em; }
+.question { font-family:var(--display); font-weight:600; font-size:clamp(24px, 3.4vw, 46px); line-height:1.2; margin:0; text-wrap:balance; }
+.answer { border-top:2px solid var(--line); padding-top:14px; font-size:clamp(20px, 2.4vw, 32px); line-height:1.3; }
+.answer b { color:var(--accent); }
+.award { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.award .lbl { color:var(--muted); font-size:14px; margin-right:4px; }
+.award .row { display:flex; gap:4px; }
+.award .ok { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.award .no { color:var(--bad); }
+.wager { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; }
+.wager label { display:grid; gap:4px; font-weight:700; }
+.wager input { padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:20px; width:100%; }
+.actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+@media (prefers-reduced-motion: reduce) { .tile { transition:none; } .tile:hover:not(:disabled) { transform:none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>Bank Showdown</h1><p>Personal Finance - Unit 3 Review</p></div>
+    <div class="controls">
+      <label class="inline" for="teamCount">Teams
+        <select id="teamCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></label>
+      <button class="btn primary" id="finalBtn">Final Round</button>
+      <button class="btn" id="resetBtn">New game</button>
+    </div>
+  </header>
+  <div class="board-scroll"><div class="board" id="board" aria-label="Question board"></div></div>
+  <div class="teams" id="teams"></div>
+  <div class="foot">Click a tile to open the question. Click a team's name to rename it. One tile hides a Double Points bonus. Use +100 / −100 to fix any score. Calculators are allowed on the math tiles.</div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="qText" id="card"></div>
+</div>
+
+<script>
+const CATS = [
+ { name:"Accounts", q:[
+  ["Which account is made for everyday spending?","<b>Checking</b>"],
+  ["What are the two main jobs of a bank?","<b>Keep money safe</b> (deposits) and <b>lend money</b>"],
+  ["Name THREE features of a checking account.","Any three: <b>direct deposit</b>, <b>debit card</b>, <b>writing checks</b>, <b>online/mobile banking</b>, <b>ATM access</b>, paying bills"],
+  ["How is an HYSA different from a traditional savings account, and why can online banks pay more?","HYSAs pay <b>much more interest</b> (both FDIC insured). Online banks have <b>no branches = lower costs</b>."],
+  ["Best account for each: an emergency fund · your paycheck · $6,000 you won't touch for 4 years · a trip in 6 months","<b>HYSA</b> · <b>Checking</b> · <b>CD</b> · <b>HYSA</b> (savings also OK)"]]},
+ { name:"Interest & CDs", q:[
+  ["What is a CD's maturity date?","The date the CD <b>ends</b>, when you can take your money <b>with no penalty</b>"],
+  ["Earn or pay interest? (a) money in savings (b) a credit card balance you didn't pay in full","(a) <b>Earn</b> (b) <b>Pay</b>"],
+  ["SIMPLE interest: $3,500 at 2% for 3 years. Maturity amount?","A = 3,500(1 + 0.02 × 3) = <b>$3,710</b>"],
+  ["COMPOUNDED annually: $4,000 at 3% for 2 years. Maturity amount?","Year 1: +$120 → $4,120. Year 2: +$123.60 → <b>$4,243.60</b>"],
+  ["$8,000 CD at 4.5% for 3 years, compounded annually. Maturity amount, and how much MORE than simple interest?","$8,360 → $8,736.20 → <b>$9,129.33</b>. Simple = $9,080, so <b>$49.33 more</b>."]]},
+ { name:"FDIC & Safety", q:[
+  ["What does FDIC stand for?","<b>Federal Deposit Insurance Corporation</b>"],
+  ["How much does the FDIC insure?","<b>$250,000</b> per depositor, per bank, per ownership category"],
+  ["You have $300,000 in one bank (one ownership category). How much is NOT insured, and what could you do?","<b>$50,000</b> uninsured. Move it to a <b>second bank</b>."],
+  ["Is money in an online bank's HYSA protected? What should you check?","Yes, if the bank is an <b>FDIC member</b>. Look for <b>FDIC insured</b> on the site."],
+  ["Name THREE things to bring when you open a bank account.","<b>Photo ID</b>, <b>proof of address</b>, <b>money for the first deposit</b> (often your Social Security number too)"]]},
+ { name:"Overdrafts & Fees", q:[
+  ["What is an overdraft?","Spending <b>more than you have</b> in checking, so the balance goes <b>below $0</b> (and the bank charges a fee)"],
+  ["Name TWO common bank fees other than overdraft.","Any two: <b>monthly maintenance</b>, <b>minimum balance</b>, <b>out-of-network ATM</b>, paper statement, early CD withdrawal"],
+  ["You have $48 in checking, buy something for $70, and get a $35 overdraft fee. New balance?","48 − 70 = –22. –22 − 35 = <b>–$57</b>"],
+  ["$9 monthly fee unless the balance stays at $600 or more. Lowest balances: Jan $650 · Feb $580 · Mar $600 · Apr $410. Total fees?","Feb and Apr only (Mar is exactly $600, not below) = <b>$18</b>"],
+  ["Give THREE habits that prevent overdraft fees.","Any three: <b>track your balance</b>, <b>low-balance alerts</b>, <b>keep a cushion</b>, <b>link savings / overdraft protection</b>, <b>read your statement</b>, don't write checks you can't cover"]]},
+ { name:"Debit vs. Credit", q:[
+  ["When you use a debit card, whose money are you spending?","<b>Your own</b>, from your checking account"],
+  ["Which card can build your credit history: debit or credit?","<b>Credit</b> (paid on time). Debit cards don't report to credit bureaus."],
+  ["Why can't a debit card normally spend more than you have?","The bank <b>checks your balance</b> before approving the purchase."],
+  ["When might you choose a credit card instead of debit? Give one smart reason and one rule.","Reason: <b>building credit</b>, <b>fraud protection</b>, travel/online, big purchases. Rule: <b>pay it in full, on time</b>."],
+  ["Debit, credit or both? (a) uses money you already have (b) can build credit (c) can charge interest if you don't pay on time (d) can get cash at an ATM","(a) <b>Debit</b> (b) <b>Credit</b> (c) <b>Credit</b> (d) <b>Both</b> (credit = a costly cash advance)"]]},
+ { name:"Read the Statement", q:[
+  ["Withdrawals make the balance go ____. Deposits make it go ____.","<b>Down</b> · <b>up</b>"],
+  ["What does \"POS DEB Purchase\" mean on a bank statement?","A <b>debit card purchase at a store</b> (point of sale)"],
+  ["Balance $412.06. Next row: Payroll Deposit $588.30. New balance?","<b>$1,000.36</b>"],
+  ["Payroll Deposits of $731.45 show up on 3/6 and 3/20. How much are you paid, and how often?","<b>$731.45 every 2 weeks</b>"],
+  ["Balance $96.18. Then: Check No. 233 for $140, an overdraft fee of $35, and an $8 maintenance fee. Ending balance, and which row caused the overdraft?","–$43.82 → –$78.82 → <b>–$86.82</b>. The <b>check for $140</b> caused it."]]}
+];
+const VALUES=[100,200,300,400,500];
+const FINAL={cat:"Final Round: Grow It", q:"You put $5,000 in a 3-year CD at 4%, compounded annually. What is the balance at maturity, and how much more is that than simple interest would pay?", a:"$5,200 → $5,408 → <b>$5,624.32</b>. Simple: 5,000(1 + 0.04 × 3) = $5,600, so compounding pays <b>$24.32 more</b>."};
+const KEY="bank-showdown-v1";
+let S;
+function fresh(n){ const dd=[Math.floor(Math.random()*6), 2+Math.floor(Math.random()*3)];
+  return {teams:Array.from({length:n},(_,i)=>({name:"Team "+(i+1),score:0})), used:{}, dd, finalDone:false}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s && s.teams) return s; }catch(e){} return null; }
+const $=id=>document.getElementById(id);
+const escA=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+
+function renderBoard(){
+  const b=$("board"); b.innerHTML="";
+  CATS.forEach(c=>{ const d=document.createElement("div"); d.className="cat"; d.textContent=c.name; b.appendChild(d); });
+  VALUES.forEach((v,r)=>CATS.forEach((c,ci)=>{
+    const t=document.createElement("button"); t.className="tile"; const k=ci+"-"+r;
+    if(S.used[k]){ t.disabled=true; t.textContent="Done"; t.setAttribute("aria-label",c.name+" "+v+", done"); }
+    else { t.textContent=v; t.setAttribute("aria-label",c.name+" for "+v); t.onclick=()=>openQ(ci,r); }
+    b.appendChild(t); }));
+}
+function renderTeams(){
+  const w=$("teams"); w.innerHTML="";
+  S.teams.forEach((t,i)=>{
+    const d=document.createElement("div"); d.className="team";
+    d.innerHTML=`<input id="team-name-${i}" aria-label="Team ${i+1} name" value="${escA(t.name)}">
+      <div class="score ${t.score<0?'neg':''}">${t.score}</div>
+      <div class="adj"><button data-d="-100" aria-label="Subtract 100 from ${escA(t.name)}">−100</button><button data-d="100" aria-label="Add 100 to ${escA(t.name)}">+100</button></div>`;
+    d.querySelector("input").oninput=e=>{ t.name=e.target.value||("Team "+(i+1)); save(); };
+    d.querySelectorAll(".adj button").forEach(btn=>btn.onclick=()=>{ t.score+=+btn.dataset.d; save(); renderTeams(); });
+    w.appendChild(d); });
+}
+function close(){ $("overlay").hidden=true; renderBoard(); renderTeams(); }
+function openQ(ci,r){
+  const c=CATS[ci], [q,a]=c.q[r], isDD=(S.dd[0]===ci && S.dd[1]===r), val=VALUES[r]*(isDD?2:1), k=ci+"-"+r;
+  const card=$("card");
+  card.innerHTML=`<div class="meta"><span>${c.name}</span><span>${isDD?'<span class="dd">Double Points!</span> ':''}${val} points</span></div>
+    <p class="question" id="qText">${q}</p>
+    <div class="answer" id="ans" hidden>${a}</div>
+    <div class="award" id="award" hidden><span class="lbl">Who got it?</span>
+      ${S.teams.map((t,i)=>`<span class="row"><button class="btn ok" data-i="${i}" data-s="1">✓ ${escA(t.name)}</button><button class="btn no" data-i="${i}" data-s="-1" aria-label="${escA(t.name)} wrong, minus ${val}">✗</button></span>`).join("")}</div>
+    <div class="actions"><button class="btn primary" id="reveal">Reveal answer</button><button class="btn" id="done">Nobody / Close</button></div>`;
+  $("overlay").hidden=false; $("reveal").focus();
+  S.used[k]=true; save();
+  $("reveal").onclick=()=>{ $("ans").hidden=false; $("award").hidden=false; $("reveal").hidden=true; };
+  $("done").onclick=close;
+  card.querySelectorAll("#award button").forEach(btn=>btn.onclick=()=>{
+    S.teams[+btn.dataset.i].score += val*(+btn.dataset.s); save();
+    if(+btn.dataset.s>0) close(); else { btn.disabled=true; renderTeams(); } });
+}
+function openFinal(){
+  const card=$("card");
+  card.innerHTML=`<div class="meta"><span>${FINAL.cat}</span><span>Wager up to your score</span></div>
+    <p class="question" id="qText">Each team: write down your wager before you see the question.</p>
+    <div class="wager">${S.teams.map((t,i)=>`<label for="wager-${i}">${escA(t.name)}<input id="wager-${i}" type="number" min="0" step="100" value="0"></label>`).join("")}</div>
+    <div class="actions"><button class="btn primary" id="showQ">Lock wagers and show question</button><button class="btn" id="done">Close</button></div>`;
+  $("overlay").hidden=false; $("done").onclick=close;
+  $("showQ").onclick=()=>{
+    const w=S.teams.map((t,i)=>Math.max(0, Math.min(Math.max(t.score,0), Math.round(+$("wager-"+i).value||0))));
+    card.innerHTML=`<div class="meta"><span>${FINAL.cat}</span><span>Wagers locked</span></div>
+      <p class="question" id="qText">${FINAL.q}</p>
+      <div class="answer" id="ans" hidden>${FINAL.a}</div>
+      <div class="award" id="award" hidden><span class="lbl">Mark each team:</span>
+        ${S.teams.map((t,i)=>`<span class="row" id="fr-${i}"><button class="btn ok" data-i="${i}" data-s="1">✓ ${escA(t.name)} (+${w[i]})</button><button class="btn no" data-i="${i}" data-s="-1" aria-label="${escA(t.name)} wrong, minus ${w[i]}">✗</button></span>`).join("")}</div>
+      <div class="actions"><button class="btn primary" id="reveal">Reveal answer</button><button class="btn" id="done">Finish</button></div>`;
+    $("reveal").onclick=()=>{ $("ans").hidden=false; $("award").hidden=false; $("reveal").hidden=true; };
+    $("done").onclick=close;
+    card.querySelectorAll("#award button").forEach(btn=>btn.onclick=()=>{
+      const i=+btn.dataset.i; S.teams[i].score += w[i]*(+btn.dataset.s); save(); renderTeams();
+      $("fr-"+i).querySelectorAll("button").forEach(b=>b.disabled=true); });
+  };
+}
+$("finalBtn").onclick=openFinal;
+$("resetBtn").onclick=()=>{ const b=$("resetBtn");
+  if(b.dataset.confirm){ S=fresh(+$("teamCount").value); save(); renderBoard(); renderTeams(); b.textContent="New game"; delete b.dataset.confirm; }
+  else { b.dataset.confirm=1; b.textContent="Click again to clear scores"; setTimeout(()=>{ b.textContent="New game"; delete b.dataset.confirm; },3000); } };
+$("teamCount").onchange=e=>{ const n=+e.target.value;
+  while(S.teams.length<n) S.teams.push({name:"Team "+(S.teams.length+1),score:0});
+  S.teams.length=n; save(); renderTeams(); };
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("overlay").hidden) close(); });
+$("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") close(); });
+
+function start(d){ S=(d&&d.S)||load()||fresh(4); $("teamCount").value=S.teams.length; renderBoard(); renderTeams(); }
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

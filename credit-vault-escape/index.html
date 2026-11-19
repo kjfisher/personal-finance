@@ -1,0 +1,174 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Credit Vault Escape</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a vault door. Top bar = team name, timer, code digits earned. Below, six lock cards in a grid; each opens into its puzzle. Final keypad appears when all six are open. */
+:root {
+  --bg:#E9EDF2; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#C6CFDC;
+  --steel:#1E2B45; --steel-ink:#E8EDF5; --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800; --bad:#C23B3B;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0B1220; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --steel:#22345C; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0B1220; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --steel:#22345C; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
+.wrap { max-width:1200px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+.bar { background:var(--steel); color:var(--steel-ink); border-radius:16px; padding:16px 20px; display:flex; flex-wrap:wrap; gap:14px 24px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3.6vw, 42px); margin:0; line-height:1; }
+.bar .tag { font-size:14px; letter-spacing:.08em; text-transform:uppercase; opacity:.75; margin-top:4px; }
+.stat { display:grid; gap:2px; }
+.stat .k { font-size:12px; letter-spacing:.1em; text-transform:uppercase; opacity:.7; }
+.stat .v { font-family:var(--mono); font-weight:600; font-size:clamp(22px, 2.6vw, 30px); font-variant-numeric:tabular-nums; }
+.digits { display:flex; gap:6px; }
+.digits span { width:34px; height:44px; border-radius:6px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:600; font-size:24px; }
+.digits span.got { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.team input { font:inherit; background:transparent; color:var(--steel-ink); border:none; border-bottom:1px dashed rgba(255,255,255,.4); font-size:18px; font-weight:700; width:170px; padding:2px 0; }
+.intro { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 20px; font-size:clamp(17px, 1.6vw, 20px); line-height:1.45; }
+.locks { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px; }
+.lock { background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:16px; display:grid; gap:10px; align-content:start; min-width:0; }
+.lock.open { border-color:var(--accent); }
+.lock .lh { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.lock .num { font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
+.lock h2 { font-family:var(--display); font-weight:800; font-size:clamp(20px, 2vw, 26px); margin:0; line-height:1.1; }
+.badge { font-family:var(--mono); font-weight:600; font-size:14px; padding:3px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
+.lock.open .badge { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.lock p { margin:0; line-height:1.4; }
+.field { display:grid; gap:4px; }
+.field label { font-weight:700; font-size:15px; }
+input.ans, select.ans { font:inherit; font-family:var(--mono); padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); width:100%; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { font:inherit; padding:6px 12px; border-radius:999px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; font-size:15px; }
+.chip[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:var(--bg); }
+.sortrow { display:grid; grid-template-columns:minmax(0,1fr) 130px; gap:8px; align-items:center; font-size:15px; }
+.mini { width:100%; border-collapse:collapse; font-size:13px; }
+.mini th, .mini td { border:1px solid var(--line); padding:4px 6px; text-align:left; }
+.mini td.m { font-family:var(--mono); }
+.scroll { overflow-x:auto; }
+.acts { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.btn { font:inherit; padding:9px 14px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, .chip:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.msg { font-weight:700; font-size:15px; }
+.msg.no { color:var(--bad); } .msg.yes { color:var(--accent); }
+.hint { font-size:15px; color:var(--muted); border-left:3px solid var(--gold); padding-left:10px; }
+.shake { animation:shake .35s; }
+@keyframes shake { 25%{transform:translateX(-6px)} 50%{transform:translateX(6px)} 75%{transform:translateX(-4px)} }
+.final { background:var(--steel); color:var(--steel-ink); border-radius:16px; padding:20px; display:grid; gap:12px; justify-items:center; text-align:center; }
+.final h2 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3.4vw, 40px); margin:0; }
+.final input { font-family:var(--mono); font-size:clamp(28px, 4vw, 44px); letter-spacing:.35em; text-align:center; width:min(360px, 100%); padding:10px; border-radius:10px; border:2px solid var(--gold); background:rgba(0,0,0,.25); color:var(--steel-ink); }
+.won { font-size:clamp(18px, 2vw, 24px); line-height:1.5; }
+.won .big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 6vw, 72px); color:var(--gold); }
+@media (prefers-reduced-motion: reduce) { .shake { animation:none; } }
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <div><h1>Credit Vault Escape</h1><div class="tag">Personal Finance - Unit 4 Review</div></div>
+    <div class="stat team"><span class="k">Team</span><input id="teamName" aria-label="Team name" placeholder="Team name"></div>
+    <div class="stat"><span class="k">Time</span><span class="v" id="clock">0:00</span></div>
+    <div class="stat"><span class="k">Vault code</span><div class="digits" id="digits"></div></div>
+  </div>
+  <div class="intro" id="intro"><b>Your first apartment application is locked in the Credit Vault.</b> Crack all 6 locks, in any order. Each lock gives you one digit of the vault code. Each hint adds 1 minute to your time. The fastest team to escape wins.</div>
+  <div class="locks" id="locks"></div>
+  <div id="finalBox"></div>
+</div>
+
+<script>
+const N=s=>String(s).toLowerCase().replace(/[\s$,%]/g,"");
+const LOCKS=[
+ {id:"range", title:"The Range", digit:4, hint:"The scale starts at 300.",
+  body:`<p>A FICO score can't go higher than this number.</p>
+    <div class="field"><label for="range-a">Highest possible FICO score</label><input class="ans" id="range-a" inputmode="numeric" autocomplete="off"></div>`,
+  check:()=>N(v("range-a"))==="850"},
+ {id:"bureau", title:"The Bureaus", digit:7, hint:"Credit Karma and FICO are not bureaus. Neither is the IRS.",
+  body:`<p>Select the <b>3 credit bureaus</b>. Select only 3.</p>
+    <div class="chips" id="bureau-chips">${["Experian","Credit Karma","TransUnion","FICO","Equifax","Bankrate","IRS","FDIC"].map(x=>`<button class="chip" aria-pressed="false" data-v="${x}">${x}</button>`).join("")}</div>`,
+  check:()=>{ const s=[...document.querySelectorAll('#bureau-chips .chip[aria-pressed="true"]')].map(c=>c.dataset.v).sort().join("|"); return s==="Equifax|Experian|TransUnion"; }},
+ {id:"pie", title:"The FICO Pie", digit:2, hint:"The two biggest slices add up to 65%. Two categories tie at 10%.",
+  body:`<p>Match each category to its percent.</p>${[["pie-ph","Payment history"],["pie-ao","Amounts owed"],["pie-lh","Length of history"],["pie-nc","New credit"],["pie-cm","Credit mix"]].map(([id,l])=>`<div class="sortrow"><label for="${id}">${l}</label><select class="ans" id="${id}"><option value="">—</option><option>10%</option><option>15%</option><option>30%</option><option>35%</option></select></div>`).join("")}`,
+  check:()=>v("pie-ph")==="35%"&&v("pie-ao")==="30%"&&v("pie-lh")==="15%"&&v("pie-nc")==="10%"&&v("pie-cm")==="10%"},
+ {id:"util", title:"Utilization", digit:9, hint:"Utilization = balance ÷ limit × 100. For the max balance, multiply the limit by 0.30.",
+  body:`<p>Jaylen has a <b>$2,400 limit</b> and owes <b>$720</b>.</p>
+    <div class="field"><label for="util-a">Jaylen's utilization (%)</label><input class="ans" id="util-a" inputmode="decimal" autocomplete="off"></div>
+    <div class="field"><label for="util-b">Most you should owe on a $1,900 limit to stay at 30% ($)</label><input class="ans" id="util-b" inputmode="decimal" autocomplete="off"></div>`,
+  check:()=>["30","30.0"].includes(N(v("util-a")))&&["570","570.00"].includes(N(v("util-b")))},
+ {id:"report", title:"Read the Report", digit:1, hint:"Look for the biggest number in the payment history columns. Inquiries are listed under the table.",
+  body:`<div class="scroll"><table class="mini"><thead><tr><th>Account</th><th>Balance</th><th>Limit</th><th>Last 6 months</th></tr></thead><tbody>
+    <tr><td>Visa</td><td class="m">$200</td><td class="m">$2,000</td><td class="m">OK OK OK OK OK OK</td></tr>
+    <tr><td>Store card</td><td class="m">$640</td><td class="m">$800</td><td class="m">OK 30 60 OK OK OK</td></tr>
+    <tr><td>Auto loan</td><td class="m">$7,300</td><td class="m">—</td><td class="m">OK OK OK OK OK OK</td></tr></tbody></table></div>
+    <p style="font-size:15px">Hard inquiries in the last 12 months: Visa (Mar), Store card (Jun)</p>
+    <div class="field"><label for="rep-a">Worst late payment on the report (days)</label><input class="ans" id="rep-a" inputmode="numeric" autocomplete="off"></div>
+    <div class="field"><label for="rep-b">Number of hard inquiries</label><input class="ans" id="rep-b" inputmode="numeric" autocomplete="off"></div>
+    <div class="field"><label for="rep-c">Which account should be paid down first?</label><select class="ans" id="rep-c"><option value="">—</option><option>Visa</option><option>Store card</option><option>Auto loan</option></select></div>`,
+  check:()=>N(v("rep-a"))==="60"&&N(v("rep-b"))==="2"&&v("rep-c")==="Store card"},
+ {id:"sort", title:"Help, Hurt, or No Effect", digit:6, hint:"Only one of these helps. Two have no effect at all.",
+  body:`<p>Sort each action.</p>${[["s1","Applying for 3 cards in one month"],["s2","Checking your own credit score"],["s3","Paying every bill on time"],["s4","Closing your oldest card"],["s5","Using a debit card"],["s6","Maxing out your card"]].map(([id,l])=>`<div class="sortrow"><label for="${id}">${l}</label><select class="ans" id="${id}"><option value="">—</option><option>Help</option><option>Hurt</option><option>No effect</option></select></div>`).join("")}`,
+  check:()=>v("s1")==="Hurt"&&v("s2")==="No effect"&&v("s3")==="Help"&&v("s4")==="Hurt"&&v("s5")==="No effect"&&v("s6")==="Hurt"}
+];
+const CODE=LOCKS.map(l=>l.digit).join("");
+const $=id=>document.getElementById(id);
+const v=id=>($(id)?.value||"").trim();
+let G, timer=null;
+function fresh(){ return {start:null, open:{}, hints:{}, tries:0, escaped:null, team:""}; }
+function elapsed(){ if(!G.start) return 0; const end=G.escaped||Date.now(); return Math.floor((end-G.start)/1000)+Object.keys(G.hints).length*60; }
+function fmt(s){ return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function tickClock(){ $("clock").textContent=fmt(elapsed()); }
+function renderDigits(){ $("digits").innerHTML=LOCKS.map(l=>`<span class="${G.open[l.id]?'got':''}">${G.open[l.id]?l.digit:"•"}</span>`).join(""); }
+function renderLocks(){
+  $("locks").innerHTML=LOCKS.map((l,i)=>{ const o=G.open[l.id];
+    return `<section class="lock ${o?'open':''}" id="lock-${l.id}" aria-labelledby="t-${l.id}">
+      <div class="lh"><span class="num">Lock ${i+1}</span><span class="badge">${o?"Open: digit "+l.digit:"Locked"}</span></div>
+      <h2 id="t-${l.id}">${l.title}</h2>
+      ${o?`<p class="msg yes">Unlocked! Your digit for lock ${i+1} is ${l.digit}.</p>`:`${l.body}
+      ${G.hints[l.id]?`<div class="hint">${l.hint}</div>`:""}
+      <div class="acts"><button class="btn primary" data-try="${l.id}">Try to unlock</button>${G.hints[l.id]?"":`<button class="btn" data-hint="${l.id}">Hint (+1 min)</button>`}<span class="msg no" id="msg-${l.id}" aria-live="polite"></span></div>`}
+    </section>`; }).join("");
+  document.querySelectorAll("#bureau-chips .chip").forEach(c=>c.onclick=()=>c.setAttribute("aria-pressed", c.getAttribute("aria-pressed")==="true"?"false":"true"));
+  document.querySelectorAll("[data-try]").forEach(b=>b.onclick=()=>tryLock(b.dataset.try));
+  document.querySelectorAll("[data-hint]").forEach(b=>b.onclick=()=>{ begin(); G.hints[b.dataset.hint]=true; keepInputs(()=>renderLocks()); tickClock(); });
+  document.querySelectorAll(".lock input, .lock select, .lock .chip").forEach(el=>el.addEventListener("focus",begin,{once:true}));
+  renderFinal();
+}
+function keepInputs(fn){ const vals={}, chips=[...document.querySelectorAll('#bureau-chips .chip[aria-pressed="true"]')].map(c=>c.dataset.v);
+  document.querySelectorAll(".lock .ans").forEach(el=>vals[el.id]=el.value); fn();
+  Object.entries(vals).forEach(([id,val])=>{ if($(id)) $(id).value=val; });
+  document.querySelectorAll('#bureau-chips .chip').forEach(c=>{ if(chips.includes(c.dataset.v)) c.setAttribute("aria-pressed","true"); }); }
+function begin(){ if(!G.start){ G.start=Date.now(); timer=setInterval(tickClock,1000); } }
+function tryLock(id){ begin(); G.tries++; const l=LOCKS.find(x=>x.id===id);
+  if(l.check()){ G.open[id]=true; keepInputs(()=>renderLocks()); renderDigits(); $("lock-"+id)?.scrollIntoView({block:"nearest"}); }
+  else { const m=$("msg-"+id); m.textContent="Still locked. Check your answers."; const box=$("lock-"+id); box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); } }
+function renderFinal(){
+  const all=LOCKS.every(l=>G.open[l.id]), f=$("finalBox");
+  if(G.escaped){ clearInterval(timer);
+    f.innerHTML=`<div class="final"><h2>The vault is open!</h2><div class="won"><div>${G.team?`<b>${G.team.replace(/</g,"&lt;")}</b> escaped in`:"You escaped in"}</div><div class="big">${fmt(elapsed())}</div>
+      <div>${Object.keys(G.hints).length} hint${Object.keys(G.hints).length===1?"":"s"} used (included in your time). Your apartment application is approved!</div>
+      <div style="opacity:.8;font-size:16px;margin-top:6px">Show this screen to your teacher.</div></div>
+      <button class="btn" id="again">Play again</button></div>`;
+    $("again").onclick=reset; return; }
+  if(!all){ f.innerHTML=""; return; }
+  f.innerHTML=`<div class="final"><h2>Enter the 6-digit vault code</h2><p style="margin:0">Use your digits in lock order: Lock 1 first, Lock 6 last.</p>
+    <input id="codeIn" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Vault code">
+    <div class="acts"><button class="btn primary" id="openVault">Open the vault</button><span class="msg" id="codeMsg" aria-live="polite" style="color:var(--gold)"></span></div></div>`;
+  $("openVault").onclick=()=>{ if(N(v("codeIn"))===CODE){ G.escaped=Date.now(); renderFinal(); tickClock(); } else { $("codeMsg").textContent="Wrong code. Check the order of your digits."; } };
+  $("codeIn").addEventListener("keydown",e=>{ if(e.key==="Enter") $("openVault").click(); });
+}
+function reset(){ clearInterval(timer); timer=null; G=fresh(); $("teamName").value=""; tickClock(); renderDigits(); renderLocks(); window.scrollTo(0,0); }
+$("teamName").oninput=e=>{ G.team=e.target.value; };
+function start(d){ G=(d&&d.G)||fresh(); $("teamName").value=G.team||""; tickClock(); renderDigits(); renderLocks();
+  if(G.start && !G.escaped){ timer=setInterval(tickClock,1000); } }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

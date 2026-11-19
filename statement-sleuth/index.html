@@ -1,0 +1,266 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Statement Sleuth</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: question card on the left, a one-month checking statement on the right (Date · Description · Withdrawals · Deposits · Balance, like the quiz). Rows become tappable for "find it" questions. Stacks below 900px. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --paper:#FFFFFF; --paper-line:#D9DFE8; --band:#E6F0EC; --q:#2F5FB8; --neg:#C23B3B;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --paper:#18233F; --paper-line:#2E3C62; --band:#1B3330; --q:#7FA6F5; --neg:#F07070; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --paper:#18233F; --paper-line:#2E3C62; --band:#1B3330; --q:#7FA6F5; --neg:#F07070; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1240px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; align-items:center; }
+.bar .stats b { color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); padding:8px 14px; }
+.wrap { max-width:1240px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, .8fr) minmax(0, 1.3fr); gap:20px; align-items:start; }
+@media (max-width:900px) { .game { grid-template-columns:1fr; } }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; grid-column:1/-1; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+.work { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 28px); display:grid; gap:14px; min-width:0; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.prompt { font-family:var(--display); font-weight:600; font-size:clamp(22px, 2.6vw, 29px); line-height:1.2; margin:0; text-wrap:balance; }
+.hint { font-family:var(--mono); font-size:15px; background:var(--bg); border-radius:10px; padding:10px 12px; line-height:1.5; }
+.answer-row { display:flex; gap:10px; flex-wrap:wrap; }
+.money { flex:1 1 180px; display:flex; align-items:center; border:2px solid var(--line); border-radius:12px; background:var(--bg); padding:0 12px; min-width:0; }
+.money:focus-within { border-color:var(--gold); }
+.money span { font-family:var(--mono); font-size:22px; color:var(--muted); }
+.money input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:24px; padding:12px 8px; outline:none; }
+.opts { display:grid; gap:8px; }
+.opt { font:inherit; font-weight:700; text-align:left; padding:12px 14px; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; line-height:1.3; }
+.opt.right { border-color:var(--ok); background:var(--ok-soft); } .opt.wrong { border-color:var(--bad); background:var(--bad-soft); }
+.opt:disabled { cursor:default; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn:focus-visible, input:focus-visible, .opt:focus-visible, tr[tabindex]:focus-visible { outline:3px solid var(--gold); outline-offset:-3px; }
+.fb { border-radius:12px; padding:12px 14px; line-height:1.45; }
+.fb.ok { background:var(--ok-soft); } .fb.no { background:var(--bad-soft); }
+.fb b { font-family:var(--display); }
+.tip { color:var(--muted); font-size:15px; margin:0; }
+/* statement */
+.stmt { background:var(--paper); border:1px solid var(--paper-line); border-radius:10px; overflow:hidden; min-width:0; box-shadow:0 8px 22px rgba(20,33,61,.08); }
+.stmt .top { padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 16px; border-bottom:2px solid var(--ink); }
+.stmt .bank { font-family:var(--display); font-weight:800; font-size:19px; }
+.stmt .meta { font-size:14px; display:grid; gap:2px; }
+.stmt .scroll { overflow-x:auto; }
+.stmt table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; min-width:560px; font-size:14px; }
+.stmt th { text-align:right; font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:8px 10px 6px; font-weight:600; background:var(--band); }
+.stmt th:nth-child(1), .stmt th:nth-child(2) { text-align:left; }
+.stmt td { padding:6px 10px; border-top:1px solid var(--paper-line); font-family:var(--mono); text-align:right; white-space:nowrap; }
+.stmt td:nth-child(2) { font-family:var(--body); text-align:left; white-space:normal; }
+.stmt td:nth-child(1) { text-align:left; color:var(--muted); }
+.stmt tr.tot td { font-weight:700; border-top:2px solid var(--ink); }
+.stmt .neg { color:var(--neg); font-weight:700; }
+.stmt .qm { color:var(--q); font-weight:700; }
+.stmt .found { color:var(--ok); font-weight:700; }
+.stmt.tapping tr[data-r] { cursor:pointer; }
+.stmt.tapping tr[data-r]:hover td { background:rgba(224,168,0,.14); }
+.stmt tr.hit td { background:var(--ok-soft); } .stmt tr.miss td { background:var(--bad-soft); }
+.stmt tr.ask td { background:rgba(47,95,184,.10); }
+/* start/end */
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.codes { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:6px 20px; font-size:15px; line-height:1.45; }
+.codes b { font-family:var(--mono); }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 68px); line-height:1; color:var(--ok); }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+.row { display:flex; flex-wrap:wrap; gap:10px; }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Statement <span>Sleuth</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const HOLDERS=[["Jamie Ortiz","2210 Elm Ct. Apt 4"],["Riley Thompson","88 Birch Ln."],["Sam Okafor","514 Lake St. Apt 12"],["Taylor Nguyen","1301 Oak Ridge Dr."],["Morgan Ellis","47 Willow Way"],["Casey Rivera","902 Prairie Ave. Apt 3B"]];
+const JOBS=["PIZZA PALACE","CINEMA 12","GROCERY MART","FITNESS CLUB","PET SUPPLY CO","SUMMIT HOTEL"];
+const POS=[["SUPERMARKET",18,74],["GAS STATION",22,58],["COFFEE SHOP",4,11],["ONLINE STORE",15,65],["PHARMACY",7,32],["FAST FOOD",6,19],["SHOE STORE",45,95],["BOOKSTORE",9,28]];
+const BILLS=[["PHONE CO.",45,85],["STREAMING SVC",11,23],["CAR INSURANCE",88,165],["GYM MEMBERSHIP",20,40],["ENERGY CO.",30,72]];
+const SKILL={bal:"Running balance", read:"Reading deposits", od:"Overdrafts", fee:"Bank fees", habit:"Smart habits"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>(x<0?"–":"")+"$"+Math.abs(x).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const cents=(a,b)=>r2(rnd(a*100,b*100)/100);
+const pick=a=>a[rnd(0,a.length-1)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const num=s=>{ s=String(s).replace(/[$,\s]/g,"").replace(/[–—]/g,"-"); return s===""||isNaN(s)?NaN:+s; };
+const pad=n=>String(n).padStart(2,"0");
+
+function mkStatement(o){
+  for(let tries=0;tries<400;tries++){
+    const m=rnd(2,10), d0=rnd(3,8), weekly=Math.random()<.35, pay=weekly?cents(260,480):cents(540,980), job=pick(JOBS);
+    const date=k=>{ const dt=new Date(Date.UTC(2026,m-1,d0+k)); return pad(dt.getUTCMonth()+1)+"/"+pad(dt.getUTCDate()); };
+    const ev=[]; let ref=rnd(1100,9800); const R=()=>String((ref+=rnd(37,911))%9000+1000);
+    const off=weekly?rnd(1,5):rnd(2,9); (weekly?[0,7,14,21]:[0,14]).forEach(x=>ev.push({k:off+x, kind:"pay", desc:"Payroll Deposit – "+job, d:pay}));
+    shuffle(POS).slice(0,rnd(5,7)).forEach(p=>ev.push({k:rnd(1,27), kind:"pos", desc:"POS DEB Purchase – "+p[0], ref:R(), w:cents(p[1],p[2])}));
+    shuffle(BILLS).slice(0,rnd(2,3)).forEach(b=>ev.push({k:rnd(2,26), kind:"bill", desc:"Online Bill Payment – "+b[0], ref:R(), w:cents(b[1],b[2])}));
+    const atmK=rnd(3,24); ev.push({k:atmK, kind:"atm", desc:o.atmFee?"ATM Withdrawal – OTHER BANK":"ATM Withdrawal – PRAIRIE FED", ref:R(), w:pick([20,40,60,80,100])});
+    if(o.atmFee) ev.push({k:atmK, kind:"atmfee", desc:"Fees – OUT-OF-NETWORK ATM", w:pick([2.50,3.00,3.50]), ord:1});
+    if(Math.random()<.5) ev.push({k:rnd(5,24), kind:"xfer", desc:"Online Funds Transfer – From SAVINGS", ref:R(), d:pick([25,40,50,75])});
+    ev.push({k:rnd(4,22), kind:"check", desc:"Check No. "+rnd(201,248), w:pick([45,60,75,120,150,200])});
+    if(o.refund){ const p=ev.find(e=>e.kind==="pos"&&e.k<20); if(p) ev.push({k:p.k+rnd(2,6), kind:"refund", desc:p.desc.replace("Purchase","Refund"), ref:p.ref, d:p.w}); }
+    ev.sort((a,b)=>a.k-b.k||(a.ord||0)-(b.ord||0));
+    let bal=cents(20,260); const rows=[{kind:"prev", date:date(0), desc:"Previous Balance", bal}];
+    let ok=true;
+    for(const e of ev){ if(e.k>27) continue; bal=r2(bal-(e.w||0)+(e.d||0)); if(bal<0){ ok=false; break; } rows.push({...e, date:date(e.k), bal}); }
+    if(!ok) continue;
+    if(o.overdraft){ const amt=r2(bal+cents(25,190)), last=rows[rows.length-1]; const k=28;
+      const big=Math.random()<.5?{kind:"check", desc:"Check No. "+rnd(249,260), w:Math.round(amt)}:{kind:"bill", desc:"Online Bill Payment – RENT", ref:R(), w:Math.round(amt)};
+      bal=r2(bal-big.w); if(bal>=0) continue; rows.push({...big, date:date(k), bal, cause:true});
+      bal=r2(bal-35); rows.push({kind:"odfee", desc:"Fees – OVERDRAFT", date:date(k), w:35, bal}); }
+    const minBal=Math.min(...rows.map(r=>r.bal));
+    if(o.maint||o.overdraft){ const fee=pick([5,8,10,12]); bal=r2(bal-fee); rows.push({kind:"mfee", desc:"Fees – MONTHLY MAINTENANCE", date:date(29), w:fee, bal}); }
+    if(rows.length>20||rows.length<13) continue;
+    const h=pick(HOLDERS), startD=date(0), endD=date(30);
+    const tw=r2(rows.reduce((s,r)=>s+(r.w||0),0)), td=r2(rows.reduce((s,r)=>s+(r.d||0),0));
+    return {holder:h[0], addr:h[1], period:`${startD}/2026 – ${endD}/2026`, acct:"0007-"+rnd(100,999)+"-"+rnd(100,999)+"-"+rnd(1,9), rows, tw, td, weekly, pay, minBal};
+  }
+  return null;
+}
+const fees=S=>r2(S.rows.filter(r=>/fee/.test(r.kind)).reduce((s,r)=>s+r.w,0));
+const payMC=S=>{ const other=S.weekly?"2 weeks":"week"; const bigW=Math.max(...S.rows.filter(r=>r.w).map(r=>r.w));
+  return {mc:true, sk:"read", q:"Look at the Deposits column. How much is this person paid, and how often?", opts:[`${fmt(S.pay)} every ${S.weekly?"week":"2 weeks"}`, `${fmt(S.pay)} every month`, `${fmt(S.pay)} every ${other}`, `${fmt(bigW)} every 2 weeks`],
+    why:`The "Payroll Deposit" rows are ${fmt(S.pay)}, and they come ${S.weekly?"7 days apart (weekly)":"14 days apart (every 2 weeks)"}.`}; };
+function balQ(S){ const idx=shuffle(S.rows.map((r,i)=>i).filter(i=>i>=3&&i<=S.rows.length-3&&S.rows[i].kind!=="atmfee"))[0], r=S.rows[idx], prev=S.rows[idx-1].bal;
+  const amt=r.w||r.d, sign=r.w?"−":"+";
+  return {q:`Fill in the missing balance after "${r.desc}" on ${r.date}.`, sk:"bal", hint:`Balance before ${fmt(prev)} ${sign} ${fmt(amt)}`, a:r.bal, hideRow:idx,
+    miss:[[r.w?prev+r.w:prev-r.d, r.w?"A withdrawal makes the balance go DOWN. Subtract it.":"A deposit makes the balance go UP. Add it."],[prev,"Use the balance from the row above, then apply this row's amount."]]}; }
+const AVOID={mc:true, sk:"habit", q:"What is the BEST way to avoid this overdraft fee next time?", opts:["Check the balance first and move money from savings if needed","Write the check anyway and hope it clears late","Use more ATMs from other banks","Stop reading the bank statement"],
+  why:"Track your balance, set low-balance alerts, and move money from savings before a big payment."};
+function caseRead(){ const S=mkStatement({refund:Math.random()<.5, maint:Math.random()<.5}); const Q=[balQ(S), payMC(S)];
+  const f=fees(S); if(f>0) Q.push({sk:"fee", q:"How much did this person pay in bank fees this month?", hint:"Add every row that starts with \"Fees –\".", a:f, miss:[]});
+  else Q.push({sk:"read", q:"How much money came in from paychecks on this statement?", hint:"Add the Payroll Deposit rows only.", a:r2(S.pay*S.rows.filter(r=>r.kind==="pay").length), miss:[[S.td,"That includes transfers and refunds. Only add the paychecks."],[S.pay,"Add ALL the payroll deposits."]]});
+  return {S, Q, kind:"Statement"}; }
+function caseOD(){ const S=mkStatement({overdraft:true, atmFee:Math.random()<.5}); const cause=S.rows.findIndex(r=>r.cause), od=S.rows.findIndex(r=>r.kind==="odfee");
+  const f=fees(S);
+  return {S, kind:"Statement · overdraft", Q:[
+    {tap:true, sk:"od", q:"The balance went below $0. Tap the transaction that CAUSED it.", accept:[cause], why:`${S.rows[cause].desc} for ${fmt(S.rows[cause].w)} was more than the ${fmt(S.rows[cause-1].bal)} in the account. The $35 overdraft fee came after, as the penalty.`},
+    {sk:"fee", q:"How much did this person pay in bank fees this month?", hint:"Add every row that starts with \"Fees –\".", a:f, miss:[[35,"Overdraft is one fee. Look for others, like ATM or maintenance fees."],[f-35,"Include the overdraft fee too."]]},
+    AVOID]}; }
+function caseATM(){ const S=mkStatement({atmFee:true, refund:true, maint:Math.random()<.4}); const af=S.rows.findIndex(r=>r.kind==="atmfee"), rf=S.rows.findIndex(r=>r.kind==="refund");
+  const Q=[{tap:true, sk:"fee", q:"Tap the fee this person could have avoided by using their OWN bank's ATM.", accept:[af], why:`Out-of-network ATMs charge a fee (${fmt(S.rows[af].w)} here). Use your own bank's ATMs.`}, balQ(S)];
+  if(rf>0) Q.push({mc:true, sk:"read", q:`Why did the balance go UP on ${S.rows[rf].date}?`, opts:["A store gave money back for a returned purchase","The bank paid a fee","A check bounced","The ATM gave extra cash"], why:`"POS DEB Refund" means money came back to the debit card from a return.`});
+  else Q.push({mc:true, sk:"read", q:"What does \"POS DEB Purchase\" mean on a statement?", opts:["A debit card purchase at a store","A paycheck deposit","A check you wrote","A bank fee"], why:"POS = point of sale. DEB = debit card."});
+  return {S, Q, kind:"Statement"}; }
+function makeGame(){ return [caseRead(), ...shuffle([caseOD(), caseATM(), caseOD(), caseRead()])]; }
+
+let G=null, best=null;
+try{ best=+localStorage.getItem("statement-sleuth-best")||null; }catch(e){}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 3: Banking</span>`; return; }
+  el.innerHTML=`<span>Statement <b>${Math.min(G.ci+1,G.cases.length)}</b>/${G.cases.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
+  $("quit")&&($("quit").onclick=intro); }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow">Unit 3 · Reading a bank statement</div>
+    <h2>Follow the money. Find the overdraft.</h2>
+    <p>Five checking-account statements, each one new. Fill in missing balances, read the deposits, find what caused an overdraft, add up the fees, and choose the smart move.</p>
+    <div class="codes"><span><b>Withdrawals</b> make the balance go down</span><span><b>Deposits</b> make the balance go up</span><span><b>POS DEB</b> = debit card purchase at a store</span><span><b>Overdraft</b> = spending more than you have; the bank charges a fee</span></div>
+    <p>Typed answers: 10 points first try, 5 second. Tap answers: one try.${best?` <b>Your best: ${best}.</b>`:""}</p>
+    <div class="row"><button class="btn go" id="go">Open the first statement</button></div></div>`;
+  $("go").onclick=()=>{ G={cases:makeGame(), ci:0, qi:0, score:0, by:{}, phase:"play", tries:0, fb:null, locked:false, shown:[]}; draw(); };
+}
+function stmt(C){
+  const S=C.S, Q=C.Q[G.qi], tapping=Q&&Q.tap&&!G.locked;
+  const rows=S.rows.map((r,i)=>{ let cls=""; if(Q&&Q.tap&&G.locked){ if(Q.accept.includes(i)) cls="hit"; else if(G.tapPick===i) cls="miss"; }
+    const hidden=Q&&Q.hideRow===i&&!G.locked && !G.shown.includes(i); if(Q&&Q.hideRow===i&&!G.locked) cls+=" ask";
+    const balCell=hidden?`<span class="qm">?</span>`:`<span class="${r.bal<0?"neg":""} ${G.shown.includes(i)?"found":""}">${fmt(r.bal)}</span>`;
+    return `<tr class="${cls}" ${r.kind!=="prev"?`data-r="${i}"`:""} ${tapping&&r.kind!=="prev"?`tabindex="0" role="button" aria-label="${esc(r.desc)}"`:""}><td>${r.date}</td><td>${esc(r.desc)}</td><td>${r.ref||""}</td><td>${r.w?fmt(r.w):""}</td><td>${r.d?fmt(r.d):""}</td><td>${balCell}</td></tr>`; }).join("");
+  return `<aside class="stmt ${tapping?"tapping":""}" aria-label="Bank statement">
+    <div class="top"><div><div class="bank">Prairie Federal Bank · Checking</div><div class="meta"><span>${esc(S.holder)} · ${esc(S.addr)}, Anytown, IL 60000</span></div></div>
+      <div class="meta"><span>Statement period: <b>${S.period}</b></span><span>Account #${S.acct}</span></div></div>
+    <div class="scroll"><table><tr><th>Date</th><th>Description</th><th>Ref</th><th>Withdrawals</th><th>Deposits</th><th>Balance</th></tr>${rows}
+      <tr class="tot"><td></td><td>Totals</td><td></td><td>${fmt(S.tw)}</td><td>${fmt(S.td)}</td><td></td></tr></table></div></aside>`;
+}
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const C=G.cases[G.ci], Q=C.Q[G.qi], nC=G.cases.length, last=G.qi+1>=C.Q.length;
+  let body="";
+  if(Q.mc){ if(!Q.order) Q.order=shuffle(Q.opts.map((_,i)=>i));
+    body=`<div class="opts">${Q.order.map(i=>{ let c="opt"; if(G.locked&&i===0) c+=" right"; else if(G.locked&&G.mcPick===i) c+=" wrong"; return `<button class="${c}" data-i="${i}" ${G.locked?"disabled":""}>${esc(Q.opts[i])}</button>`; }).join("")}</div>`; }
+  else if(Q.tap) body=G.locked?"":`<p class="tip">Tap a row on the statement.</p>`;
+  else body=`${Q.hint?`<div class="hint">${esc(Q.hint)}</div>`:""}<form id="af" class="answer-row" novalidate>
+      <label class="money" for="ans"><span>$</span><input id="ans" inputmode="decimal" autocomplete="off" aria-label="Your answer" ${G.locked?"disabled":""}></label>
+      ${G.locked?"":`<button class="btn go" type="submit">Check</button>`}</form>`;
+  const fb=G.fb?`<div class="fb ${G.fb.ok?"ok":"no"}" role="status"><b>${esc(G.fb.title)}</b> ${esc(G.fb.msg)}</div>`:"";
+  $("root").innerHTML=`<div class="game">
+    <div class="progress" aria-hidden="true"><i style="width:${(G.ci+(G.qi+(G.locked?1:0))/C.Q.length)/nC*100}%"></i></div>
+    <section class="work">
+      <div class="eyebrow">${esc(C.kind)} ${G.ci+1} · question ${G.qi+1} of ${C.Q.length}</div>
+      <p class="prompt">${esc(Q.q)}</p>
+      ${body}${fb}
+      ${G.locked?`<div><button class="btn go" id="next">${last?(G.ci+1<nC?"Next statement":"See my results"):"Next question"}</button></div>`:""}
+    </section>
+    ${stmt(C)}</div>`;
+  if(G.locked){ $("next").onclick=advance; $("next").focus({preventScroll:true}); return; }
+  if(Q.mc) document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(+b.dataset.i));
+  else if(Q.tap) document.querySelectorAll(".stmt tr[data-r]").forEach(tr=>{ tr.onclick=()=>tapRow(+tr.dataset.r); tr.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tapRow(+tr.dataset.r); } }; });
+  else { $("ans").focus({preventScroll:true}); $("af").onsubmit=e=>{ e.preventDefault(); typed($("ans").value); }; }
+}
+function tally(sk,ok){ const b=G.by[sk]||(G.by[sk]=[0,0]); b[1]++; if(ok) b[0]++; }
+function choose(i){ const Q=G.cases[G.ci].Q[G.qi]; G.mcPick=i; G.locked=true; const ok=i===0; if(ok) G.score+=10; tally(Q.sk,ok); G.fb={ok, title:ok?"+10.":"Not this one.", msg:Q.why}; draw(); }
+function tapRow(i){ const Q=G.cases[G.ci].Q[G.qi]; G.tapPick=i; G.locked=true; const ok=Q.accept.includes(i); if(ok) G.score+=10; tally(Q.sk,ok); G.fb={ok, title:ok?"Found it. +10.":"Not that row.", msg:Q.why}; draw(); }
+function typed(raw){
+  const Q=G.cases[G.ci].Q[G.qi], v=num(raw);
+  if(isNaN(v)){ G.fb={ok:false,title:"Type a number.",msg:Q.a<0?"Negative balances can start with a minus sign.":""}; return draw(); }
+  const okv=Math.abs(v-Q.a)<=.015 || (Q.a<0&&Math.abs(-v-Q.a)<=.015&&false);
+  if(okv){ const pts=G.tries?5:10; G.score+=pts; tally(Q.sk,!G.tries); G.locked=true; if(Q.hideRow!=null) G.shown.push(Q.hideRow); G.fb={ok:true,title:`+${pts}.`,msg:fmt(Q.a)+" is right."}; return draw(); }
+  const hit=(Q.miss||[]).find(([x])=>Math.abs(v-r2(x))<=.02&&Math.abs(r2(x)-Q.a)>.015);
+  G.tries++;
+  if(G.tries<2){ G.fb={ok:false,title:"Not quite.",msg:(hit?hit[1]:"Check the hint.")+" Try again."}; return draw(); }
+  tally(Q.sk,false); G.locked=true; if(Q.hideRow!=null) G.shown.push(Q.hideRow); G.fb={ok:false,title:"The answer is "+fmt(Q.a)+".",msg:hit?hit[1]:(Q.hint||"")}; draw();
+}
+function advance(){ const C=G.cases[G.ci]; G.fb=null; G.locked=false; G.tries=0; G.mcPick=null; G.tapPick=null;
+  if(G.qi+1<C.Q.length){ G.qi++; return draw(); }
+  G.ci++; G.qi=0; G.shown=[];
+  if(G.ci>=G.cases.length){ G.phase="end"; if(!best||G.score>best){ best=G.score; try{ localStorage.setItem("statement-sleuth-best",String(best)); }catch(e){} } }
+  draw(); }
+function end(){
+  stats();
+  const max=G.cases.reduce((s,c)=>s+c.Q.length*10,0);
+  const rows=Object.keys(SKILL).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    return `<div class="skill"><b>${SKILL[k]}</b><span class="v">${a} of ${t} first try</span>${p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel"><div class="eyebrow">Statements reviewed</div>
+    <div class="big">${G.score} <span style="font-size:.45em;color:var(--muted)">/ ${max}</span></div>
+    <div class="skills">${rows}</div>
+    <p>Habits that prevent overdrafts: check your balance before you spend, set low-balance alerts, keep a cushion, and read your statement every month.</p>
+    <div class="row"><button class="btn go" id="again">New statements</button></div></div>`;
+  $("again").onclick=intro;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

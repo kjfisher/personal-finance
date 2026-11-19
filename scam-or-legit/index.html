@@ -1,0 +1,170 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Scam or Legit?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one iPad flat on the desk between two partners. Screen splits in half; the top half is rotated 180° so the partner across the desk reads it right side up. Same question on both halves; first correct tap scores. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --p1:#0F8B6C; --p1-soft:#DDF1EA; --p2:#C2412D; --p2-soft:#F9E1DC; --gold:#E0A800; --bad:#C23B3B;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --p1:#3CCB9F; --p1-soft:#123A32; --p2:#FF7A63; --p2-soft:#3E1F1A; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --p1:#3CCB9F; --p1-soft:#123A32; --p2:#FF7A63; --p2-soft:#3E1F1A; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+html, body, #root { height:100%; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); margin:0; touch-action:manipulation; -webkit-user-select:none; user-select:none; overflow:hidden; }
+.app { height:100%; display:grid; grid-template-rows:1fr auto 1fr; padding-left:max(10px, env(safe-area-inset-left, 0px)); padding-right:max(10px, env(safe-area-inset-right, 0px)); padding-block:8px; gap:8px; }
+.half { border-radius:18px; padding:clamp(10px, 2vh, 22px); display:grid; grid-template-rows:auto 1fr auto; gap:clamp(6px, 1.4vh, 14px); min-height:0; border:3px solid transparent; transition:border-color .2s, background .2s; }
+.half.p1 { background:var(--p1-soft); }
+.half.p2 { background:var(--p2-soft); transform:rotate(180deg); }
+.half.win { border-color:var(--gold); }
+.half.lock { opacity:.55; }
+.hd { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.who { font-family:var(--display); font-weight:800; font-size:clamp(18px, 2.6vh, 28px); }
+.p1 .who { color:var(--p1); } .p2 .who { color:var(--p2); }
+.pts { display:flex; gap:5px; align-items:center; }
+.pts i { width:clamp(12px, 1.8vh, 18px); height:clamp(12px, 1.8vh, 18px); border-radius:50%; border:2px solid var(--muted); display:block; }
+.p1 .pts i.on { background:var(--p1); border-color:var(--p1); } .p2 .pts i.on { background:var(--p2); border-color:var(--p2); }
+.qq { display:grid; gap:clamp(4px,1vh,10px); align-self:center; }
+.msg { background:var(--surface); border:2px solid var(--line); border-radius:16px 16px 16px 4px; padding:clamp(8px,1.4vh,14px) 14px; font-size:clamp(15px, 2.3vh, 23px); line-height:1.3; font-weight:700; }
+.q { font-family:var(--display); font-weight:600; font-size:clamp(17px, 3vh, 32px); line-height:1.2; margin:0; align-self:center; text-wrap:balance; }
+.opts { display:grid; grid-template-columns:1fr 1fr; gap:clamp(6px, 1.2vh, 12px); }
+.opt { font:inherit; font-size:clamp(15px, 2.2vh, 22px); font-weight:700; line-height:1.2; text-align:left; padding:clamp(8px, 1.6vh, 16px) 12px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; min-height:clamp(46px, 7vh, 72px); }
+.opt:active:not(:disabled) { transform:scale(.98); }
+.opt:disabled { cursor:default; }
+.opt.right { border-color:var(--p1); background:var(--p1); color:#fff; }
+.p2 .opt.right { border-color:var(--p2); background:var(--p2); }
+.opt.wrong { border-color:var(--bad); color:var(--bad); }
+.note { font-size:clamp(14px, 2vh, 19px); line-height:1.35; min-height:1.4em; }
+.note b { color:var(--gold); }
+.mid { display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap; text-align:center; }
+.mid .t { font-family:var(--display); font-weight:800; font-size:clamp(16px, 2.2vh, 22px); }
+.mid .s { color:var(--muted); font-size:14px; }
+.btn { font:inherit; font-weight:700; padding:10px 18px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.btn:focus-visible, .opt:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.setup { height:100%; overflow:auto; display:grid; place-items:center; padding:20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 32px); width:min(560px, 100%); display:grid; gap:14px; }
+.card h1 { font-family:var(--display); font-weight:800; font-size:clamp(34px, 6vw, 54px); margin:0; line-height:1; }
+.card .unit { font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+.card p { margin:0; line-height:1.45; }
+.card ol { margin:0; padding-left:20px; line-height:1.5; }
+.field { display:grid; gap:4px; font-weight:700; }
+.field input, .field select { font:inherit; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); -webkit-user-select:text; user-select:text; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:420px) { .two { grid-template-columns:1fr; } }
+.winner { font-family:var(--display); font-weight:800; font-size:clamp(26px, 4vh, 44px); text-align:center; align-self:center; }
+@media (prefers-reduced-motion: reduce) { .half { transition:none; } }
+</style>
+
+<div id="root"></div>
+
+<script>
+const BANK=[
+ ["Scam or legit?",["Scam","Legit"],"Banks never ask for your PIN or password by text. Call the number on the back of your card.","TEXT from \"Prairie Bank\": Your account is LOCKED. Reply with your PIN to unlock."],
+ ["Scam or legit?",["Scam","Legit"],"The IRS never calls demanding gift cards. Gift card payment = scam.","CALL: \"This is the IRS. You owe back taxes. Pay today with gift cards or you'll be arrested.\""],
+ ["Scam or legit?",["Legit","Scam"],"You started the login, so a code you asked for is normal. Never share it with anyone else.","TEXT right after YOU try to log in: \"Your verification code is 482913. Don't share this code.\""],
+ ["Scam or legit?",["Scam","Legit"],"Real prizes never make you pay a fee first.","EMAIL: \"Congrats! You won a $1,000 gift card! Pay a $4.99 shipping fee to claim it.\""],
+ ["Scam or legit?",["Scam","Legit"],"Look-alike links (prairie-bank-secure-login.co) steal passwords. Type your bank's real address yourself.","TEXT: \"Suspicious charge of $612. Verify now: prairie-bank-secure-login.co\""],
+ ["Scam or legit?",["Legit","Scam"],"annualcreditreport.com is the only site authorized by federal law for free reports, and you went there yourself.","You type annualcreditreport.com into your browser to get your free credit reports."],
+ ["Scam or legit?",["Scam","Legit"],"Real jobs don't send you a check and ask you to send part of it back. The check will bounce.","JOB OFFER: \"Work from home! We'll mail you a $2,000 check. Deposit it and send $1,500 back for supplies.\""],
+ ["Scam or legit?",["Scam","Legit"],"Delivery services don't need your card number to deliver a package.","TEXT: \"Your package can't be delivered. Pay $1.99 here with your card number to reschedule.\""],
+ ["Scam or legit?",["Legit","Scam"],"An alert inside your own bank app that you can check is normal. You can confirm it in the app.","Your bank's official app sends a notification: \"Debit purchase $6.45 at Coffee Shop.\""],
+ ["Scam or legit?",["Scam","Legit"],"Pressure + secrecy + money from a stranger online = scam.","DM from a new online \"friend\": \"I'm stuck overseas. Please send $300 in gift cards. Don't tell anyone.\""],
+ ["Scam or legit?",["Scam","Legit"],"No one can \"guarantee\" to erase true negative info. Late payments can stay 7 years.","AD: \"We'll erase ALL your late payments and raise your score 200 points! Just $399 upfront.\""],
+ ["Scam or legit?",["Scam","Legit"],"Student loan forgiveness is free through the government. Upfront fees + urgency = scam.","CALL: \"You qualify for instant student loan forgiveness! Pay a $250 fee today. Offer ends in 1 hour.\""],
+ ["What is phishing?",["Fake messages that trick you into sharing private info","A safe way to pay bills","A type of savings account","A credit card reward"],"Phishing = fake emails, texts or sites that try to steal your information."],
+ ["A stranger asks you to pay with gift cards. That's...",["A red flag for a scam","Normal for bills","Required by banks","Safer than a check"],"Real businesses and the government don't demand gift cards."],
+ ["What is identity theft?",["Someone uses your personal info to open accounts or spend","Forgetting your password","Losing your debit card at home","Overdrafting your account"],"Thieves use your name, SSN or account numbers to commit fraud."],
+ ["Which info should you protect the MOST?",["Your Social Security number","Your favorite color","Your school mascot","Your shoe size"],"Your SSN plus birthdate can open credit in your name."],
+ ["A credit FREEZE does what?",["Blocks new credit from being opened in your name","Lowers your score","Closes your bank account","Stops you from using your debit card"],"A freeze is free and stops new accounts. You can lift it when you apply for credit."],
+ ["You see a credit card on your report you never opened. FIRST step?",["Dispute it with the credit bureau","Ignore it","Pay the balance","Close your checking account"],"Dispute errors with the bureau, then report identity theft at IdentityTheft.gov."],
+ ["Where do you report identity theft to get a recovery plan?",["IdentityTheft.gov","A social media post","The store's cashier","Your school counselor only"],"IdentityTheft.gov (from the FTC) builds a step-by-step recovery plan."],
+ ["Your debit card is lost or stolen. What should you do?",["Call your bank right away to lock it","Wait a week to see if it shows up","Post the card number online","Nothing, it's insured"],"Report it fast. Many apps let you lock the card instantly."],
+ ["Best way to spot fraud early?",["Check your bank statements and credit reports","Only read texts from strangers","Share passwords with friends","Never open bank mail"],"Review statements monthly and pull your free reports."],
+ ["A strong password is...",["Long and different for each account","Your birthday","\"password123\"","The same everywhere"],"Long, unique passwords (or a password manager) protect every account."],
+ ["Two-factor authentication (2FA) means...",["A second step, like a code, to log in","Two bank accounts","Two credit cards","Paying twice"],"Even if someone steals your password, they still need the code."],
+ ["Someone calls \"from your bank\" asking for your card number. You should...",["Hang up and call the number on your card","Read them the number","Give only the last 4 digits and PIN","Text it instead"],"Call back using a number you trust. Scammers fake caller ID."],
+ ["Which is a red flag in a message?",["\"Act NOW or your account closes!\"","Your real name spelled right","A message you expected","A receipt for something you bought"],"Urgency and threats push you to act before you think."],
+ ["Which website is safest for typing your card number?",["A site you typed in yourself, starting with https","A link from an unknown text","A pop-up that says you won","A site with lots of typos"],"Go to sites directly and look for https. Avoid links in unexpected messages."],
+ ["Shoulder surfing at an ATM means...",["Someone watches you type your PIN","A free ATM","A bank fee","A surfing competition"],"Cover the keypad when you type your PIN."],
+ ["Card skimmers are...",["Hidden devices that copy card info at ATMs or gas pumps","A type of rewards card","Bank tellers","Credit bureaus"],"Wiggle the card reader. If anything looks loose or odd, use another machine."],
+ ["Why shred old bank statements?",["They have account numbers thieves can use","To earn interest","The bank requires it","To raise your credit score"],"Shred papers with account numbers, SSN or birthdate."],
+ ["Using public Wi-Fi at the mall to check your bank account is...",["Risky. Use cell data or wait for a secure network","Totally safe","Required by law","Faster and safer"],"Public Wi-Fi can be watched. Save banking for a secure connection."],
+ ["A fraud alert on your credit report tells lenders to...",["Verify your identity before opening credit","Close all your accounts","Raise your limit","Lower your interest"],"It's free and lasts one year. Contact one bureau and it tells the other two."],
+ ["Who can you share your online banking password with?",["No one","Your best friend","A caller from the bank","Anyone who asks nicely"],"Real bank employees never need your password."]
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+let G=null, timerId=null;
+let names=["Player 1","Player 2"], target=7;
+try{ const s=JSON.parse(localStorage.getItem("scam-duel-names")||"null"); if(s) names=s; }catch(e){}
+
+function setup(){
+  G=null; clearTimeout(timerId);
+  $("root").innerHTML=`<div class="setup"><div class="card">
+    <div class="unit">Unit 4 · Scams, Fraud & Identity Theft</div>
+    <h1>Scam or Legit?</h1>
+    <p>Read the text, call or email and decide fast. Two players, one iPad. Lay it flat on the desk between you. The top half flips so your partner can read it.</p>
+    <ol><li>Both of you see the same question.</li><li>Tap the right answer first to score.</li><li>Tap a wrong answer and you're locked out for that question.</li></ol>
+    <div class="two"><label class="field" for="n1">Player 1 (bottom)<input id="n1" maxlength="16" value="${esc(names[0])}"></label>
+      <label class="field" for="n2">Player 2 (top)<input id="n2" maxlength="16" value="${esc(names[1])}"></label></div>
+    <label class="field" for="tg">Play to<select id="tg"><option value="5">5 points (quick)</option><option value="7" selected>7 points</option><option value="10">10 points (long)</option></select></label>
+    <button class="btn go" id="start">Start the duel</button></div></div>`;
+  $("tg").value=String(target);
+  $("start").onclick=()=>{ names=[$("n1").value.trim()||"Player 1", $("n2").value.trim()||"Player 2"]; target=+$("tg").value;
+    try{ localStorage.setItem("scam-duel-names", JSON.stringify(names)); }catch(e){}
+    G={deck:shuffle(BANK.map((_,i)=>i)), qi:0, score:[0,0], phase:"ask", locked:[false,false], winner:null, round:1};
+    newQ(); };
+}
+function newQ(){ if(G.qi>=G.deck.length){ G.deck=shuffle(BANK.map((_,i)=>i)); G.qi=0; }
+  const b=BANK[G.deck[G.qi++]]; const order=b[1].length===2?[b[1].indexOf("Scam")>=0?b[1].indexOf("Scam"):0, b[1].indexOf("Scam")>=0?1-b[1].indexOf("Scam"):1]:shuffle(b[1].map((_,i)=>i));
+  G.cur={q:b[0], msg:b[3]||"", opts:order.map(i=>b[1][i]), right:order.indexOf(0), why:b[2]}; G.phase="ask"; G.locked=[false,false]; G.taps=[null,null]; G.scorer=null; draw(); }
+function half(p){
+  const c=G.cur, done=G.phase!=="ask", over=G.phase==="over";
+  const dots=Array.from({length:target},(_,i)=>`<i class="${i<G.score[p]?'on':''}"></i>`).join("");
+  let body;
+  if(over){ body=`<div class="winner">${G.winner===p?"You win!":"Good game!"}</div>`; }
+  else body=`<div class="qq">${c.msg?`<div class="msg">${esc(c.msg)}</div>`:""}<p class="q">${esc(c.q)}</p></div>
+    <div><div class="opts">${c.opts.map((o,k)=>{ let cls=""; if(done&&k===c.right) cls="right"; else if(G.taps[p]===k) cls="wrong";
+      return `<button class="opt ${cls}" data-p="${p}" data-k="${k}" ${done||G.locked[p]?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>
+    <div class="note">${done?(G.scorer===p?"<b>+1 point!</b> ":G.scorer===null?"No point this time. ":"")+esc(c.why):G.locked[p]?"Locked out. Wait for your partner.":""}</div></div>`;
+  return `<section class="half p${p+1} ${(over&&G.winner===p)||(!over&&done&&G.scorer===p)?'win':''} ${G.locked[p]&&!done?'lock':''}" aria-label="${esc(names[p])}">
+    <div class="hd"><span class="who">${esc(names[p])}</span><span class="pts" aria-label="${G.score[p]} of ${target} points">${dots}</span></div>
+    ${body}${over?"<span></span>":""}</section>`;
+}
+function draw(){
+  const over=G.phase==="over";
+  const mid= over ? `<div class="mid"><span class="t">${esc(names[G.winner])} wins ${G.score[G.winner]} to ${G.score[1-G.winner]}!</span><button class="btn go" id="again">Rematch</button><button class="btn" id="home">New players</button></div>`
+    : G.phase==="ask" ? `<div class="mid"><span class="t">Question ${G.round}</span><span class="s">First to ${target} wins</span><button class="btn" id="home">Quit</button></div>`
+    : G.winner!=null ? `<div class="mid"><span class="t">Game point!</span></div>` : `<div class="mid"><button class="btn go" id="next">Next question</button><button class="btn" id="home">Quit</button></div>`;
+  $("root").innerHTML=`<div class="app">${half(1)}${mid}${half(0)}</div>`;
+  document.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>tap(+b.dataset.p, +b.dataset.k)));
+  $("next")&&($("next").onclick=()=>{ G.round++; newQ(); });
+  $("again")&&($("again").onclick=()=>{ G={deck:shuffle(BANK.map((_,i)=>i)), qi:0, score:[0,0], phase:"ask", locked:[false,false], winner:null, round:1}; newQ(); });
+  $("home")&&($("home").onclick=setup);
+}
+function tap(p,k){
+  if(G.phase!=="ask"||G.locked[p]) return;
+  G.taps[p]=k;
+  if(k===G.cur.right){ G.score[p]++; G.scorer=p; G.phase="shown";
+    if(G.score[p]>=target){ G.winner=p; draw(); clearTimeout(timerId); timerId=setTimeout(()=>{ G.phase="over"; draw(); },1800); return; } }
+  else { G.locked[p]=true; if(G.locked[0]&&G.locked[1]){ G.phase="shown"; G.scorer=null; } }
+  draw();
+}
+function start(d){ if(d&&d.G){ G=d.G; names=d.names||names; target=d.target||target; if(G.phase==="shown"&&G.winner!=null) G.phase="over"; draw(); } else setup(); }
+window.claude?.hot?.snapshot?.(()=>({G, names, target}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

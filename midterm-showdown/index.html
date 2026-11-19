@@ -1,0 +1,235 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Midterm Showdown</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: projected 5×5 money board, team scoreboard strip below; clue opens full-screen.
+   Deliberate single dark "vault" look to match Future Millionaire. */
+:root {
+  --vault: #0b1f1a; --tile: #164036; --tile-hi: #1d5245; --line: #2c574a; --panel: #123129;
+  --ink: #eef5f0; --muted: #9fb8ad; --gold: #e2b350; --gold-ink: #2a1f05; --good: #6fd3a2; --bad: #ee7462;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--vault); color: var(--ink); font-family: var(--body); font-size: 17px;
+  background-image: repeating-radial-gradient(circle at 88% 0%, transparent 0 14px, rgba(226,179,80,.035) 14px 15px); }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 16px 30px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 3.4vw, 40px); margin: 0; }
+h1 span { color: var(--gold); }
+.tag { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ghost { background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; color: var(--muted); }
+.ghost:hover { color: var(--ink); }
+.primary { background: var(--gold); color: var(--gold-ink); border: 0; border-radius: 12px; padding: 11px 18px; font-weight: 700; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.boardwrap { overflow-x: auto; }
+.board { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 8px; min-width: 680px; }
+.cat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 8px; text-align: center; min-height: 74px; display: flex; flex-direction: column; justify-content: center; }
+.cat b { font-family: var(--display); font-size: clamp(16px, 1.6vw, 21px); line-height: 1.1; }
+.cat small { font-family: var(--mono); font-size: 11px; color: var(--gold); letter-spacing: .1em; text-transform: uppercase; margin-top: 3px; }
+.cell { background: var(--tile); border: 1px solid var(--line); border-radius: 12px; min-height: clamp(62px, 9vh, 92px);
+  font-family: var(--mono); font-weight: 700; font-size: clamp(24px, 3vw, 38px); color: var(--gold); transition: background .15s, transform .15s; }
+.cell:hover:not(:disabled) { background: var(--tile-hi); transform: translateY(-2px); }
+.cell:disabled { background: transparent; border-style: dashed; color: transparent; cursor: default; }
+
+.teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 14px; }
+.team { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.team.lead { border-color: var(--gold); }
+.team .name { font-family: var(--display); font-weight: 600; font-size: 19px; border-radius: 6px; padding: 0 4px; outline: none; }
+.team .name:focus { background: var(--vault); }
+.team .pts { font-family: var(--mono); font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.team .adj { display: flex; gap: 6px; }
+.team .adj button { flex: 1; background: var(--vault); border: 1px solid var(--line); border-radius: 8px; padding: 4px; font-family: var(--mono); font-size: 14px; }
+
+.overlay { position: fixed; inset: 0; background: rgba(5,15,12,.94); display: grid; place-items: center; padding: 20px; z-index: 20; }
+.clue { width: min(1000px, 100%); max-height: 92vh; overflow: auto; background: var(--panel); border: 1px solid var(--gold); border-radius: 22px; padding: clamp(18px, 3vw, 34px); display: flex; flex-direction: column; gap: 16px; }
+.clue .meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-family: var(--mono); color: var(--gold); text-transform: uppercase; letter-spacing: .1em; font-size: 14px; }
+.clue .q { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3.4vw, 42px); line-height: 1.2; text-wrap: balance; }
+.clue .a { border-top: 1px dashed var(--line); padding-top: 14px; font-size: clamp(19px, 2.2vw, 26px); line-height: 1.4; }
+.clue .a b { color: var(--good); }
+.double { font-family: var(--display); font-weight: 800; color: var(--gold); font-size: clamp(30px, 5vw, 56px); text-align: center; animation: pulse 1s ease-in-out 2; }
+@keyframes pulse { 50% { transform: scale(1.08); } }
+.award { display: flex; flex-wrap: wrap; gap: 8px; }
+.award .t { background: var(--vault); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; display: flex; gap: 6px; align-items: center; }
+.award .t span { min-width: 6em; }
+.award .t button { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); width: 40px; height: 34px; font-weight: 700; }
+.award .t button.y { color: var(--good); } .award .t button.n { color: var(--bad); }
+.award .t button.on { background: var(--ink); color: var(--vault); }
+.wager { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.wager label { display: flex; flex-direction: column; gap: 4px; background: var(--vault); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+.wager input { font: inherit; font-family: var(--mono); background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; min-width: 0; }
+.muted { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div><h1>Midterm <span>Showdown</span></h1><div class="tag">Personal Finance · Units 1–4 · #FutureMillionaires</div></div>
+    <div class="row">
+      <button class="ghost" id="addTeam">+ Team</button>
+      <button class="ghost" id="rmTeam">− Team</button>
+      <button class="ghost" id="finalBtn">Final Round</button>
+      <button class="ghost" id="resetBtn">New game</button>
+    </div>
+  </header>
+  <div class="boardwrap"><div class="board" id="board"></div></div>
+  <div class="teams" id="teams"></div>
+  <p class="muted" style="font-size:14px">Click a value to open a question. Read it aloud, give teams time, then click <b>Show answer</b> and mark each team ✓ or ✗. Click a team name to rename it. One tile is hidden Double Points.</p>
+</div>
+
+<div class="overlay" id="ov" hidden><div class="clue" id="clue"></div></div>
+
+<script>
+const CATS = [
+ { name: "Paycheck Deductions", unit: "Unit 1", qs: [
+   ["Your job offer says $52,000 a year. Is that your gross or net income?", "<b>Gross</b> — it's what you earn before taxes and deductions. Net is your take-home pay."],
+   ["Name the two FICA taxes and their percentages.", "<b>Social Security 6.2%</b> and <b>Medicare 1.45%</b> (7.65% total)."],
+   ["You're offered $62,400 per year. What is your gross monthly income?", "$62,400 ÷ 12 = <b>$5,200</b>"],
+   ["You earn $3,600 a month and put 5% in your 401(k). Your employer matches 100% up to 5%. How much goes into your 401(k) in total each month?", "You: $3,600 × 0.05 = $180. Match: $180. Total <b>$360</b> a month."],
+   ["You earn $34,000 a year and pay Social Security (6.2%), Medicare (1.45%), and federal tax (10%). What's your approximate annual net pay?", "17.65% × $34,000 = $6,001 taxes. Net = <b>$27,999</b>."]
+ ]},
+ { name: "Pay Stub Pro", unit: "Unit 2", qs: [
+   ["What does YTD mean on a pay stub?", "<b>Year-to-date</b>: totals from January 1 through the current pay period."],
+   ["Monthly pay period 10/01 – 10/31, pay date 11/01. How many full months are in the YTD totals?", "<b>10</b> months. Count the pay period, not the pay date."],
+   ["You earn $22 an hour. What is your federal overtime rate?", "$22 × 1.5 = <b>$33 per hour</b>"],
+   ["You earn $15 an hour and work 52 hours this week (1.5× after 40). What is your total gross pay?", "40 × $15 = $600. 12 × $22.50 = $270. Total <b>$870</b>."],
+   ["Gross pay $3,000. Deductions: federal $300, state $148.50, Social Security $186, Medicare $43.50, health $100, 401(k) $90. What is net pay?", "Deductions = $868. $3,000 − $868 = <b>$2,132</b>."]
+ ]},
+ { name: "Bank On It", unit: "Unit 3", qs: [
+   ["Which account is used for everyday spending, direct deposit, and paying bills?", "A <b>checking account</b>."],
+   ["What is the FDIC, and how much does it insure?", "Government insurance for bank deposits — <b>$250,000 per depositor, per bank</b>, if the bank fails."],
+   ["What's the difference between a debit card and a credit card?", "<b>Debit</b> spends your own checking money. <b>Credit</b> spends borrowed money you must pay back, often with interest."],
+   ["Why can an online bank's high-yield savings account (HYSA) often pay more interest?", "<b>Lower costs</b> — no physical branches to pay for. Many are still FDIC insured."],
+   ["$2,500 in a CD at 4% for 2 years, interest added once per year. What is it worth at maturity?", "Year 1: $2,600. Year 2: $2,600 × 4% = $104 → <b>$2,704</b>. ($2,700 = simple interest.)"]
+ ]},
+ { name: "Credit Check", unit: "Unit 4", qs: [
+   ["What is the range of a FICO credit score?", "<b>300 to 850</b>"],
+   ["Name all 3 credit bureaus.", "<b>Experian, Equifax, TransUnion</b>"],
+   ["Name 3 of the 4 ways a teen can establish credit.", "<b>Secured card, cosigner, retail store card, authorized user</b> on a parent's card."],
+   ["Credit limit $2,200, balance $660. What is the utilization? Is it OK?", "$660 ÷ $2,200 × 100 = <b>30%</b> — right at the guideline."],
+   ["Rank the 5 FICO categories from biggest to smallest, with percentages.", "<b>Payment history 35% · Amounts owed 30% · Length of history 15% · New credit 10% · Credit mix 10%</b>"]
+ ]},
+ { name: "Smart or Not?", unit: "CER", qs: [
+   ["\"I'll check my credit report for free at annualcreditreport.com.\" Smart or not? Why?", "<b>Smart.</b> It's free, federally authorized, and checking your own report doesn't hurt your score."],
+   ["\"I keep $0 extra in checking and just swipe my debit card anyway.\" Smart or not? Why?", "<b>Not smart.</b> You'll get overdraft fees (often $25–$35 each time)."],
+   ["\"I'm putting my emergency fund in a 5-year CD.\" Smart or not? Why?", "<b>Not smart.</b> Emergencies can't wait; an early withdrawal penalty eats your money. Use savings or a HYSA."],
+   ["\"I'll put in enough to get my full 401(k) employer match.\" Smart or not? Why?", "<b>Smart.</b> The match is free money, and it grows for retirement."],
+   ["\"I'll cosign my friend's car loan. It's their loan, not mine.\" Smart or not? Why? (Use 2 vocab words.)", "<b>Not smart.</b> A cosigner owes the loan too — missed payments hurt <i>your</i> payment history and credit score."]
+ ]}
+];
+const FINAL = { q: "You earn $4,000 a month gross. You put 5% in your 401(k) and your employer matches 100% up to 5%. You also put 10% of your gross into a HYSA. How much goes to savings + retirement each month in total?",
+  a: "401(k): $200 (you) + $200 (match) = $400. HYSA: $400. Total <b>$800 a month</b> — that's $9,600 a year toward Future Millionaire status!" };
+const VALUES = [100, 200, 300, 400, 500];
+const KEY = "midterm-showdown-v1";
+const $ = id => document.getElementById(id);
+let S;
+
+function fresh(n = 4) { return { teams: Array.from({ length: n }, (_, i) => ({ name: "Team " + (i + 1), pts: 0 })), used: [], dbl: [Math.floor(Math.random() * 5), 2 + Math.floor(Math.random() * 3)] }; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
+function load() { try { const v = JSON.parse(localStorage.getItem(KEY)); if (v && v.teams) return v; } catch {} return fresh(); }
+S = load();
+
+function drawBoard() {
+  let h = CATS.map(c => `<div class="cat"><b>${c.name}</b><small>${c.unit}</small></div>`).join("");
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
+    const id = c + "-" + r, used = S.used.includes(id);
+    h += `<button class="cell" data-c="${c}" data-r="${r}" ${used ? "disabled aria-label='used'" : `aria-label="${CATS[c].name} for ${VALUES[r]}"`}>${VALUES[r]}</button>`;
+  }
+  $("board").innerHTML = h;
+  $("board").querySelectorAll(".cell:not(:disabled)").forEach(b => b.onclick = () => openClue(+b.dataset.c, +b.dataset.r));
+}
+function drawTeams() {
+  const max = Math.max(...S.teams.map(t => t.pts));
+  $("teams").innerHTML = S.teams.map((t, i) => `<div class="team ${t.pts === max && max > 0 ? "lead" : ""}">
+    <div class="name" contenteditable="true" spellcheck="false" data-i="${i}">${t.name.replace(/</g, "&lt;")}</div>
+    <div class="pts">${t.pts.toLocaleString()}</div>
+    <div class="adj"><button data-i="${i}" data-d="-100">−100</button><button data-i="${i}" data-d="100">+100</button></div></div>`).join("");
+  $("teams").querySelectorAll(".name").forEach(el => {
+    el.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); el.blur(); } });
+    el.addEventListener("blur", () => { S.teams[+el.dataset.i].name = el.textContent.trim().slice(0, 24) || "Team " + (+el.dataset.i + 1); save(); drawTeams(); });
+  });
+  $("teams").querySelectorAll(".adj button").forEach(b => b.onclick = () => { S.teams[+b.dataset.i].pts += +b.dataset.d; save(); drawTeams(); });
+}
+
+function openClue(c, r) {
+  const isDbl = S.dbl[0] === c && S.dbl[1] === r, val = VALUES[r] * (isDbl ? 2 : 1);
+  const [q, a] = CATS[c].qs[r], marks = {};
+  const body = () => `
+    ${isDbl ? `<div class="double">DOUBLE POINTS!</div>` : ""}
+    <div class="meta"><span>${CATS[c].name} · ${CATS[c].unit}</span><span>${val} points</span></div>
+    <div class="q">${q}</div>
+    <div class="a" id="ansBox" hidden>${a}</div>
+    <div class="award" id="award" hidden>${S.teams.map((t, i) => `<div class="t"><span>${t.name.replace(/</g, "&lt;")}</span><button class="y" data-i="${i}" data-v="1" aria-label="${t.name} correct">✓</button><button class="n" data-i="${i}" data-v="-1" aria-label="${t.name} wrong">✗</button></div>`).join("")}</div>
+    <div class="row"><button class="primary" id="showA">Show answer</button><button class="primary" id="done" hidden>Back to board</button><span style="flex:1"></span><button class="ghost" id="cancel">Close without scoring</button></div>
+    <p class="muted" id="awardHelp" hidden style="margin:0;font-size:15px">✓ adds ${val} · ✗ is 0 (or click ✗ twice to subtract ${val}, for buzz-in games).</p>`;
+  $("clue").innerHTML = body(); $("ov").hidden = false; $("showA").focus();
+  $("showA").onclick = () => { $("ansBox").hidden = false; $("award").hidden = false; $("awardHelp").hidden = false; $("showA").hidden = true; $("done").hidden = false; };
+  $("award").querySelectorAll("button").forEach(b => b.onclick = () => {
+    // states: "none" 0 pts · "right" +val · "wrong" 0 pts · "minus" −val
+    const i = +b.dataset.i, v = +b.dataset.v, prev = marks[i] || "none";
+    const next = v === 1 ? (prev === "right" ? "none" : "right") : (prev === "wrong" ? "minus" : prev === "minus" ? "none" : "wrong");
+    const pts = s => s === "right" ? val : s === "minus" ? -val : 0;
+    S.teams[i].pts += pts(next) - pts(prev);
+    marks[i] = next;
+    const row = b.parentElement.querySelectorAll("button");
+    row[0].classList.toggle("on", next === "right"); row[1].classList.toggle("on", next === "wrong" || next === "minus");
+    row[1].textContent = next === "minus" ? "−" + val : "✗";
+    row[1].style.width = next === "minus" ? "auto" : "";
+    save(); drawTeams();
+  });
+  const close = used => { $("ov").hidden = true; if (used) { S.used.push(c + "-" + r); save(); drawBoard(); } };
+  $("done").onclick = () => close(true);
+  $("cancel").onclick = () => close(false);
+}
+
+function openFinal() {
+  $("clue").innerHTML = `<div class="meta"><span>Final Round · All units</span><span>Wager up to your score</span></div>
+    <div class="q" style="font-size:clamp(22px,2.6vw,32px)">Category: <span style="color:var(--gold)">Paycheck → Savings → Retirement</span>. Each team writes a secret wager first.</div>
+    <div class="wager">${S.teams.map((t, i) => `<label for="w${i}">${t.name.replace(/</g, "&lt;")} wager<input id="w${i}" type="number" min="0" max="${Math.max(t.pts, 0)}" value="0"></label>`).join("")}</div>
+    <div class="row"><button class="primary" id="showQ">Show the question</button><span style="flex:1"></span><button class="ghost" id="cancel">Back to board</button></div>
+    <div class="q" id="fq" hidden>${FINAL.q}</div>
+    <div class="a" id="fa" hidden>${FINAL.a}</div>
+    <div class="award" id="faward" hidden>${S.teams.map((t, i) => `<div class="t"><span>${t.name.replace(/</g, "&lt;")}</span><button class="y" data-i="${i}" data-v="1">✓</button><button class="n" data-i="${i}" data-v="-1">✗</button></div>`).join("")}</div>
+    <div class="row"><button class="primary" id="showFA" hidden>Show answer</button><button class="primary" id="fdone" hidden>See final scores</button></div>`;
+  $("ov").hidden = false;
+  $("cancel").onclick = () => $("ov").hidden = true;
+  $("showQ").onclick = () => { $("fq").hidden = false; $("showQ").hidden = true; $("showFA").hidden = false; };
+  $("showFA").onclick = () => { $("fa").hidden = false; $("faward").hidden = false; $("showFA").hidden = true; $("fdone").hidden = false; };
+  const done = new Set();
+  $("faward").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i; if (done.has(i)) return; done.add(i);
+    const w = Math.max(0, Math.min(+$("w" + i).value || 0, Math.max(S.teams[i].pts, 0)));
+    S.teams[i].pts += w * +b.dataset.v; b.classList.add("on"); save(); drawTeams();
+  });
+  $("fdone").onclick = () => {
+    const ranked = S.teams.map(t => t).sort((a, b) => b.pts - a.pts);
+    $("clue").innerHTML = `<div class="meta"><span>Final scores</span><span>#FutureMillionaires</span></div>
+      <div class="q">${ranked[0].name.replace(/</g, "&lt;")} wins with ${ranked[0].pts.toLocaleString()} points!</div>
+      <ol style="font-size:22px;line-height:1.6;margin:0">${ranked.map(t => `<li>${t.name.replace(/</g, "&lt;")} — <span style="font-family:var(--mono)">${t.pts.toLocaleString()}</span></li>`).join("")}</ol>
+      <div class="row"><button class="primary" id="closeEnd">Close</button></div>`;
+    $("closeEnd").onclick = () => $("ov").hidden = true;
+  };
+}
+
+$("finalBtn").onclick = openFinal;
+$("addTeam").onclick = () => { if (S.teams.length < 6) { S.teams.push({ name: "Team " + (S.teams.length + 1), pts: 0 }); save(); drawTeams(); } };
+$("rmTeam").onclick = () => { if (S.teams.length > 2) { S.teams.pop(); save(); drawTeams(); } };
+let armed = false;
+$("resetBtn").onclick = () => {
+  if (!armed) { armed = true; $("resetBtn").textContent = "Click again to clear"; setTimeout(() => { armed = false; $("resetBtn").textContent = "New game"; }, 3000); return; }
+  armed = false; $("resetBtn").textContent = "New game"; S = fresh(S.teams.length); save(); drawBoard(); drawTeams();
+};
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("ov").hidden) $("ov").hidden = true; });
+drawBoard(); drawTeams();
+</script>
+
+</body></html>

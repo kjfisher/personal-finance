@@ -1,0 +1,272 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Check It!</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one big personal check is the game board. Each round asks students to tap a part of it, pick the amount in words, or find the mistake. The check stays paper-colored in both themes. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --check-bg:#EAF4EE; --check-pattern:#D6E9DD; --check-ink:#22303F; --check-line:#7C8C86; --pen:#1D3F9A;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --hand:"Caveat", "Bradley Hand", "Segoe Print", cursive;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1100px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; }
+.bar .stats b { color:var(--gold); }
+.wrap { max-width:1100px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.prompt { font-family:var(--display); font-weight:600; font-size:clamp(22px, 3vw, 32px); line-height:1.2; margin:0; text-wrap:balance; }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+/* the check */
+.check { position:relative; width:100%; aspect-ratio:2.35/1; max-width:100%; container-type:inline-size; color:var(--check-ink); border-radius:10px; border:1px solid var(--check-line);
+  background:var(--check-bg) repeating-linear-gradient(135deg, transparent 0 9px, var(--check-pattern) 9px 10px); box-shadow:0 10px 26px rgba(20,33,61,.14); overflow:hidden; }
+.rg { position:absolute; display:flex; align-items:flex-end; gap:1.2cqw; padding:.4cqw .8cqw; border:2px solid transparent; border-radius:8px; background:transparent; color:inherit; font:inherit; text-align:left; cursor:default; }
+.tappable .rg[data-part] { cursor:pointer; }
+.tappable .rg[data-part]:hover { border-color:rgba(29,63,154,.35); border-style:dashed; }
+.rg.hit { border-color:var(--ok); border-style:solid; background:rgba(15,139,108,.12); }
+.rg.miss { border-color:var(--bad); border-style:solid; background:rgba(194,59,59,.10); }
+.rg.ask { border-color:var(--gold); border-style:solid; background:rgba(224,168,0,.16); }
+.rg:focus-visible { outline:3px solid var(--gold); outline-offset:1px; }
+.lb { font-size:max(9px, 1.45cqw); white-space:nowrap; line-height:1.1; }
+.ln { flex:1; border-bottom:1.5px solid var(--check-line); min-height:3.6cqw; display:flex; align-items:flex-end; padding:0 .6cqw; min-width:0; }
+.hw { font-family:var(--hand); font-weight:600; color:var(--pen); font-size:max(14px, 3.5cqw); line-height:1; white-space:nowrap; overflow:hidden; }
+.fill { flex:1; border-bottom:2px solid var(--pen); margin:0 0 .8cqw .8cqw; min-width:2cqw; }
+.owner { flex-direction:column; align-items:flex-start; gap:0; font-size:max(9px, 1.5cqw); line-height:1.3; }
+.owner b { font-size:max(10px, 1.75cqw); }
+.bank { position:absolute; left:40%; top:6%; width:22%; text-align:center; font-family:var(--display); font-weight:800; font-size:max(10px, 1.9cqw); line-height:1.05; color:#1F5E4A; }
+.bank small { display:block; font-family:var(--body); font-weight:400; font-size:max(8px, 1.2cqw); color:var(--check-ink); }
+.box { flex:1; border:1.5px solid var(--check-line); background:rgba(255,255,255,.7); border-radius:4px; min-height:5cqw; display:flex; align-items:center; padding:0 .8cqw; }
+.micr { font-family:var(--mono); font-size:max(10px, 2.3cqw); letter-spacing:.12em; align-items:center; justify-content:center; }
+.cnum { font-family:var(--mono); font-size:max(10px, 1.9cqw); justify-content:flex-end; align-items:flex-start; }
+.qmark { font-family:var(--display); color:var(--gold); font-size:max(14px, 3.4cqw); }
+/* options + feedback */
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px; }
+.opt { font:inherit; font-weight:700; text-align:left; padding:14px 16px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; line-height:1.3; }
+.opt.words { font-family:var(--hand); font-size:24px; font-weight:600; }
+.opt:disabled { cursor:default; }
+.opt.right { border-color:var(--ok); background:var(--ok-soft); }
+.opt.wrong { border-color:var(--bad); background:var(--bad-soft); }
+.fb { border-radius:12px; padding:12px 14px; line-height:1.45; }
+.fb.ok { background:var(--ok-soft); } .fb.no { background:var(--bad-soft); }
+.fb b { font-family:var(--display); }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.btn:focus-visible, .opt:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+.how { margin:0; padding-left:20px; line-height:1.55; }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Check <span>It!</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const ME={name:"Jordan Rivera", addr1:"418 Maple Ave.", addr2:"Anytown, IL 60000"};
+const PAYEES=[["Oak Street Apartments","December rent",950,1450],["Bright Smile Dental","Cleaning copay",25,90],["Riverside Auto Repair","Brake pads",180,620],
+ ["Lakeview Water Dept.","Water bill",30,95],["Summit Driving School","Driver's ed",250,450],["Taylor Morgan","Babysitting",40,120],
+ ["Northside Youth Soccer","Spring season fee",85,210],["Green Thumb Landscaping","Lawn care",60,175],["Anytown Electric Co.","Electric bill",48,160]];
+const PARTS={
+ routing:{n:"routing number", why:"The routing number is the 9 digits at the bottom left. It identifies your BANK."},
+ account:{n:"account number", why:"The account number comes after the routing number. It identifies YOUR account."},
+ checkno:{n:"check number", why:"The check number is at the top right and repeats at the end of the bottom line."},
+ date:{n:"date line", why:"Always fill in the date."},
+ payee:{n:"\"Pay to the Order of\" line", why:"This line names the person or business getting the money."},
+ amount:{n:"amount box", why:"The dollar amount goes in numbers in the box next to the $."},
+ words:{n:"amount in words", why:"The amount written in words goes on the long line that ends in \"Dollars.\" Banks go by the words if they don't match the box."},
+ memo:{n:"memo (\"For\") line", why:"The memo line says what the check is for. It's optional but helpful."},
+ sig:{n:"signature line", why:"Sign the same way every time. A check isn't valid without a signature."}
+};
+const SKILLS={label:"Parts of a check", words:"Amount in words", mistake:"Spot the mistake", dd:"Direct deposit"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const ONES=["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+const TENS=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+function w(n){ if(n<20) return ONES[n]; if(n<100) return TENS[Math.floor(n/10)]+(n%10?"-"+ONES[n%10]:"");
+  if(n<1000) return ONES[Math.floor(n/100)]+" hundred"+(n%100?" "+w(n%100):"");
+  return w(Math.floor(n/1000))+" thousand"+(n%1000?" "+w(n%1000):""); }
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const cc=c=>String(c).padStart(2,"0");
+const words=(d,c)=>cap(w(d))+" and "+cc(c)+"/100";
+const money=(d,c)=>d.toLocaleString("en-US")+"."+cc(c);
+function today(){ const t=new Date(); return t.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+function newCheck(){ const p=PAYEES[rnd(0,PAYEES.length-1)]; const d=rnd(p[2],p[3]); let c=rnd(0,99); if(Math.random()<.15) c=0;
+  return {payee:p[0], memo:p[1], d, c, date:today(), no:0}; }
+function wordDistractors(d,c){
+  const out=new Set(), right=words(d,c);
+  out.add(cap(w(d))+" and "+cc(c)+"/10");
+  const s=String(d); if(s.length>=2){ const sw=+(s.slice(0,-2)+s.slice(-1)+s.slice(-2,-1)); if(sw!==d&&sw>0) out.add(words(sw,c)); }
+  if(d>=100&&d%100) out.add(words(d%100,c));
+  if(d%100>=20) out.add(words(d>=30?d-10:d+10,c));
+  const rc=+(cc(c).split("").reverse().join("")); if(rc!==c) out.add(words(d,rc));
+  if(d>=13&&d%100>=13&&d%100<=19) out.add(words(d-(d%100)+(d%10)*10,c));
+  let k=1; while(out.size<3){ out.add(words(d+k,c)); k++; }
+  out.delete(right); return shuffle([...out]).slice(0,3);
+}
+const FLAWS=[
+ {id:"mismatch", accept:["words","amount"], why:"The box and the words don't match. The bank goes by the words, so they must say the same amount."},
+ {id:"nosig", accept:["sig"], why:"No signature. The bank won't pay a check that isn't signed."},
+ {id:"nodate", accept:["date"], why:"The date is missing. Always fill in the date."},
+ {id:"nopayee", accept:["payee"], why:"The payee line is blank. Anyone could write in their own name and cash it."},
+ {id:"cents", accept:["words"], why:"Cents go over 100, like 07/100. Writing cents over 10 changes the amount."},
+ {id:"space", accept:["words"], why:"Blank space after the words. Draw a line to the end so no one can add more."}
+];
+const DD=[
+ ()=>({q:"You're filling out a direct deposit form. What goes in \"Bank Routing Number\"?", opts:[G.acct.routing, G.acct.account, String(G.acct.no), "Your Social Security number"], why:"The 9-digit number at the bottom left of your check is the routing number. It tells your employer which bank.", show:true}),
+ ()=>({q:"On the direct deposit form, what goes in \"Account Number\"?", opts:[G.acct.account, G.acct.routing, String(G.acct.no), "Your employee ID"], why:"The account number comes right after the routing number on the bottom of the check.", show:true}),
+ ()=>({q:"You want your whole paycheck to go into checking. Which box do you check on the form?", opts:["Entire Net Paycheck","Gross pay","7.65%","Life insurance"], why:"Direct deposit sends your NET pay, the amount after deductions."}),
+ ()=>({q:"What is one advantage of direct deposit over a paper paycheck?", opts:["Money arrives fast with no trip to the bank","You get paid more","It lowers your taxes","You don't need a bank account"], why:"Direct deposit is safe and convenient. Your pay goes straight to your account."}),
+ ()=>({q:"Why do many employers prefer direct deposit?", opts:["It's cheaper and faster than printing checks","It removes FICA taxes","It raises their credit score","Employees get paid less"], why:"No printing, mailing or lost checks."}),
+ ()=>({q:"When might you still need to write a check?", opts:["Paying rent to a landlord","Buying a snack","Paying with your phone","Tapping your debit card"], why:"Some landlords, offices and people still want a check."}),
+ ()=>({q:"A check is a promise from your ___ to pay someone.", opts:["Bank","Employer","Government","Landlord"], why:"The bank pays the money out of your account when the check is cashed."})
+];
+let G=null;
+function makeRounds(){
+  const labels=shuffle(Object.keys(PARTS)).slice(0,3).map(p=>({type:"label", part:p}));
+  const wds=[0,1,2].map(()=>({type:"words"}));
+  const flaws=shuffle(FLAWS).slice(0,4).map(f=>({type:"mistake", flaw:f.id}));
+  const dds=shuffle(DD.map((_,i)=>i)).slice(0,2).map(i=>({type:"dd", i}));
+  return shuffle([...labels,...wds,...flaws,...dds]);
+}
+function newGame(){
+  const r=()=>Array.from({length:9},(_,i)=>i===0?rnd(0,3):rnd(0,9)).join("");
+  G={acct:{routing:r(), account:String(rnd(1,9))+Array.from({length:9},()=>rnd(0,9)).join(""), no:rnd(1001,1180)}, rounds:makeRounds(), i:0, score:0, by:{}, phase:"play"};
+  setupRound();
+}
+function setupRound(){
+  const R=G.rounds[G.i]; G.acct.no++;
+  R.chk=newCheck(); R.done=false; R.pick=null;
+  if(R.type==="words"){ const right=words(R.chk.d,R.chk.c); R.opts=shuffle([right,...wordDistractors(R.chk.d,R.chk.c)]); R.right=R.opts.indexOf(right); }
+  if(R.type==="mistake"){ R.f=FLAWS.find(f=>f.id===R.flaw); if(R.flaw==="mismatch"){ const opts=wordDistractors(R.chk.d,R.chk.c).filter(s=>!s.includes("/10")||s.includes("/100")); R.wrongWords=opts[0]; } }
+  if(R.type==="dd"){ const q=DD[R.i](); const right=q.opts[0]; R.q=q; R.opts=shuffle(q.opts); R.right=R.opts.indexOf(right); }
+  draw();
+}
+function checkHTML(R){
+  const k=R.chk, A=G.acct, f=R.type==="mistake"?R.flaw:null, showWords=R.type!=="words"||R.done;
+  const pos={owner:"left:2%;top:5%;width:34%;height:22%", checkno:"left:84%;top:4%;width:14%;height:12%", date:"left:56%;top:17%;width:30%;height:13%",
+   payee:"left:2%;top:32%;width:74%;height:14%", amount:"left:78%;top:31%;width:20%;height:15%", words:"left:2%;top:48%;width:96%;height:14%",
+   memo:"left:2%;top:66%;width:44%;height:15%", sig:"left:52%;top:66%;width:46%;height:15%", routing:"left:4%;top:84%;width:27%;height:13%",
+   account:"left:33%;top:84%;width:29%;height:13%", micrno:"left:64%;top:84%;width:14%;height:13%"};
+  const cls=p=>{ const part=p==="micrno"?"checkno":p; let c="rg";
+    if(R.done){ const ok=R.type==="label"?[R.part]:R.type==="mistake"?R.f.accept:[];
+      if(ok.includes(part)) c+=" hit"; else if(R.pick===part) c+=" miss"; }
+    if(R.type==="words"&&p==="words"&&!R.done) c+=" ask";
+    if(R.type==="dd"&&R.q.show&&!R.done&&(p==="routing"||p==="account")) c+=" ask";
+    return c; };
+  const btn=(p,inner,extra="")=>`<button class="${cls(p)} ${extra}" style="${pos[p]}" data-part="${p==="micrno"?"checkno":p}" aria-label="${p==="micrno"?"check number":p==="owner"?"name and address":PARTS[p].n}" type="button">${inner}</button>`;
+  let wtxt=f==="mismatch"?R.wrongWords:f==="cents"?cap(w(k.d))+" and "+cc(k.c)+"/10":words(k.d,k.c);
+  const wordsInner=showWords?`<span class="hw">${esc(wtxt)}</span>${f==="space"?"":`<span class="fill"></span>`}`:`<span class="qmark">?</span>`;
+  const interactive=(R.type==="label"||R.type==="mistake")&&!R.done;
+  return `<div class="check ${interactive?"tappable":""}" id="check" role="group" aria-label="Personal check">
+    <div class="rg owner" style="${pos.owner}"><b>${ME.name}</b><span>${ME.addr1}</span><span>${ME.addr2}</span></div>
+    <div class="bank">Prairie Federal Bank<small>Anytown, IL</small></div>
+    ${btn("checkno",String(A.no),"cnum")}
+    ${btn("date",`<span class="lb">Date</span><span class="ln">${f==="nodate"?"":`<span class="hw">${esc(k.date)}</span>`}</span>`)}
+    ${btn("payee",`<span class="lb">Pay to the<br>Order of</span><span class="ln">${f==="nopayee"?"":`<span class="hw">${esc(k.payee)}</span>`}</span>`)}
+    ${btn("amount",`<span class="lb" style="font-size:max(14px,2.6cqw)">$</span><span class="box"><span class="hw">${money(k.d,k.c)}</span></span>`)}
+    ${btn("words",`<span class="ln">${wordsInner}</span><span class="lb">Dollars</span>`)}
+    ${btn("memo",`<span class="lb">For</span><span class="ln"><span class="hw">${esc(k.memo)}</span></span>`)}
+    ${btn("sig",`<span class="ln" style="flex-direction:column;align-items:center">${f==="nosig"?"":`<span class="hw">${ME.name}</span>`}</span>`)}
+    ${btn("routing",`:${A.routing}:`,"micr")}${btn("account",`${A.account}:`,"micr")}${btn("micrno",String(A.no),"micr")}
+  </div>`;
+}
+function promptFor(R){
+  if(R.type==="label") return `Tap the ${PARTS[R.part].n}.`;
+  if(R.type==="words") return `How should ${"$"+money(R.chk.d,R.chk.c)} be written in words?`;
+  if(R.type==="mistake") return `This check has one mistake. Tap it.`;
+  return R.q.q;
+}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 1: Checks & Direct Deposit</span>`; return; }
+  el.innerHTML=`<span>Round <b>${Math.min(G.i+1,G.rounds.length)}</b> of ${G.rounds.length}</span><span>Score <b>${G.score}</b></span>`; }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow">Unit 1 · Payroll Deductions packet, pages 6 and 7</div>
+    <h2>Read it. Write it. Check it.</h2>
+    <p>Twelve quick rounds about checks and direct deposit. You'll tap parts of a real-looking check, pick the right way to write an amount in words, find the mistake on a check, and fill in a direct deposit form.</p>
+    <ul class="how"><li>One try per round. Read the explanation when you miss one.</li><li>Every check is new each time you play.</li></ul>
+    <div class="row"><button class="btn go" id="go">Start</button></div></div>`;
+  $("go").onclick=newGame;
+}
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const R=G.rounds[G.i], n=G.rounds.length;
+  const optsHTML=(R.type==="words"||R.type==="dd")?`<div class="opts">${R.opts.map((o,k)=>{ let c="opt"+(R.type==="words"?" words":""); if(R.done&&k===R.right) c+=" right"; else if(R.done&&R.pick===k) c+=" wrong";
+     return `<button class="${c}" data-k="${k}" ${R.done?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>`:"";
+  let fb="";
+  if(R.done){ const why=R.type==="label"?PARTS[R.part].why:R.type==="mistake"?R.f.why:R.type==="words"?`Write the dollars in words, then the cents over 100: ${words(R.chk.d,R.chk.c)}. Then draw a line to the word "Dollars."`:R.q.why;
+    fb=`<div class="fb ${R.ok?"ok":"no"}" role="status"><b>${R.ok?"Correct!":"Not this time."}</b> ${esc(why)}</div>`; }
+  const showCheck=R.type!=="dd"||R.q.show;
+  $("root").innerHTML=`
+    <div class="progress" aria-hidden="true"><i style="width:${(G.i+(R.done?1:0))/n*100}%"></i></div>
+    <div class="eyebrow">${SKILLS[R.type]}</div>
+    <p class="prompt" aria-live="polite">${esc(promptFor(R))}</p>
+    ${showCheck?checkHTML(R):""}
+    ${optsHTML}
+    ${fb}
+    ${R.done?`<div class="row"><button class="btn go" id="next">${G.i+1<n?"Next round":"See my results"}</button></div>`:""}`;
+  if(!R.done){
+    if(R.type==="label"||R.type==="mistake") document.querySelectorAll("#check button.rg").forEach(b=>b.onclick=()=>answer(b.dataset.part));
+    else document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  } else { $("next").onclick=next; $("next").focus({preventScroll:true}); }
+}
+function answer(x){
+  const R=G.rounds[G.i]; if(R.done) return;
+  R.pick=x; R.done=true;
+  R.ok = R.type==="label" ? x===R.part : R.type==="mistake" ? R.f.accept.includes(x) : x===R.right;
+  const b=G.by[R.type]||(G.by[R.type]=[0,0]); b[1]++; if(R.ok){ b[0]++; G.score++; }
+  draw();
+}
+function next(){ G.i++; if(G.i>=G.rounds.length){ G.phase="end"; draw(); } else setupRound(); }
+function end(){
+  stats();
+  const n=G.rounds.length;
+  const rows=Object.keys(SKILLS).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    const pill=p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`;
+    return `<div class="skill"><b>${SKILLS[k]}</b><span class="v">${a} of ${t}</span>${pill}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow">Results</div>
+    <h2>${G.score} of ${n} correct${G.score===n?". Perfect!":G.score>=n*.8?". Nice work.":"."}</h2>
+    <div class="skills">${rows}</div>
+    <p>Missed some? Look at page 7 of your packet: the check-writing tips list what goes on each line.</p>
+    <div class="row"><button class="btn go" id="again">Play again (new checks)</button></div></div>`;
+  $("again").onclick=newGame;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

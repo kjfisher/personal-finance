@@ -1,0 +1,330 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Paycheck Builder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: work card on the left walks the Payroll Deduction Packet one step at a time; a paper pay stub on the right fills in line by line. Stacks on narrow screens. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --paper:#FFFDF6; --paper-line:#D9D2BC; --stamp:#0F8B6C; --stamp-soft:#DDF1EA;
+  --gold:#E0A800; --bad:#C23B3B; --bad-soft:#FBE7E7; --hero:#14213D; --hero-ink:#F3F5F8;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --paper:#1B2540; --paper-line:#3A4870; --stamp:#3CCB9F; --stamp-soft:#123A32;
+  --gold:#F5C542; --bad:#F07070; --bad-soft:#3A1C24; --hero:#101A30; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --paper:#1B2540; --paper-line:#3A4870; --stamp:#3CCB9F; --stamp-soft:#123A32;
+  --gold:#F5C542; --bad:#F07070; --bad-soft:#3A1C24; --hero:#101A30; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1180px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; align-items:center; flex-wrap:wrap; }
+.bar .stats b { color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); }
+.wrap { max-width:1180px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, 1.15fr) minmax(0, 1fr); gap:20px; align-items:start; }
+@media (max-width:820px) { .game { grid-template-columns:1fr; } }
+.work { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:16px; min-width:0; }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+.progress i { display:block; height:100%; background:var(--stamp); transition:width .3s; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.prompt { font-family:var(--display); font-weight:600; font-size:clamp(23px, 3vw, 32px); line-height:1.2; margin:0; text-wrap:balance; }
+.formula { font-family:var(--mono); font-size:15px; background:var(--bg); border-radius:10px; padding:10px 12px; line-height:1.5; overflow-wrap:anywhere; }
+.answer-row { display:flex; gap:10px; flex-wrap:wrap; }
+.money { flex:1 1 200px; display:flex; align-items:center; border:2px solid var(--line); border-radius:12px; background:var(--bg); padding:0 12px; min-width:0; }
+.money:focus-within { border-color:var(--gold); }
+.money span { font-family:var(--mono); font-size:24px; color:var(--muted); }
+.money input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:26px; padding:12px 8px; outline:none; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--stamp); color:#fff; border-color:var(--stamp); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.btn:focus-visible, input:focus-visible, .pick:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.fb { border-radius:12px; padding:12px 14px; line-height:1.45; }
+.fb.ok { background:var(--stamp-soft); }
+.fb.no { background:var(--bad-soft); }
+.fb b { font-family:var(--display); }
+.fb .steps { font-family:var(--mono); font-size:15px; margin-top:6px; }
+.tip { color:var(--muted); font-size:15px; margin:0; }
+/* pay stub */
+.stub { background:var(--paper); border:1px solid var(--paper-line); border-radius:6px; padding:18px 18px 22px; font-family:var(--mono); font-size:14px; position:relative; min-width:0; box-shadow:0 8px 22px rgba(20,33,61,.08); }
+.stub::before { content:""; position:absolute; left:0; right:0; top:-1px; height:8px; background:radial-gradient(circle at 6px 0, var(--bg) 4px, transparent 4.5px) 0 0/12px 8px repeat-x; }
+.stub h2 { font-family:var(--display); font-size:20px; margin:4px 0 2px; }
+.stub .co { color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+.stub table { width:100%; border-collapse:collapse; margin-top:10px; font-variant-numeric:tabular-nums; }
+.stub th { text-align:left; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:10px 0 4px; border-bottom:1px dashed var(--paper-line); font-weight:600; }
+.stub td { padding:5px 0; border-bottom:1px dotted var(--paper-line); vertical-align:top; }
+.stub td:last-child { text-align:right; white-space:nowrap; padding-left:8px; }
+.stub tr.cur td { background:rgba(224,168,0,.16); }
+.stub tr.done td:last-child { color:var(--stamp); font-weight:600; }
+.stub tr.shown td:last-child { color:var(--bad); font-weight:600; }
+.stub tr.total td { font-weight:600; border-bottom:2px solid var(--ink); }
+.stub .blank { color:var(--paper-line); }
+.stub .rate { color:var(--muted); font-size:12px; }
+/* start + end */
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:16px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.picks { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px; }
+.pick { font:inherit; text-align:left; padding:12px 14px; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; display:grid; gap:2px; }
+.pick:hover { border-color:var(--stamp); }
+.pick b { font-family:var(--display); font-size:18px; }
+.pick span { font-family:var(--mono); font-size:14px; color:var(--muted); }
+.pick.star { border-color:var(--gold); }
+.own { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; align-items:end; border-top:1px solid var(--line); padding-top:14px; }
+.own label { display:grid; gap:4px; font-weight:700; }
+.own input { font:inherit; font-family:var(--mono); padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); width:100%; }
+.err { color:var(--bad); font-weight:700; }
+.split { display:grid; gap:6px; }
+.split .track { display:flex; height:34px; border-radius:8px; overflow:hidden; font-family:var(--mono); font-size:13px; color:#fff; }
+.split .track div { display:flex; align-items:center; padding:0 8px; white-space:nowrap; overflow:hidden; }
+.k-net { background:var(--stamp); } .k-tax { background:#B8572F; } .k-401 { background:#2F5FB8; } .k-ins { background:#6B4FB0; }
+.legend { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:14px; color:var(--muted); }
+.legend i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 72px); line-height:1; color:var(--stamp); font-variant-numeric:tabular-nums; }
+.review { margin:0; padding-left:20px; line-height:1.5; }
+.row { display:flex; flex-wrap:wrap; gap:10px; }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner">
+  <h1>Paycheck <span>Builder</span></h1>
+  <div class="stats" id="stats"></div>
+</div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const CAREERS=[
+ {n:"Minimum wage job", hr:15, fed:5, note:"Illinois minimum wage"},
+ {n:"Pharmacy Technician", hr:18, fed:6},
+ {n:"Auto Mechanic", hr:22.5, fed:7},
+ {n:"Welder", hr:24, fed:7},
+ {n:"HVAC Technician", hr:27, fed:8},
+ {n:"Electrician", hr:33, fed:10},
+ {n:"Preschool Teacher", yr:39600, fed:6},
+ {n:"Line Cook", yr:40800, fed:6},
+ {n:"Graphic Designer", yr:50400, fed:7},
+ {n:"Paralegal", yr:53400, fed:7},
+ {n:"Firefighter", yr:55200, fed:8},
+ {n:"Marketing Specialist", yr:58800, fed:8},
+ {n:"Plumber", yr:63600, fed:8},
+ {n:"Police Officer", yr:67200, fed:10},
+ {n:"Accountant", yr:76800, fed:10},
+ {n:"Dental Hygienist", yr:82800, fed:12},
+ {n:"Registered Nurse", yr:85200, fed:12},
+ {n:"Physical Therapist", yr:99600, fed:13},
+ {n:"Software Developer", yr:109200, fed:13}
+];
+const HEALTH=120, LIFE=10;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:x%1?2:0,maximumFractionDigits:2});
+const pct=x=>(+x).toLocaleString("en-US",{maximumFractionDigits:2})+"%";
+
+function build(c){
+  const hourly=c.hr!=null;
+  const annual=hourly?r2(c.hr*40*52):c.yr, m=r2(annual/12), f=c.fed/100;
+  const ss=r2(m*.062), med=r2(m*.0145), fed=r2(m*f), st=r2(m*.05), tax=r2(ss+med+fed+st);
+  const k=r2(m*.03), both=r2(k*2), net=r2(m-tax-k-HEALTH-LIFE), annNet=r2(net*12), bw=r2(annNet/26);
+  const V={annual,m,ss,med,fed,st,tax,k,match:k,both,net,annNet,bw};
+  const S=[];
+  if(hourly) S.push({key:"annual", sec:"Gross pay", label:"Gross annual salary", prompt:`You earn ${fmt0(c.hr)} an hour, full time (40 hours a week, 52 weeks). What is your gross annual salary?`,
+    formula:`Hourly wage × 40 hours × 52 weeks`, steps:`${fmt0(c.hr)} × 40 × 52 = ${fmt(annual)}`,
+    miss:[[c.hr*40,"That's one week of pay. Multiply by 52 weeks too."],[c.hr*40*12,"There are 52 weeks in a year, not 12."],[c.hr*52,"Don't forget the 40 hours each week."],[c.hr*40*4*12,"Use 52 weeks. 4 weeks × 12 months is only 48 weeks."]]});
+  S.push({key:"m", sec:"Gross pay", label:"Gross monthly salary", prompt:`Your gross annual salary is ${fmt0(annual)}. What is your gross monthly salary?`,
+    formula:`Annual salary ÷ 12`, steps:`${fmt0(annual)} ÷ 12 = ${fmt(m)}`,
+    miss:[[annual/52,"That's weekly pay (÷ 52). Monthly is ÷ 12."],[annual/26,"That's bi-weekly pay (÷ 26). Monthly is ÷ 12."],[annual/24,"There are 12 months in a year. Divide by 12."]]});
+  S.push({key:"ss", sec:"Taxes (page 2)", label:"Social Security", rate:"6.2%", prompt:`Social Security is 6.2% of your gross monthly pay. How much is taken out?`,
+    formula:`Gross monthly × 0.062`, steps:`${fmt(m)} × 0.062 = ${fmt(ss)}`,
+    miss:[[m*.62,"Decimal slip: 6.2% is 0.062, not 0.62."],[m*6.2,"Change the percent to a decimal first: 6.2% = 0.062."],[annual*.062,"Use your MONTHLY gross pay, not annual."],[m*.0765,"7.65% is all of FICA. Social Security alone is 6.2%."]]});
+  S.push({key:"med", sec:"Taxes (page 2)", label:"Medicare", rate:"1.45%", prompt:`Medicare is 1.45% of your gross monthly pay. How much is taken out?`,
+    formula:`Gross monthly × 0.0145`, steps:`${fmt(m)} × 0.0145 = ${fmt(med)}`,
+    miss:[[m*.145,"Decimal slip: 1.45% is 0.0145, not 0.145."],[m*1.45,"Change the percent to a decimal first: 1.45% = 0.0145."],[annual*.0145,"Use your MONTHLY gross pay, not annual."],[m*.062,"That's the Social Security rate. Medicare is 1.45%."]]});
+  S.push({key:"fed", sec:"Taxes (page 2)", label:"Federal income tax", rate:pct(c.fed), prompt:`The tax calculator says your federal rate is ${pct(c.fed)}. How much federal income tax comes out each month?`,
+    formula:`Gross monthly × ${(f).toFixed(4).replace(/0+$/,"")}`, steps:`${fmt(m)} × ${pct(c.fed)} = ${fmt(fed)}`,
+    miss:[[m*f*10,"Decimal slip. Move the decimal two places: "+pct(c.fed)+" = "+(f).toFixed(4).replace(/0+$/,"")+"."],[m*c.fed,"Change the percent to a decimal before you multiply."],[annual*f,"Use your MONTHLY gross pay, not annual."]]});
+  S.push({key:"st", sec:"Taxes (page 2)", label:"State income tax", rate:"5%", prompt:`Use 5% for state and local income tax. How much comes out each month?`,
+    formula:`Gross monthly × 0.05`, steps:`${fmt(m)} × 0.05 = ${fmt(st)}`,
+    miss:[[m*.5,"Decimal slip: 5% is 0.05, not 0.5."],[m*5,"Change 5% to 0.05 before you multiply."],[annual*.05,"Use your MONTHLY gross pay, not annual."]]});
+  S.push({key:"tax", sec:"Taxes (page 2)", label:"Total taxes", tol:.03, prompt:`Add up all four taxes. What are your total taxes each month?`,
+    formula:`Social Security + Medicare + Federal + State`, steps:`${fmt(ss)} + ${fmt(med)} + ${fmt(fed)} + ${fmt(st)} = ${fmt(tax)}`,
+    miss:[[tax-st,"You left out state tax."],[tax-fed,"You left out federal tax."],[tax-ss,"You left out Social Security."],[tax-med,"You left out Medicare."],[ss+med,"That's only FICA. Add federal and state tax too."]]});
+  S.push({key:"k", sec:"401(k) (page 4)", label:"Your 401(k) contribution", rate:"3%", prompt:`You put 3% of your gross monthly pay into your 401(k). How much is that?`,
+    formula:`Gross monthly × 0.03`, steps:`${fmt(m)} × 0.03 = ${fmt(k)}`,
+    miss:[[m*.3,"Decimal slip: 3% is 0.03, not 0.3."],[annual*.03,"That's a whole year. Use your MONTHLY gross pay."],[m*3,"Change 3% to 0.03 before you multiply."]]});
+  S.push({key:"match", sec:"401(k) (page 4)", label:"Employer match", prompt:`Your employer matches your contribution dollar for dollar. How much does your employer add?`,
+    formula:`Match = the same amount you put in`, steps:`You put in ${fmt(k)}, so your employer adds ${fmt(k)}`,
+    miss:[[both,"That's the total. Just the employer's part is the same as yours."],[0,"A match means they DO add money: the same amount you put in."]]});
+  S.push({key:"both", sec:"401(k) (page 4)", label:"Total into your 401(k)", prompt:`How much goes into your 401(k) in total this month?`,
+    formula:`Your contribution + employer match`, steps:`${fmt(k)} + ${fmt(k)} = ${fmt(both)}`,
+    miss:[[k,"That's only one part. Add your money AND your employer's match."]]});
+  S.push({key:"net", sec:"Net pay (page 4)", label:"Net monthly pay", tol:.03, prompt:`Health insurance is ${fmt0(HEALTH)} and life insurance is ${fmt0(LIFE)} a month. What is your estimated NET monthly pay?`,
+    formula:`Gross − 401(k) − total taxes − health − life`, steps:`${fmt(m)} − ${fmt(k)} − ${fmt(tax)} − ${fmt0(HEALTH)} − ${fmt0(LIFE)} = ${fmt(net)}`,
+    miss:[[net+k,"You forgot to subtract your 401(k) contribution."],[net-k,"Only subtract YOUR 401(k) part. The employer match doesn't come out of your pay."],[net+HEALTH+LIFE,"You forgot health and life insurance."],[net+HEALTH,"You forgot health insurance ("+fmt0(HEALTH)+")."],[net+LIFE,"You forgot life insurance ("+fmt0(LIFE)+")."],[m-tax,"You only took out taxes. Subtract 401(k), health and life too."],[tax+k+HEALTH+LIFE,"That's your total deductions. Subtract them from gross pay."]]});
+  S.push({key:"annNet", sec:"Net pay (page 4)", label:"Annual net income", tol:.05, prompt:`What is your annual net income?`,
+    formula:`Net monthly × 12`, steps:`${fmt(net)} × 12 = ${fmt(annNet)}`,
+    miss:[[annual,"That's your gross annual salary. Use your NET monthly pay × 12."],[net*52,"There are 12 months in a year. Multiply by 12."]]});
+  S.push({key:"bw", sec:"Net pay (page 4)", label:"Bi-weekly net pay", tol:.03, prompt:`If you're paid every two weeks, how much is each net paycheck?`,
+    formula:`Annual net ÷ 26`, steps:`${fmt(annNet)} ÷ 26 = ${fmt(bw)}`,
+    miss:[[annNet/24,"Bi-weekly means every 2 weeks: 26 paychecks a year, not 24."],[annNet/52,"That's weekly. Bi-weekly is ÷ 26."],[net/2,"Months aren't exactly 4 weeks. Use annual net ÷ 26."]]});
+  return {V,S};
+}
+
+let S=null, best={}, lastCareer=null;
+try{ best=JSON.parse(localStorage.getItem("paycheck-builder-best")||"{}")||{}; }catch(e){}
+
+function stats(){
+  const el=$("stats");
+  if(!S||S.phase==="pick"){ el.innerHTML=`<span>Unit 1: Payroll Deductions</span>`; return; }
+  el.innerHTML=`<span>${esc(S.c.n)}</span><span>Score <b>${S.score}</b></span>${S.phase==="play"?`<button class="btn" id="quit">Change career</button>`:""}`;
+  $("quit")&&($("quit").onclick=pick);
+}
+function careerLine(c){ return c.hr!=null?`${fmt0(c.hr)}/hr · full time`:`${fmt0(c.yr)}/yr`; }
+function pick(){
+  S={phase:"pick"}; stats();
+  $("root").innerHTML=`<div class="panel">
+    <h2>Pick a career. Build its paycheck.</h2>
+    <p>Work through the Payroll Deduction Packet one step at a time: gross pay, taxes, your 401(k), insurance, then net pay. Use a calculator and round to the cent. Get it on the first try for 10 points, second try for 5.</p>
+    <div class="picks">
+      <button class="pick star" id="rand"><b>Surprise me</b><span>Random career</span></button>
+      ${CAREERS.map((c,i)=>`<button class="pick" data-i="${i}"><b>${esc(c.n)}</b><span>${careerLine(c)}${best[c.n]!=null?` · best ${best[c.n]}`:""}</span></button>`).join("")}
+    </div>
+    <form class="own" id="ownForm" novalidate>
+      <label for="ownName">My career (from the packet)<input id="ownName" maxlength="40" placeholder="Career title"></label>
+      <label for="ownSal">Gross annual salary<input id="ownSal" inputmode="decimal" placeholder="e.g. 61,500"></label>
+      <label for="ownFed">Federal rate % (tinyurl.com/fakeTax)<input id="ownFed" inputmode="decimal" placeholder="e.g. 8"></label>
+      <button class="btn gold" type="submit">Use my career</button>
+      <span class="err" id="ownErr"></span>
+    </form></div>`;
+  document.querySelectorAll(".pick[data-i]").forEach(b=>b.onclick=()=>begin(CAREERS[+b.dataset.i]));
+  $("rand").onclick=()=>{ let c; do{ c=CAREERS[Math.floor(Math.random()*CAREERS.length)]; }while(CAREERS.length>1&&c===lastCareer); begin(c); };
+  $("ownForm").onsubmit=e=>{ e.preventDefault();
+    const sal=num($("ownSal").value), fed=num($("ownFed").value);
+    if(!(sal>=5000&&sal<=1000000)){ $("ownErr").textContent="Enter your yearly salary, like 61500."; return; }
+    if(!(fed>=0&&fed<=40)){ $("ownErr").textContent="Enter the federal rate as a percent, like 8."; return; }
+    begin({n:$("ownName").value.trim()||"My career", yr:r2(sal), fed, own:true}); };
+}
+function num(s){ s=String(s).replace(/[$,%\s]/g,""); if(s===""||isNaN(s)) return NaN; return +s; }
+function begin(c){
+  lastCareer=c; const b=build(c);
+  S={phase:"play", c, V:b.V, steps:b.S, i:0, tries:0, score:0, status:{}, review:[], fb:null, locked:false};
+  draw();
+}
+function stubRow(key,label,rate){
+  const st=S.status[key], cur=S.phase==="play"&&S.steps[S.i]&&S.steps[S.i].key===key;
+  const val=st?fmt(S.V[key]):`<span class="blank">$ ______</span>`;
+  return `<tr class="${cur?"cur":""} ${st||""}"><td>${label}${rate?` <span class="rate">${rate}</span>`:""}</td><td>${val}</td></tr>`;
+}
+function stub(){
+  const c=S.c, has=k=>S.steps.some(s=>s.key===k);
+  return `<aside class="stub" aria-label="Your pay stub">
+    <div class="co">Earnings statement · monthly</div>
+    <h2>${esc(c.n)}</h2>
+    <div class="rate">${c.hr!=null?`${fmt0(c.hr)} per hour × 40 hrs × 52 wks`:`Salary ${fmt0(c.yr)} per year`}</div>
+    <table>
+      <tr><th colspan="2">Earnings</th></tr>
+      ${has("annual")?stubRow("annual","Gross annual"):`<tr class="done"><td>Gross annual</td><td>${fmt(S.V.annual)}</td></tr>`}
+      ${stubRow("m","Gross monthly")}
+      <tr><th colspan="2">Taxes</th></tr>
+      ${stubRow("ss","Social Security","6.2%")}${stubRow("med","Medicare","1.45%")}${stubRow("fed","Federal income tax",pct(c.fed))}${stubRow("st","State income tax","5%")}
+      ${stubRow("tax","Total taxes").replace("<tr class=\"","<tr class=\"total ")}
+      <tr><th colspan="2">Benefits</th></tr>
+      ${stubRow("k","401(k) contribution","3%")}
+      <tr class="${S.i>=S.steps.findIndex(s=>s.key==="net")?"done":""}"><td>Health insurance</td><td>${fmt(HEALTH)}</td></tr>
+      <tr class="${S.i>=S.steps.findIndex(s=>s.key==="net")?"done":""}"><td>Life insurance</td><td>${fmt(LIFE)}</td></tr>
+      <tr><th colspan="2">Net pay</th></tr>
+      ${stubRow("net","Net monthly pay").replace("<tr class=\"","<tr class=\"total ")}
+      ${stubRow("annNet","Annual net")}${stubRow("bw","Bi-weekly net")}
+      <tr><th colspan="2">Employer contributions (not taken from your pay)</th></tr>
+      ${stubRow("match","Employer 401(k) match")}${stubRow("both","Total into 401(k)")}
+    </table></aside>`;
+}
+function draw(){
+  stats();
+  if(S.phase==="pick") return pick();
+  if(S.phase==="end") return end();
+  const s=S.steps[S.i], n=S.steps.length;
+  let fb="";
+  if(S.fb){ const f=S.fb;
+    fb= f.t==="ok" ? `<div class="fb ok" role="status"><b>${f.pts?`+${f.pts} points.`:"Correct."}</b> ${esc(s.steps)}</div>`
+      : f.t==="retry" ? `<div class="fb no" role="status"><b>Not quite.</b> ${esc(f.msg)} Try once more.</div>`
+      : `<div class="fb no" role="status"><b>Here's how it works.</b> ${f.msg?esc(f.msg)+" ":""}<div class="steps">${esc(s.steps)}</div></div>`; }
+  $("root").innerHTML=`<div class="game">
+    <section class="work" aria-live="polite">
+      <div class="progress" aria-hidden="true"><i style="width:${S.i/n*100}%"></i></div>
+      <div class="eyebrow">Step ${S.i+1} of ${n} · ${esc(s.sec)}</div>
+      <p class="prompt">${esc(s.prompt)}</p>
+      <div class="formula">${esc(s.formula)}</div>
+      <form id="ansForm" class="answer-row" novalidate>
+        <label class="money" for="ans"><span>$</span><input id="ans" inputmode="decimal" autocomplete="off" aria-label="${esc(s.label)} in dollars" ${S.locked?"disabled":""}></label>
+        ${S.locked?`<button class="btn go" id="next" type="button">${S.i+1<n?"Next step":"See my paycheck"}</button>`:`<button class="btn go" type="submit">Check</button>`}
+      </form>
+      ${fb}
+      <p class="tip">Round to the nearest cent. Commas and $ signs are fine.</p>
+    </section>
+    ${stub()}
+  </div>`;
+  if(S.locked){ $("next").onclick=advance; $("next").focus(); }
+  else { const a=$("ans"); a.focus({preventScroll:true}); $("ansForm").onsubmit=e=>{ e.preventDefault(); check(a.value); }; }
+}
+function check(raw){
+  const s=S.steps[S.i], v=num(raw);
+  if(isNaN(v)) { S.fb={t:"retry", msg:"Type a dollar amount, like 1234.56."}; return draw(); }
+  const ans=S.V[s.key], tol=s.tol||.015;
+  if(Math.abs(v-ans)<=tol){ const pts=S.tries===0?10:5; S.score+=pts; S.status[s.key]="done"; S.fb={t:"ok",pts}; S.locked=true; return draw(); }
+  const hit=s.miss.find(([x])=>Math.abs(v-r2(x))<=.02 && Math.abs(r2(x)-ans)>tol);
+  const msg=hit?hit[1]:"Check your math against the formula.";
+  S.tries++;
+  if(S.tries<2){ S.fb={t:"retry",msg}; return draw(); }
+  S.status[s.key]="shown"; S.review.push(s.label+(hit?": "+hit[1]:"")); S.fb={t:"show",msg:hit?hit[1]:""}; S.locked=true; draw();
+}
+function advance(){ S.i++; S.tries=0; S.fb=null; S.locked=false;
+  if(S.i>=S.steps.length){ S.phase="end"; const max=S.steps.length*10;
+    if(!S.c.own){ if(best[S.c.n]==null||S.score>best[S.c.n]){ best[S.c.n]=S.score; try{ localStorage.setItem("paycheck-builder-best",JSON.stringify(best)); }catch(e){} } }
+    S.max=max; }
+  draw(); }
+function end(){
+  const V=S.V, keep=V.net/V.m*100, w=x=>(x/V.m*100).toFixed(1)+"%";
+  const ins=HEALTH+LIFE, minC=CAREERS[0];
+  $("root").innerHTML=`<div class="game">
+    <section class="panel">
+      <div class="eyebrow">Paycheck complete · ${S.score} of ${S.max} points</div>
+      <h2>You keep ${fmt(V.net)} of ${fmt(V.m)} each month.</h2>
+      <div class="big">${Math.round(keep)}%</div>
+      <p>That's how much of your gross pay you take home. The rest goes to taxes, your 401(k) and insurance. Your employer also adds ${fmt(V.match)} to your 401(k), so ${fmt(V.both)} goes toward retirement every month.</p>
+      <div class="split">
+        <div class="track" role="img" aria-label="Gross pay split: net ${w(V.net)}, taxes ${w(V.tax)}, 401(k) ${w(V.k)}, insurance ${w(ins)}">
+          <div class="k-net" style="width:${w(V.net)}">Net</div><div class="k-tax" style="width:${w(V.tax)}">Taxes</div><div class="k-401" style="width:${w(V.k)}"></div><div class="k-ins" style="width:${w(ins)}"></div>
+        </div>
+        <div class="legend"><span><i class="k-net"></i>Net pay ${fmt(V.net)}</span><span><i class="k-tax"></i>Taxes ${fmt(V.tax)}</span><span><i class="k-401"></i>401(k) ${fmt(V.k)}</span><span><i class="k-ins"></i>Insurance ${fmt(ins)}</span></div>
+      </div>
+      ${S.review.length?`<div><b>Write these in your notes:</b><ul class="review">${S.review.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>`:`<p><b>Perfect paycheck.</b> Every step right on the first try.</p>`}
+      <div class="row">
+        <button class="btn go" id="again">Try another career</button>
+        ${S.c===minC?"":`<button class="btn gold" id="minw">Compare: minimum wage</button>`}
+        <button class="btn" id="redo">Redo this career</button>
+      </div>
+    </section>
+    ${stub()}
+  </div>`;
+  $("again").onclick=pick; $("redo").onclick=()=>begin(S.c);
+  $("minw")&&($("minw").onclick=()=>begin(minC));
+}
+function start(d){ if(d&&d.S&&d.S.phase&&d.S.phase!=="pick"){ S=d.S; draw(); } else pick(); }
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

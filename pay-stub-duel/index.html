@@ -1,0 +1,172 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pay Stub Duel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one iPad flat on the desk between two partners. Screen splits in half; the top half is rotated 180° so the partner across the desk reads it right side up. Same question on both halves; first correct tap scores. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --p1:#0F8B6C; --p1-soft:#DDF1EA; --p2:#6B4FB0; --p2-soft:#E9E3F6; --gold:#E0A800; --bad:#C23B3B;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --p1:#3CCB9F; --p1-soft:#123A32; --p2:#A68BEF; --p2-soft:#261E3F; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --p1:#3CCB9F; --p1-soft:#123A32; --p2:#A68BEF; --p2-soft:#261E3F; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+html, body, #root { height:100%; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); margin:0; touch-action:manipulation; -webkit-user-select:none; user-select:none; overflow:hidden; }
+.app { height:100%; display:grid; grid-template-rows:1fr auto 1fr; padding-left:max(10px, env(safe-area-inset-left, 0px)); padding-right:max(10px, env(safe-area-inset-right, 0px)); padding-block:8px; gap:8px; }
+.half { border-radius:18px; padding:clamp(10px, 2vh, 22px); display:grid; grid-template-rows:auto 1fr auto; gap:clamp(6px, 1.4vh, 14px); min-height:0; border:3px solid transparent; transition:border-color .2s, background .2s; }
+.half.p1 { background:var(--p1-soft); }
+.half.p2 { background:var(--p2-soft); transform:rotate(180deg); }
+.half.win { border-color:var(--gold); }
+.half.lock { opacity:.55; }
+.hd { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.who { font-family:var(--display); font-weight:800; font-size:clamp(18px, 2.6vh, 28px); }
+.p1 .who { color:var(--p1); } .p2 .who { color:var(--p2); }
+.pts { display:flex; gap:5px; align-items:center; }
+.pts i { width:clamp(12px, 1.8vh, 18px); height:clamp(12px, 1.8vh, 18px); border-radius:50%; border:2px solid var(--muted); display:block; }
+.p1 .pts i.on { background:var(--p1); border-color:var(--p1); } .p2 .pts i.on { background:var(--p2); border-color:var(--p2); }
+.q { font-family:var(--display); font-weight:600; font-size:clamp(17px, 3vh, 32px); line-height:1.2; margin:0; align-self:center; text-wrap:balance; }
+.opts { display:grid; grid-template-columns:1fr 1fr; gap:clamp(6px, 1.2vh, 12px); }
+.opt { font:inherit; font-size:clamp(15px, 2.2vh, 22px); font-weight:700; line-height:1.2; text-align:left; padding:clamp(8px, 1.6vh, 16px) 12px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; min-height:clamp(46px, 7vh, 72px); }
+.opt:active:not(:disabled) { transform:scale(.98); }
+.opt:disabled { cursor:default; }
+.opt.right { border-color:var(--p1); background:var(--p1); color:#fff; }
+.p2 .opt.right { border-color:var(--p2); background:var(--p2); }
+.opt.wrong { border-color:var(--bad); color:var(--bad); }
+.note { font-size:clamp(14px, 2vh, 19px); line-height:1.35; min-height:1.4em; }
+.note b { color:var(--gold); }
+.mid { display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap; text-align:center; }
+.mid .t { font-family:var(--display); font-weight:800; font-size:clamp(16px, 2.2vh, 22px); }
+.mid .s { color:var(--muted); font-size:14px; }
+.btn { font:inherit; font-weight:700; padding:10px 18px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.btn:focus-visible, .opt:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.setup { height:100%; overflow:auto; display:grid; place-items:center; padding:20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 32px); width:min(560px, 100%); display:grid; gap:14px; }
+.card h1 { font-family:var(--display); font-weight:800; font-size:clamp(34px, 6vw, 54px); margin:0; line-height:1; }
+.card .unit { font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+.card p { margin:0; line-height:1.45; }
+.card ol { margin:0; padding-left:20px; line-height:1.5; }
+.field { display:grid; gap:4px; font-weight:700; }
+.field input, .field select { font:inherit; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); -webkit-user-select:text; user-select:text; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:420px) { .two { grid-template-columns:1fr; } }
+.winner { font-family:var(--display); font-weight:800; font-size:clamp(26px, 4vh, 44px); text-align:center; align-self:center; }
+@media (prefers-reduced-motion: reduce) { .half { transition:none; } }
+</style>
+
+<div id="root"></div>
+
+<script>
+const BANK=[
+ ["Under federal law, overtime starts after...",["40 hours in a workweek","8 hours in a day","35 hours a week","45 hours a week"],"Federal rule: hours over 40 in a workweek."],
+ ["The federal overtime rate is...",["1.5× your hourly rate","2× your hourly rate","Your rate + $1.50","Your regular rate"],"Time-and-a-half: hourly rate × 1.5."],
+ ["You earn $18 an hour. Your overtime rate is...",["$27.00","$36.00","$19.50","$9.00"],"18 × 1.5 = $27."],
+ ["$21/hr and you worked 44 hours. Overtime pay?",["$126.00","$84.00","$924.00","$42.00"],"OT rate 21 × 1.5 = $31.50. 4 hrs × $31.50 = $126."],
+ ["$20/hr and you worked 43 hours. Total pay for the week?",["$890","$860","$1,290","$830"],"40 × $20 = $800. 3 × $30 = $90. Total $890."],
+ ["Who usually earns overtime?",["Hourly workers","Most salaried managers","Commission-only agents","Nobody"],"Hourly (nonexempt) workers usually get overtime."],
+ ["Does an unpaid 30-minute lunch count as hours worked?",["No, if you're fully off duty","Yes, always","Only on weekends","Only for overtime"],"Meal breaks don't count if you're completely relieved from duty."],
+ ["Paid a set amount for the whole year:",["Salary","Hourly","Commission","Overtime"],"Salary = a fixed yearly amount, paid in equal checks."],
+ ["Pay based on how much you sell:",["Commission","Salary","Hourly","Overtime"],"Commission is a percent of your sales."],
+ ["Which job is usually paid commission?",["Car salesperson","Teacher","Cashier","Engineer"],"Car, real estate and insurance sales often pay commission."],
+ ["Which job is usually paid hourly?",["Warehouse worker","Teacher","Real estate agent","Accountant"],"Cashiers, servers and warehouse workers are usually hourly."],
+ ["3% commission on a $420,000 house:",["$12,600","$1,260","$126,000","$4,200"],"420,000 × 0.03 = $12,600."],
+ ["5% commission on a $22,600 car:",["$1,130","$113","$11,300","$2,260"],"22,600 × 0.05 = $1,130."],
+ ["A downside of commission pay:",["Income can swing month to month","You never get raises","Overtime is double","Taxes are higher"],"Slow sales month = smaller paycheck."],
+ ["An upside of salary pay:",["Same amount every paycheck","Overtime on every extra hour","More pay with every sale","You pick your hours"],"Salary is steady and predictable."],
+ ["$19/hr × 40 hrs × 52 weeks =",["$39,520","$3,952","$36,480","$760"],"19 × 40 × 52 = $39,520 a year."],
+ ["YTD stands for...",["Year to date","Yearly total deductions","Your take-home dollars","Yesterday's total due"],"Year to date."],
+ ["YTD counts from...",["January 1 until now","Your hire date","The last 12 months","This pay period only"],"YTD = January 1 through this pay period."],
+ ["Paid monthly. Pay period 6/1–6/30. How many paychecks in YTD?",["6","5","7","12"],"January through June = 6 monthly paychecks."],
+ ["Semi-monthly pay means...",["Twice a month (24 checks)","Every 2 weeks (26 checks)","Once a month (12 checks)","Every week (52 checks)"],"Semi-monthly = twice a month, like the 15th and the last day."],
+ ["Bi-weekly pay = how many paychecks a year?",["26","24","52","12"],"Every 2 weeks: 52 ÷ 2 = 26."],
+ ["Gross pay $1,250. This is paycheck #8. YTD gross?",["$10,000","$8,750","$11,250","$1,258"],"YTD = this paycheck × paycheck #: 1,250 × 8."],
+ ["The PAY DATE on a stub is...",["The day you get paid","The dates you worked","Your hire date","January 1"],"Pay date = when the money arrives."],
+ ["The PAY PERIOD on a stub is...",["The dates this check pays for","The day you get paid","Your yearly salary","Your tax rate"],"Pay period = the work dates this check covers."],
+ ["Why might a lender look at your YTD pay?",["To see if you can repay a loan","To set your tax rate","To pick your bank","To count your hours"],"YTD shows how much you're on track to earn."],
+ ["Social Security on a pay stub is figured from...",["Gross pay","Taxable pay","Net pay","YTD pay"],"FICA (Social Security + Medicare) uses gross pay."],
+ ["Illinois state income tax rate:",["4.95%","6.2%","1.45%","7.65%"],"Illinois: 4.95% of taxable pay."],
+ ["A pre-tax 401(k) lowers your...",["Federal and state income tax","Social Security tax","Medicare tax","Gross pay"],"It comes out before income tax. FICA still uses gross."],
+ ["Taxable pay =",["Gross − 401(k)","Gross − all taxes","Net + taxes","Gross × 12"],"Pre-tax 401(k) comes out first."],
+ ["Take-home pay + total deductions should equal...",["Gross pay","Net pay","YTD net","Taxable pay"],"Check before you spend: they add back up to gross."],
+ ["Gross $2,000. Total deductions $540. Net pay?",["$1,460","$2,540","$540","$1,540"],"2,000 − 540 = $1,460."],
+ ["A stub shows 44 hours with overtime at the regular rate. That's...",["An error: OT should be 1.5×","Correct","Fine on weekends","Only wrong in California"],"Hours over 40 must be paid at 1.5×."],
+ ["Your deposit is less than your stub's take-home. Ask...",["Payroll or HR","The IRS","A cashier","Nobody"],"Payroll or HR can find and fix pay mistakes."],
+ ["Which state requires overtime after 8 hours in a DAY?",["California","Illinois","Texas","Florida"],"California has daily overtime. Federal law is weekly."],
+ ["In California, double time starts after...",["12 hours in a day","8 hours","10 hours","40 hours"],"CA: 1.5× after 8 hours, 2× after 12."],
+ ["Overtime must be paid...",["In the check for that pay period","At the end of the year","Only if you ask","As vacation days"],"Overtime goes in the paycheck for the period you earned it."]
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+let G=null, timerId=null;
+let names=["Player 1","Player 2"], target=7;
+try{ const s=JSON.parse(localStorage.getItem("pay-stub-duel-names")||"null"); if(s) names=s; }catch(e){}
+
+function setup(){
+  G=null; clearTimeout(timerId);
+  $("root").innerHTML=`<div class="setup"><div class="card">
+    <div class="unit">Unit 2 · Reading a Pay Stub</div>
+    <h1>Pay Stub Duel</h1>
+    <p>Two players, one iPad. Lay it flat on the desk between you. The top half flips so your partner can read it.</p>
+    <ol><li>Both of you see the same question.</li><li>Tap the right answer first to score.</li><li>Tap a wrong answer and you're locked out for that question.</li></ol>
+    <div class="two"><label class="field" for="n1">Player 1 (bottom)<input id="n1" maxlength="16" value="${esc(names[0])}"></label>
+      <label class="field" for="n2">Player 2 (top)<input id="n2" maxlength="16" value="${esc(names[1])}"></label></div>
+    <label class="field" for="tg">Play to<select id="tg"><option value="5">5 points (quick)</option><option value="7" selected>7 points</option><option value="10">10 points (long)</option></select></label>
+    <button class="btn go" id="start">Start the duel</button></div></div>`;
+  $("tg").value=String(target);
+  $("start").onclick=()=>{ names=[$("n1").value.trim()||"Player 1", $("n2").value.trim()||"Player 2"]; target=+$("tg").value;
+    try{ localStorage.setItem("pay-stub-duel-names", JSON.stringify(names)); }catch(e){}
+    G={deck:shuffle(BANK.map((_,i)=>i)), qi:0, score:[0,0], phase:"ask", locked:[false,false], winner:null, round:1};
+    newQ(); };
+}
+function newQ(){ if(G.qi>=G.deck.length){ G.deck=shuffle(BANK.map((_,i)=>i)); G.qi=0; }
+  const b=BANK[G.deck[G.qi++]]; const order=shuffle([0,1,2,3]);
+  G.cur={q:b[0], opts:order.map(i=>b[1][i]), right:order.indexOf(0), why:b[2]}; G.phase="ask"; G.locked=[false,false]; G.taps=[null,null]; G.scorer=null; draw(); }
+function half(p){
+  const c=G.cur, done=G.phase!=="ask", over=G.phase==="over";
+  const dots=Array.from({length:target},(_,i)=>`<i class="${i<G.score[p]?'on':''}"></i>`).join("");
+  let body;
+  if(over){ body=`<div class="winner">${G.winner===p?"You win!":"Good game!"}</div>`; }
+  else body=`<p class="q">${esc(c.q)}</p>
+    <div><div class="opts">${c.opts.map((o,k)=>{ let cls=""; if(done&&k===c.right) cls="right"; else if(G.taps[p]===k) cls="wrong";
+      return `<button class="opt ${cls}" data-p="${p}" data-k="${k}" ${done||G.locked[p]?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>
+    <div class="note">${done?(G.scorer===p?"<b>+1 point!</b> ":G.scorer===null?"No point this time. ":"")+esc(c.why):G.locked[p]?"Locked out. Wait for your partner.":""}</div></div>`;
+  return `<section class="half p${p+1} ${(over&&G.winner===p)||(!over&&done&&G.scorer===p)?'win':''} ${G.locked[p]&&!done?'lock':''}" aria-label="${esc(names[p])}">
+    <div class="hd"><span class="who">${esc(names[p])}</span><span class="pts" aria-label="${G.score[p]} of ${target} points">${dots}</span></div>
+    ${body}${over?"<span></span>":""}</section>`;
+}
+function draw(){
+  const over=G.phase==="over";
+  const mid= over ? `<div class="mid"><span class="t">${esc(names[G.winner])} wins ${G.score[G.winner]} to ${G.score[1-G.winner]}!</span><button class="btn go" id="again">Rematch</button><button class="btn" id="home">New players</button></div>`
+    : G.phase==="ask" ? `<div class="mid"><span class="t">Question ${G.round}</span><span class="s">First to ${target} wins</span><button class="btn" id="home">Quit</button></div>`
+    : G.winner!=null ? `<div class="mid"><span class="t">Game point!</span></div>` : `<div class="mid"><button class="btn go" id="next">Next question</button><button class="btn" id="home">Quit</button></div>`;
+  $("root").innerHTML=`<div class="app">${half(1)}${mid}${half(0)}</div>`;
+  document.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>tap(+b.dataset.p, +b.dataset.k)));
+  $("next")&&($("next").onclick=()=>{ G.round++; newQ(); });
+  $("again")&&($("again").onclick=()=>{ G={deck:shuffle(BANK.map((_,i)=>i)), qi:0, score:[0,0], phase:"ask", locked:[false,false], winner:null, round:1}; newQ(); });
+  $("home")&&($("home").onclick=setup);
+}
+function tap(p,k){
+  if(G.phase!=="ask"||G.locked[p]) return;
+  G.taps[p]=k;
+  if(k===G.cur.right){ G.score[p]++; G.scorer=p; G.phase="shown";
+    if(G.score[p]>=target){ G.winner=p; draw(); clearTimeout(timerId); timerId=setTimeout(()=>{ G.phase="over"; draw(); },1800); return; } }
+  else { G.locked[p]=true; if(G.locked[0]&&G.locked[1]){ G.phase="shown"; G.scorer=null; } }
+  draw();
+}
+function start(d){ if(d&&d.G){ G=d.G; names=d.names||names; target=d.target||target; if(G.phase==="shown"&&G.winner!=null) G.phase="over"; draw(); } else setup(); }
+window.claude?.hot?.snapshot?.(()=>({G, names, target}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

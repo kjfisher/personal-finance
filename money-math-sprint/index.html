@@ -1,0 +1,351 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Money Math Sprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one centered "teller window" card per problem, HUD strip above (timer, score, streak).
+   Light = mint banknote paper, dark = vault green. */
+:root {
+  --bg: #e9f1ec; --card: #ffffff; --ink: #11261f; --muted: #5a7268; --line: #c7d8cf;
+  --accent: #1d6b4f; --accent-ink: #ffffff; --gold: #a8740d; --good: #1f8a5a; --bad: #c2412f; --tint: #f3f8f5;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1f1a; --card: #123129; --ink: #eef5f0; --muted: #9fb8ad; --line: #2c574a;
+  --accent: #6fd3a2; --accent-ink: #082018; --gold: #e2b350; --good: #6fd3a2; --bad: #ee7462; --tint: #0f2822; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0b1f1a; --card: #123129; --ink: #eef5f0; --muted: #9fb8ad; --line: #2c574a;
+  --accent: #6fd3a2; --accent-ink: #082018; --gold: #e2b350; --good: #6fd3a2; --bad: #ee7462; --tint: #0f2822; color-scheme: dark }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.45;
+  background-image: repeating-radial-gradient(circle at 50% -20%, transparent 0 16px, color-mix(in srgb, var(--accent) 6%, transparent) 16px 17px); }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 42px); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+h1 span { color: var(--gold); }
+.tag { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 700; }
+.ghost { background: transparent; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; color: var(--muted); }
+.ghost:hover { color: var(--ink); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* start screen */
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.mode { text-align: left; border: 2px solid var(--line); background: var(--tint); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+.mode:hover { border-color: var(--accent); }
+.mode b { font-family: var(--display); font-size: 20px; }
+.mode small { color: var(--muted); }
+label.nm { display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
+input[type=text], input[type=number] { border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--tint); min-width: 0; }
+
+/* game */
+.hud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; }
+.hud > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+.hud .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.hud .v { font-family: var(--mono); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hud .v.low { color: var(--bad); }
+.qunit { font-family: var(--mono); font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: .1em; }
+.prompt { font-family: var(--display); font-weight: 600; font-size: clamp(20px, 3.2vw, 26px); line-height: 1.25; margin: 6px 0 4px; text-wrap: balance; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+td, th { border: 1px solid var(--line); padding: 5px 9px; }
+th { text-align: left; background: var(--tint); }
+td.n { text-align: right; font-family: var(--mono); }
+.answer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.answer .unitmark { font-family: var(--mono); font-size: 22px; font-weight: 700; }
+.answer input { font-family: var(--mono); font-size: 22px; width: 190px; }
+.fb { border-radius: 12px; padding: 12px 14px; border: 2px solid var(--line); background: var(--tint); }
+.fb.ok { border-color: var(--good); } .fb.no { border-color: var(--bad); }
+.fb .t { font-family: var(--display); font-weight: 800; font-size: 20px; }
+.fb .t.ok { color: var(--good); } .fb .t.no { color: var(--bad); }
+.fb ol { margin: 6px 0 0; padding-left: 20px; } .fb li { margin: 2px 0; }
+.fb .err { margin-top: 6px; font-weight: 700; }
+.bar { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); width: 100%; transition: width 1s linear; }
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.res { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--tint); }
+.res .l { font-size: 13px; color: var(--muted); } .res .s { font-family: var(--mono); font-size: 24px; font-weight: 700; }
+.chip { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 9px; border-radius: 999px; border: 1px solid currentColor; margin-top: 4px; }
+.chip.g { color: var(--good); } .chip.a { color: var(--gold); } .chip.n { color: var(--bad); } .chip.x { color: var(--muted); }
+.big { font-family: var(--mono); font-size: clamp(40px, 9vw, 64px); font-weight: 700; color: var(--gold); line-height: 1; }
+.muted { color: var(--muted); }
+.flash { animation: fl .4s ease-out; }
+@keyframes fl { from { transform: scale(1.15); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@media (max-width: 480px) { .hud { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="wrap">
+  <header class="row" style="justify-content:space-between">
+    <div><h1>Money Math <span>Sprint</span></h1><div class="tag">Midterm Review · Units 1–4 · #FutureMillionaires</div></div>
+  </header>
+
+  <!-- START -->
+  <section id="start" class="stack" style="margin-top:16px">
+    <div class="card stack">
+      <p style="margin:0">Every problem is a calculation from the midterm: monthly pay, 401(k), net pay, YTD, overtime, commission, CDs, and credit utilization. The numbers are new every time, so you can play again and again. Get one wrong and you'll see the steps and the mistake you most likely made.</p>
+      <label class="nm" for="player">Your name (first name + last initial)
+        <input type="text" id="player" maxlength="24" placeholder="e.g. Jordan M." autocomplete="off"></label>
+      <div class="modes">
+        <button class="mode" data-mode="sprint"><b>3-Minute Sprint</b><small>All 4 units, mixed. Streaks earn bonus points. Beat your high score!</small></button>
+        <button class="mode" data-mode="u1"><b>Unit 1 Practice</b><small>Monthly pay, 401(k) + match, net pay after taxes. No timer.</small></button>
+        <button class="mode" data-mode="u2"><b>Unit 2 Practice</b><small>Pay stub net pay, YTD months & totals, overtime, commission.</small></button>
+        <button class="mode" data-mode="u3"><b>Unit 3 Practice</b><small>CD value at maturity, one year at a time.</small></button>
+        <button class="mode" data-mode="u4"><b>Unit 4 Practice</b><small>Credit utilization and the 30% rule.</small></button>
+      </div>
+      <p class="muted" id="hs" style="margin:0"></p>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" hidden>
+    <div class="hud">
+      <div><div class="l" id="tLabel">Time</div><div class="v" id="time">3:00</div></div>
+      <div><div class="l">Score</div><div class="v" id="score">0</div></div>
+      <div><div class="l">Streak</div><div class="v" id="streak">0</div></div>
+      <div><div class="l">Correct</div><div class="v" id="correct">0/0</div></div>
+    </div>
+    <div class="bar" id="barWrap"><i id="bar"></i></div>
+    <div class="card stack" style="margin-top:12px">
+      <div><div class="qunit" id="qunit"></div><div class="prompt" id="prompt"></div></div>
+      <div id="extra"></div>
+      <form id="ansForm" class="answer" autocomplete="off">
+        <span class="unitmark" id="pre">$</span>
+        <input type="number" step="any" id="ans" inputmode="decimal" aria-label="Your answer">
+        <span class="unitmark" id="post"></span>
+        <button class="primary" id="check" type="submit">Check</button>
+        <button class="ghost" id="skip" type="button">Skip</button>
+      </form>
+      <div class="fb" id="fb" hidden></div>
+      <div class="row"><button class="primary" id="next" hidden>Next problem →</button><span style="flex:1"></span><button class="ghost" id="quit">End game</button></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="stack" hidden style="margin-top:16px"></section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const rnd = (a, b, step = 1) => a + step * Math.floor(Math.random() * (Math.floor((b - a) / step) + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const r2 = x => Math.round(x * 100) / 100;
+const usd = x => "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 });
+const usd2 = x => "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const NAMES = ["Maya","Leo","Sofia","Jayden","Amara","Diego","Priya","Owen","Zoe","Mateo","Lena","Kai"];
+// exam/study-guide numbers to avoid so this never mirrors the real test
+const AVOID_SAL = new Set([45600, 51000, 39000, 48000, 30000, 26000, 40000, 20000, 57600, 50000]);
+
+// Each generator returns {unit, prompt, extra(html), pre, post, answer, tol, steps[], errors:[[value, message]]}
+const GEN = {
+  monthly() {
+    let s; do { s = rnd(31200, 74400, 1200); } while (AVOID_SAL.has(s));
+    const n = pick(NAMES), m = s / 12;
+    return { unit: 1, prompt: `${n} is offered a job paying <b>${usd(s)} per year</b>. What is the gross <b>monthly</b> income?`,
+      pre: "$", post: "", answer: m, tol: 0.01,
+      steps: [`Gross monthly = annual salary ÷ 12`, `${usd(s)} ÷ 12 = <b>${usd2(m)}</b>`],
+      errors: [[r2(s / 52), "That's weekly pay (÷ 52). Monthly means ÷ 12."], [s * 12, "You multiplied by 12. Annual → monthly means divide by 12."]] };
+  },
+  k401() {
+    const m = rnd(2600, 5400, 100), p = pick([3, 4, 5, 6]), match = Math.random() < .5;
+    const you = r2(m * p / 100);
+    if (!match) return { unit: 1, prompt: `Your gross monthly pay is <b>${usd(m)}</b>. You put <b>${p}%</b> into your 401(k). How much is that <b>per month</b>?`,
+      pre: "$", post: "", answer: you, tol: 0.01, steps: [`${p}% = ${p / 100}`, `${usd(m)} × ${p / 100} = <b>${usd2(you)}</b>`],
+      errors: [[r2(m * p / 10), "Decimal slip: " + p + "% is " + (p / 100) + ", not " + (p / 10) + "."], [r2(m - you), "That's your pay after the 401(k). The question asks for the 401(k) amount."]] };
+    return { unit: 1, prompt: `Your gross monthly pay is <b>${usd(m)}</b>. You put <b>${p}%</b> in your 401(k), and your employer matches <b>100% up to ${p}%</b>. How much goes into your 401(k) <b>in total</b> each month?`,
+      pre: "$", post: "", answer: you * 2, tol: 0.01,
+      steps: [`Your part: ${usd(m)} × ${p / 100} = ${usd2(you)}`, `Employer match (100%): ${usd2(you)}`, `Total = ${usd2(you)} + ${usd2(you)} = <b>${usd2(you * 2)}</b>`],
+      errors: [[you, "That's only your part. Add the employer's matching amount — that's free money!"]] };
+  },
+  netAnnual() {
+    let s; do { s = rnd(22000, 64000, 1000); } while (AVOID_SAL.has(s));
+    const tax = r2(s * .1765), net = r2(s - tax), n = pick(NAMES);
+    return { unit: 1, prompt: `${n} earns <b>${usd(s)} per year</b> and pays Social Security (6.2%), Medicare (1.45%), and federal income tax (10%). What is the approximate annual <b>net</b> pay?`,
+      pre: "$", post: "", answer: net, tol: 1,
+      steps: [`Add the rates: 6.2% + 1.45% + 10% = 17.65%`, `Taxes: ${usd(s)} × 0.1765 = ${usd2(tax)}`, `Net = ${usd(s)} − ${usd2(tax)} = <b>${usd2(net)}</b>`],
+      errors: [[tax, "That's the total taxes. Net pay = gross − taxes."], [r2(s * .9), "You only subtracted federal tax. Social Security and Medicare (FICA) come out too."], [r2(s * (1 - .0765)), "You only subtracted FICA. Federal income tax comes out too."]] };
+  },
+  netStub() {
+    const g = rnd(2400, 4300, 100), fed = r2(g * .1), st = r2(g * .0495), ss = r2(g * .062), med = r2(g * .0145), hi = rnd(70, 130, 5), k = r2(g * .03);
+    const ded = r2(fed + st + ss + med + hi + k), net = r2(g - ded);
+    const rows = [["Federal Income Tax", fed], ["State Income Tax (IL)", st], ["Social Security", ss], ["Medicare", med], ["Health Insurance", hi], ["401(k)", k]];
+    return { unit: 2, prompt: `The <b>Net Pay</b> is missing from this pay stub. Calculate it.`,
+      extra: `<div class="tablewrap"><table><tr><th>Gross Pay</th><td class="n">${usd2(g)}</td></tr>${rows.map(([a, b]) => `<tr><td>${a}</td><td class="n">${usd2(b)}</td></tr>`).join("")}<tr><th>Net Pay</th><td class="n">?</td></tr></table></div>`,
+      pre: "$", post: "", answer: net, tol: 0.01,
+      steps: [`Add every deduction: ${rows.map(r => usd2(r[1])).join(" + ")} = ${usd2(ded)}`, `Net = ${usd2(g)} − ${usd2(ded)} = <b>${usd2(net)}</b>`],
+      errors: [[ded, "That's the total deductions. Subtract them from gross pay."], [r2(g + ded), "You added the deductions. Net pay = gross − deductions."],
+               [r2(g - (ded - hi)), "Looks like you skipped Health Insurance. Every line comes out."], [r2(g - (ded - k)), "Looks like you skipped the 401(k). Every line comes out."]] };
+  },
+  ytdMonths() {
+    const m = rnd(2, 11), last = new Date(2026, m, 0).getDate();
+    const mm = String(m).padStart(2, "0"), nx = String(m + 1).padStart(2, "0");
+    return { unit: 2, prompt: `You're paid monthly. Your pay period is <b>${mm}/01/2026 – ${mm}/${last}/2026</b> and the pay date is <b>${nx}/01/2026</b>. How many full months are included in the YTD totals?`,
+      pre: "", post: "months", answer: m, tol: 0,
+      steps: [`Count the pay <u>period</u>, not the pay date.`, `January through ${MONTHS[m - 1]} = <b>${m}</b> months`],
+      errors: [[m + 1, "You counted the pay date's month. The pay date pays for work done in the period before it."]] };
+  },
+  ytdSum() {
+    const k = rnd(4, 8), vals = Array.from({ length: k }, () => rnd(2400, 4800, 5)), tot = vals.reduce((a, b) => a + b, 0);
+    const n = pick(NAMES);
+    return { unit: 2, prompt: `What is ${n}'s <b>YTD gross income</b> through ${MONTHS[k - 1]}?`,
+      extra: `<div class="tablewrap"><table><tr>${vals.map((_, i) => `<th>${MONTHS[i].slice(0, 3)}</th>`).join("")}</tr><tr>${vals.map(v => `<td class="n">${usd(v)}</td>`).join("")}</tr></table></div>`,
+      pre: "$", post: "", answer: tot, tol: 0.01,
+      steps: [`Add all ${k} months: ${vals.map(usd).join(" + ")}`, `= <b>${usd(tot)}</b>`],
+      errors: [...vals.map((v, i) => [tot - v, `You left out ${MONTHS[i]}. Count the months before you add!`]), [vals[k - 1], "That's only the last month. YTD adds every month since January."]] };
+  },
+  overtime() {
+    const r = rnd(14, 24), h = rnd(41, 50), ot = r * 1.5, total = r2(40 * r + (h - 40) * ot);
+    const askRate = Math.random() < .25;
+    if (askRate) return { unit: 2, prompt: `You earn <b>${usd(r)} per hour</b>. Under federal law, what is your <b>overtime hourly rate</b>?`,
+      pre: "$", post: "per hour", answer: ot, tol: 0.01, steps: [`Overtime = 1.5 × regular rate`, `${usd(r)} × 1.5 = <b>${usd2(ot)}</b>`],
+      errors: [[r * 2, "That's double time (2×). Federal overtime is time-and-a-half (1.5×)."], [r + 1.5, "Multiply by 1.5 — don't add 1.5."]] };
+    return { unit: 2, prompt: `You earn <b>${usd(r)}/hour</b> and worked <b>${h} hours</b> this week. Federal overtime is 1.5× after 40 hours. What is your <b>total gross pay</b> for the week?`,
+      pre: "$", post: "", answer: total, tol: 0.01,
+      steps: [`Regular: 40 × ${usd(r)} = ${usd2(40 * r)}`, `Overtime rate: ${usd(r)} × 1.5 = ${usd2(ot)}`, `Overtime: ${h - 40} × ${usd2(ot)} = ${usd2((h - 40) * ot)}`, `Total = <b>${usd2(total)}</b>`],
+      errors: [[h * r, "You paid every hour at the regular rate. Hours over 40 earn 1.5×."], [r2(h * ot), "You paid every hour at the overtime rate. Only hours over 40 get 1.5×."], [r2((h - 40) * ot), "That's just the overtime pay. Add the 40 regular hours too."]] };
+  },
+  commission() {
+    const items = [["home", 180000, 520000, 5000, [2, 2.5, 3]], ["car", 18000, 46000, 500, [2, 3, 5]], ["boat", 30000, 90000, 1000, [4, 5, 6]]];
+    const [it, a, b, st, ps] = pick(items), price = rnd(a, b, st), p = pick(ps), c = r2(price * p / 100);
+    return { unit: 2, prompt: `A salesperson sells a <b>${it}</b> for <b>${usd(price)}</b> and earns a <b>${p}% commission</b>. How much commission do they earn?`,
+      pre: "$", post: "", answer: c, tol: 0.01, steps: [`${p}% = ${p / 100}`, `${usd(price)} × ${p / 100} = <b>${usd2(c)}</b>`],
+      errors: [[r2(price * p / 10), `Decimal slip: ${p}% = ${p / 100}.`], [r2(price - c), "That's the price minus commission. The question asks for the commission."]] };
+  },
+  cd() {
+    const P = rnd(1000, 6000, 500), rate = pick([2, 2.5, 3, 3.5, 4, 5]), y = rnd(2, 4);
+    let bal = P; const steps = [];
+    for (let i = 1; i <= y; i++) { const int = r2(bal * rate / 100); steps.push(`Year ${i}: ${usd2(bal)} × ${rate}% = ${usd2(int)} → ${usd2(r2(bal + int))}`); bal = r2(bal + int); }
+    const simple = r2(P * (1 + rate / 100 * y));
+    steps.push(`Value at maturity = <b>${usd2(bal)}</b>`);
+    return { unit: 3, prompt: `You put <b>${usd(P)}</b> in a CD earning <b>${rate}%</b> for <b>${y} years</b> (interest added once per year). What is it worth at maturity?`,
+      pre: "$", post: "", answer: bal, tol: 0.05, steps,
+      errors: [[simple, "That's simple interest. Each year's interest is added before you find the next year's — use the new balance each year."], [r2(bal - P), "That's just the interest earned. Add it to the starting amount."], [r2(P * (1 + rate / 100)), "That's only one year. Keep going for every year of the term."]] };
+  },
+  util() {
+    const lim = pick([1000, 1200, 1500, 2000, 2400, 2500, 3000, 4000, 5000, 6000]), pct = pick([10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 75, 80]);
+    const bal = lim * pct / 100;
+    if (Math.random() < .5) return { unit: 4, prompt: `Your credit limit is <b>${usd(lim)}</b> and your balance is <b>${usd(bal)}</b>. What is your credit utilization?`,
+      pre: "", post: "%", answer: pct, tol: 0.5, steps: [`Utilization = balance ÷ limit × 100`, `${usd(bal)} ÷ ${usd(lim)} × 100 = <b>${pct}%</b>`, pct > 30 ? "That's above the 30% guideline, which can hurt the Amounts Owed part of your score (30%)." : "That's at or under the 30% guideline. Nice!"],
+      errors: [[r2(lim / bal * 100), "You divided the limit by the balance. It's balance ÷ limit."], [r2(bal / lim), "Multiply by 100 to turn the decimal into a percent."]] };
+    return { unit: 4, prompt: `Your credit limit is <b>${usd(lim)}</b>. To stay at <b>30%</b> utilization, what's the <b>most</b> you should owe?`,
+      pre: "$", post: "", answer: lim * .3, tol: 0.01, steps: [`Max balance = limit × 0.30`, `${usd(lim)} × 0.30 = <b>${usd2(lim * .3)}</b>`],
+      errors: [[lim * .7, "That's 70% of the limit. Use 30%."], [lim * 3, "Decimal slip: 30% = 0.30."]] };
+  }
+};
+const UNIT_GENS = { 1: ["monthly", "k401", "netAnnual"], 2: ["netStub", "ytdMonths", "ytdSum", "overtime", "commission"], 3: ["cd"], 4: ["util"] };
+const UNIT_NAMES = { 1: "Payroll Deductions", 2: "Pay Stubs", 3: "Banking", 4: "Credit" };
+
+let G = null, tick = null;
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+
+function showHS() { const hs = +store.get("mms-high") || 0; $("hs").textContent = hs ? `Your high score on this device: ${hs.toLocaleString()} points` : ""; }
+showHS();
+const savedName = store.get("mms-name"); if (savedName) $("player").value = savedName;
+
+document.querySelectorAll(".mode").forEach(b => b.onclick = () => start(b.dataset.mode));
+
+function start(mode) {
+  store.set("mms-name", $("player").value.trim());
+  G = { mode, timed: mode === "sprint", t: 180, score: 0, streak: 0, best: 0, n: 0, c: 0, byUnit: { 1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0] }, last: null, done: false };
+  $("start").hidden = true; $("results").hidden = true; $("game").hidden = false;
+  $("barWrap").hidden = !G.timed; $("tLabel").textContent = G.timed ? "Time" : "Mode";
+  $("time").textContent = G.timed ? "3:00" : "Unit " + mode.slice(1);
+  $("time").classList.remove("low");
+  clearInterval(tick);
+  if (G.timed) tick = setInterval(() => {
+    G.t--; $("time").textContent = `${Math.floor(G.t / 60)}:${String(G.t % 60).padStart(2, "0")}`;
+    $("time").classList.toggle("low", G.t <= 20);
+    $("bar").style.width = (G.t / 180 * 100) + "%";
+    if (G.t <= 0) finish();
+  }, 1000);
+  $("bar").style.width = "100%";
+  hud(); newProblem();
+}
+
+function newProblem() {
+  let key;
+  if (G.mode === "sprint") { const u = pick([1, 2, 2, 3, 4]); key = pick(UNIT_GENS[u]); } else key = pick(UNIT_GENS[+G.mode.slice(1)]);
+  if (key === G.last && UNIT_GENS[GEN[key]().unit].length > 1) return newProblem();
+  G.last = key;
+  G.p = GEN[key]();
+  $("qunit").textContent = `Unit ${G.p.unit} · ${UNIT_NAMES[G.p.unit]}`;
+  $("prompt").innerHTML = G.p.prompt; $("extra").innerHTML = G.p.extra || "";
+  $("pre").textContent = G.p.pre; $("post").textContent = G.p.post;
+  $("ans").value = ""; $("ans").disabled = false; $("check").disabled = false; $("skip").disabled = false;
+  $("fb").hidden = true; $("next").hidden = true; G.answered = false;
+  $("ans").focus();
+}
+
+function judge(skipped) {
+  if (G.answered || G.done) return;
+  const raw = $("ans").value.trim();
+  if (!skipped && raw === "") { $("ans").focus(); return; }
+  G.answered = true;
+  const v = parseFloat(raw.replace(/[$,%\s]/g, ""));
+  const p = G.p, ok = !skipped && Math.abs(v - p.answer) <= p.tol + 1e-9;
+  G.n++; G.byUnit[p.unit][1]++;
+  let html;
+  if (ok) {
+    G.c++; G.byUnit[p.unit][0]++; G.streak++; G.best = Math.max(G.best, G.streak);
+    const bonus = Math.min(G.streak - 1, 5) * 20; G.score += 100 + bonus;
+    html = `<div class="t ok">✓ Correct! +${100 + bonus}${bonus ? ` (streak bonus +${bonus})` : ""}</div><ol>${p.steps.map(s => `<li>${s}</li>`).join("")}</ol>`;
+    $("fb").className = "fb ok";
+  } else {
+    G.streak = 0;
+    const hit = !skipped && p.errors.find(([e]) => Math.abs(v - e) <= Math.max(p.tol, 0.01) + 1e-9);
+    html = `<div class="t no">${skipped ? "Skipped." : "Not quite."} The answer is ${p.pre}${p.pre === "$" ? usd2(p.answer).slice(1) : p.answer}${p.post === "%" ? "%" : p.post ? " " + p.post : ""}</div>` +
+      (hit ? `<div class="err">Common mistake: ${hit[1]}</div>` : "") + `<ol>${p.steps.map(s => `<li>${s}</li>`).join("")}</ol>`;
+    $("fb").className = "fb no";
+  }
+  $("fb").innerHTML = html; $("fb").hidden = false;
+  $("ans").disabled = true; $("check").disabled = true; $("skip").disabled = true;
+  $("next").hidden = false; $("next").focus();
+  hud();
+}
+
+function hud() {
+  $("score").textContent = G.score.toLocaleString(); $("streak").textContent = G.streak;
+  $("correct").textContent = `${G.c}/${G.n}`;
+  $("score").classList.remove("flash"); void $("score").offsetWidth; $("score").classList.add("flash");
+}
+
+function finish() {
+  if (G.done) return; G.done = true; clearInterval(tick);
+  const hs = +store.get("mms-high") || 0, newHigh = G.timed && G.score > hs;
+  if (newHigh) store.set("mms-high", G.score);
+  const name = $("player").value.trim();
+  const cards = [1, 2, 3, 4].map(u => {
+    const [c, t] = G.byUnit[u]; const pct = t ? c / t : null;
+    const chip = t === 0 ? `<span class="chip x">Not practiced</span>` : pct >= .8 ? `<span class="chip g">Got it</span>` : pct >= .6 ? `<span class="chip a">Almost</span>` : `<span class="chip n">Need help</span>`;
+    return `<div class="res"><div class="l">Unit ${u} · ${UNIT_NAMES[u]}</div><div class="s">${c}/${t}</div>${chip}</div>`;
+  }).join("");
+  const weak = [1, 2, 3, 4].filter(u => G.byUnit[u][1] && G.byUnit[u][0] / G.byUnit[u][1] < .8);
+  $("results").innerHTML = `<div class="card stack">
+    <div class="tag">${name ? name + " · " : ""}${G.timed ? "3-Minute Sprint" : "Unit " + G.mode.slice(1) + " Practice"}</div>
+    <div class="big">${G.score.toLocaleString()} pts</div>
+    <div class="row muted"><span>${G.c} of ${G.n} correct</span><span>·</span><span>Best streak: ${G.best}</span>${newHigh ? `<span>·</span><b style="color:var(--gold)">New high score!</b>` : ""}</div>
+    <div><b>Your self-check by unit</b></div>
+    <div class="results">${cards}</div>
+    <p style="margin:0">${G.n === 0 ? "Try a few problems to see your results." : weak.length ? `Focus next on <b>${weak.map(u => "Unit " + u).join(" and ")}</b>. Try a Unit Practice round until you hit “Got it.”` : "Every unit you practiced is at Got it. You're midterm-ready!"}</p>
+    <div class="row"><button class="primary" id="again">Play again</button><button class="ghost" id="menu">Choose a different mode</button></div></div>`;
+  $("game").hidden = true; $("results").hidden = false;
+  $("again").onclick = () => start(G.mode); $("menu").onclick = () => { $("results").hidden = true; $("start").hidden = false; showHS(); };
+}
+
+$("ansForm").addEventListener("submit", e => { e.preventDefault(); judge(false); });
+$("skip").onclick = () => judge(true);
+$("next").onclick = () => { if (!G.done) newProblem(); };
+$("quit").onclick = finish;
+</script>
+
+</body></html>

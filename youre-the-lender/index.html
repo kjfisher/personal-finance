@@ -1,0 +1,176 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>You're the Lender</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: loan officer's desk. Left = applicant's mini credit report (like the class sample); right = the decision stamp panel and reveal. Stacks on phones. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --paper:#FBFCFE; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800; --bad:#C23B3B; --warn:#C7741C;
+  --ok:#1F9E6E; --l30:#E0A800; --l60:#EE8A2E; --l90:#D64545;
+  --b1:#D64545; --b2:#EE8A2E; --b3:#E7C33A; --b4:#6BBF59; --b5:#1F9E6E;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --paper:#1B2745; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; --warn:#F0A55A; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --paper:#1B2745; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; --warn:#F0A55A; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
+.wrap { max-width:1400px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:10px; }
+h1 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 48px); line-height:1; margin:0; }
+header p { margin:4px 0 0; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:15px; }
+.tally { display:flex; gap:10px; align-items:center; font-weight:700; }
+.tally .big { font-family:var(--display); font-size:30px; font-variant-numeric:tabular-nums; }
+.btn { font:inherit; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn:hover { border-color:var(--ink); }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, .stamp:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.grid { display:grid; grid-template-columns:minmax(0, 7fr) minmax(0, 5fr); gap:16px; align-items:start; }
+@media (max-width:900px) { .grid { grid-template-columns:minmax(0, 1fr); } }
+.report { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:clamp(14px, 2vw, 24px); display:grid; gap:14px; min-width:0; }
+.rhead { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; border-bottom:2px solid var(--ink); padding-bottom:10px; }
+.rhead .t { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.rhead .name { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3vw, 38px); line-height:1.05; }
+.rhead .req { text-align:right; }
+.rhead .req .amt { font-family:var(--display); font-weight:800; font-size:clamp(20px, 2.2vw, 28px); }
+.facts { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; }
+.fact { border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:var(--surface); }
+.fact .k { font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:700; }
+.fact .v { font-family:var(--mono); font-size:clamp(17px, 1.7vw, 21px); margin-top:2px; }
+.fact.flag { border-color:var(--bad); }
+.tablewrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; min-width:560px; font-size:clamp(15px, 1.4vw, 18px); }
+th, td { text-align:left; padding:8px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+th { font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+td.num { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.ph { display:flex; gap:3px; flex-wrap:nowrap; }
+.ph span { width:24px; height:24px; border-radius:5px; font-family:var(--mono); font-size:10px; display:flex; align-items:center; justify-content:center; color:#14213D; font-weight:700; }
+.ph .OK { background:var(--ok); color:#fff; } .ph .L30 { background:var(--l30); } .ph .L60 { background:var(--l60); } .ph .L90 { background:var(--l90); color:#fff; }
+.key { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:13px; color:var(--muted); }
+.key i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+.desk { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:clamp(14px, 2vw, 24px); display:grid; gap:12px; min-width:0; }
+.desk h2 { font-family:var(--display); font-weight:800; font-size:clamp(22px, 2.4vw, 32px); margin:0; line-height:1.1; }
+.desk .sub { color:var(--muted); margin:0; }
+.stamp { font:inherit; text-align:left; display:grid; gap:2px; padding:14px 16px; border-radius:12px; border:3px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.stamp b { font-family:var(--display); font-size:clamp(20px, 2vw, 26px); }
+.stamp small { color:var(--muted); font-size:15px; }
+.stamp:hover:not(:disabled) { border-color:var(--ink); }
+.stamp:disabled { cursor:default; opacity:.45; }
+.stamp.picked { opacity:1; border-color:var(--ink); }
+.stamp.right { opacity:1; border-color:var(--accent); }
+.verdict { border-radius:12px; padding:14px; border:1px solid var(--line); background:var(--bg); display:grid; gap:8px; }
+.verdict .res { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3vw, 40px); line-height:1; }
+.verdict .res.good { color:var(--accent); } .verdict .res.badc { color:var(--bad); }
+.score { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.score .n { font-family:var(--display); font-weight:800; font-size:clamp(40px, 5vw, 64px); line-height:1; font-variant-numeric:tabular-nums; }
+.pill { padding:4px 12px; border-radius:999px; font-weight:700; color:#14213D; }
+.flags { margin:0; padding-left:20px; display:grid; gap:4px; font-size:clamp(16px, 1.5vw, 19px); }
+.flags .r::marker { content:"✗  "; color:var(--bad); } .flags .g::marker { content:"✓  "; color:var(--accent); }
+.row { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+.end { text-align:center; display:grid; gap:14px; justify-items:center; padding:20px; }
+.end h2 { font-family:var(--display); font-weight:800; font-size:clamp(34px, 5vw, 64px); margin:0; }
+.foot { color:var(--muted); font-size:14px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div><h1>You're the Lender</h1><p>Personal Finance - Unit 4 Review - Read the report, make the call</p></div>
+    <div class="tally"><span>Class score</span><span class="big" id="tally">0 / 0</span><button class="btn" id="restart">Restart</button></div>
+  </header>
+  <div id="main"></div>
+  <div class="foot">The credit score is hidden until you decide. Teams study the report, then vote: 1 finger = Approve with the best rate, 2 = Approve with a higher rate, 3 = Deny. Click the class's choice to stamp the application.</div>
+</div>
+
+<script>
+const BANDS=[[300,579,"Very Poor","--b1"],[580,669,"Fair","--b2"],[670,739,"Good","--b3"],[740,799,"Very Good","--b4"],[800,850,"Exceptional","--b5"]];
+const DEC=[["Approve: best rate","Low risk. Lowest interest, least paperwork."],["Approve: higher rate","Some risk. Charge more interest, ask for proof of income."],["Deny","Too risky to lend to right now."]];
+const OK="OK", A=(s)=>s.split(" ");
+const APPS=[
+ {name:"Maya R.", age:26, req:"$22,000 car loan", hist:"7 years", inq:0, coll:"None", pub:"None", score:792, dec:0,
+  acct:[["Visa card","Revolving",300,5000,A("OK OK OK OK OK OK OK OK OK OK OK OK")],["Student loan","Installment",8400,null,A("OK OK OK OK OK OK OK OK OK OK OK OK")],["Auto loan","Installment",3100,null,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
+  g:["Every payment on time for 12 months","Very low utilization ($300 ÷ $5,000 = 6%)","7 years of history and a good credit mix"], r:[]},
+ {name:"Dante W.", age:21, req:"$15,000 car loan", hist:"1 year", inq:4, coll:"None", pub:"None", score:598, dec:1,
+  acct:[["Store card","Revolving",480,500,A("OK OK 30 OK OK OK 30 OK OK OK OK OK")],["Visa card","Revolving",410,600,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
+  g:["No collections or public records"], r:["Two 30-day late payments on the store card","Store card is 96% used ($480 ÷ $500)","4 hard inquiries in one year","Only 1 year of history"]},
+ {name:"Priya N.", age:24, req:"$18,000 car loan", hist:"4 years", inq:1, coll:"None", pub:"None", score:718, dec:1,
+  acct:[["Visa card","Revolving",1050,3000,A("OK OK OK OK OK OK OK OK OK OK OK OK")],["Student loan","Installment",12500,null,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
+  g:["Every payment on time","No collections"], r:["Utilization is 35% ($1,050 ÷ $3,000), just over 30%","Only 4 years of history"]},
+ {name:"Marcus J.", age:23, req:"$20,000 car loan", hist:"3 years", inq:3, coll:"1 account, $1,100", pub:"None", score:512, dec:2,
+  acct:[["Visa card","Revolving",2000,2000,A("OK 30 60 90 90 90 90 90 90 90 90 90")],["Store card","Revolving",750,800,A("OK OK 30 30 60 OK OK 30 OK 60 OK OK")]],
+  g:[], r:["Visa is 90+ days late for 10 months","An account in collections","Both cards maxed out (100% and 94%)","3 hard inquiries"]},
+ {name:"Lena O.", age:31, req:"$25,000 car loan", hist:"12 years", inq:0, coll:"None", pub:"None", score:828, dec:0,
+  acct:[["Visa card","Revolving",220,8000,A("OK OK OK OK OK OK OK OK OK OK OK OK")],["Mortgage","Installment",184000,null,A("OK OK OK OK OK OK OK OK OK OK OK OK")],["Retail card","Revolving",0,2500,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
+  g:["Perfect payment history","Utilization about 2% ($220 ÷ $10,500)","12 years of history","Mix of revolving and installment credit"], r:[]},
+ {name:"Theo B.", age:19, req:"$12,000 car loan", hist:"1 year", inq:0, coll:"None", pub:"None", score:688, dec:1,
+  acct:[["Parent's Visa (authorized user)","Revolving",350,4000,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
+  g:["Every payment on time","Low utilization (about 9%)","No hard inquiries"], r:["Only 1 year of history and just 1 account (a thin file)"]},
+ {name:"Tony K.", age:27, req:"$19,000 car loan", hist:"6 years", inq:2, coll:"None", pub:"None", score:641, dec:1,
+  acct:[["Visa card","Revolving",3400,4000,A("OK OK OK OK OK OK OK OK OK OK OK OK")],["Auto loan","Installment",5200,null,A("OK OK OK OK OK OK OK OK 30 60 OK OK")]],
+  g:["6 years of history","Mostly on-time payments"], r:["Recent 30- and 60-day late payments on the auto loan","Visa is 85% used ($3,400 ÷ $4,000)"]},
+ {name:"Rosa M.", age:25, req:"$16,000 car loan", hist:"5 years", inq:1, coll:"None", pub:"Bankruptcy (2 years ago)", score:563, dec:2,
+  acct:[["Secured card","Revolving",90,300,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
+  g:["Rebuilding with a secured card, paid on time"], r:["Bankruptcy on her public record","Very little active credit right now"]}
+];
+const $=id=>document.getElementById(id);
+let G;
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function fresh(){ return {order:shuffle(APPS.map((_,i)=>i)), i:0, pick:null, right:0, done:0}; }
+const money=n=>"$"+n.toLocaleString("en-US");
+const band=s=>BANDS.find(b=>s>=b[0]&&s<=b[1]);
+function phCell(p){ const cls=p==="OK"?"OK":"L"+p.replace("+",""); return `<span class="${cls}" title="${p==='OK'?'On time':p+' days late'}">${p==="OK"?"OK":p}</span>`; }
+function render(){
+  $("tally").textContent=`${G.right} / ${G.done}`;
+  const m=$("main");
+  if(G.i>=G.order.length){
+    m.innerHTML=`<div class="desk end"><span class="pill" style="background:var(--gold)">All applications reviewed</span>
+      <h2>${G.right} of ${G.order.length} correct calls</h2>
+      <p class="sub">Remember: lenders care most about payment history (35%) and amounts owed (30%).</p>
+      <button class="btn primary" id="again">Play again (new order)</button></div>`;
+    $("again").onclick=()=>{ G=fresh(); render(); }; return; }
+  const a=APPS[G.order[G.i]], done=G.pick!=null;
+  const rows=a.acct.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td class="num">${money(x[2])}</td><td class="num">${x[3]==null?"—":money(x[3])}</td><td><div class="ph">${x[4].map(phCell).join("")}</div></td></tr>`).join("");
+  let h=`<div class="grid"><section class="report" aria-label="Credit report">
+    <div class="rhead"><div><div class="t">Credit report - Application ${G.i+1} of ${G.order.length}</div><div class="name">${a.name}, age ${a.age}</div></div>
+      <div class="req"><div class="t">Requesting</div><div class="amt">${a.req}</div></div></div>
+    <div class="facts">
+      <div class="fact"><div class="k">Credit score</div><div class="v">${done?a.score:"??? hidden"}</div></div>
+      <div class="fact"><div class="k">Length of history</div><div class="v">${a.hist}</div></div>
+      <div class="fact ${a.inq>=3?'flag':''}"><div class="k">Hard inquiries (12 mo)</div><div class="v">${a.inq}</div></div>
+      <div class="fact ${a.coll!=='None'?'flag':''}"><div class="k">Collections</div><div class="v">${a.coll}</div></div>
+      <div class="fact ${a.pub!=='None'?'flag':''}"><div class="k">Public records</div><div class="v">${a.pub}</div></div>
+    </div>
+    <div class="tablewrap"><table><thead><tr><th>Account</th><th>Type</th><th>Balance</th><th>Limit</th><th>Payment history (last 12 months)</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="key"><span><i style="background:var(--ok)"></i>OK = on time</span><span><i style="background:var(--l30)"></i>30 days late</span><span><i style="background:var(--l60)"></i>60 days late</span><span><i style="background:var(--l90)"></i>90+ days late</span></div>
+  </section>
+  <section class="desk" aria-live="polite"><h2>Your decision</h2><p class="sub">Look for red flags: late payments, high utilization, lots of new credit, collections, public records.</p>
+    ${DEC.map((d,k)=>`<button class="stamp ${done&&k===a.dec?'right':''} ${done&&G.pick===k?'picked':''}" data-k="${k}" ${done?'disabled':''}><b>${k+1}. ${d[0]}</b><small>${d[1]}</small></button>`).join("")}`;
+  if(done){ const b=band(a.score), ok=G.pick===a.dec;
+    h+=`<div class="verdict"><div class="res ${ok?'good':'badc'}">${ok?"Good call!":"Not quite."}</div>
+      <div class="score"><span class="n">${a.score}</span><span class="pill" style="background:var(${b[3]})">${b[2]}</span></div>
+      <div>Best decision: <b>${DEC[a.dec][0]}</b></div>
+      <ul class="flags">${a.r.map(x=>`<li class="r">${x}</li>`).join("")}${a.g.map(x=>`<li class="g">${x}</li>`).join("")}</ul></div>
+      <div class="row"><button class="btn primary" id="next">${G.i===G.order.length-1?"See results":"Next applicant"}</button></div>`; }
+  h+=`</section></div>`;
+  m.innerHTML=h;
+  m.querySelectorAll(".stamp").forEach(s=>s.onclick=()=>{ G.pick=+s.dataset.k; G.done++; if(G.pick===a.dec) G.right++; render(); $("next")?.focus(); });
+  $("next")&&($("next").onclick=()=>{ G.i++; G.pick=null; render(); });
+}
+document.addEventListener("keydown",e=>{ if(["1","2","3"].includes(e.key)){ const s=document.querySelector(`.stamp[data-k="${+e.key-1}"]:not(:disabled)`); s&&s.click(); } });
+$("restart").onclick=()=>{ const b=$("restart");
+  if(b.dataset.c){ G=fresh(); render(); b.textContent="Restart"; delete b.dataset.c; }
+  else { b.dataset.c=1; b.textContent="Click again to restart"; setTimeout(()=>{ b.textContent="Restart"; delete b.dataset.c; },3000); } };
+function start(d){ G=(d&&d.G)||fresh(); render(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

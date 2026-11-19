@@ -1,0 +1,177 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Minimum Payment Trap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: projector slideshow, one scene per step. Each scene = a big prompt + either vote buttons or a live payoff chart (balance over years, Matt vs. Mark) with running counters. Arrow keys move scenes. */
+:root {
+  --bg:#F4F1EC; --surface:#FFFFFF; --ink:#1B1F2E; --muted:#5D6375; --line:#D8D3CA;
+  --matt:#0F8B6C; --mark:#C2412D; --gold:#E0A800; --grid:#E6E1D8; --ok-soft:#DDF1EA; --bad-soft:#F9E1DC;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#12141D; --surface:#1C2030; --ink:#ECEEF4; --muted:#9AA1B5; --line:#2E3448;
+  --matt:#3CCB9F; --mark:#FF7A63; --gold:#F5C542; --grid:#262B3C; --ok-soft:#123A32; --bad-soft:#3E1F1A; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#12141D; --surface:#1C2030; --ink:#ECEEF4; --muted:#9AA1B5; --line:#2E3448;
+  --matt:#3CCB9F; --mark:#FF7A63; --gold:#F5C542; --grid:#262B3C; --ok-soft:#123A32; --bad-soft:#3E1F1A; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+html, body { height:100%; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:18px; margin:0; }
+.app { min-height:100%; display:grid; grid-template-rows:auto 1fr auto; max-width:1280px; margin:0 auto; padding-block:16px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); gap:14px; }
+header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px 16px; }
+header h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3vw, 36px); margin:0; }
+header h1 span { color:var(--mark); }
+.dots { display:flex; gap:6px; }
+.dots i { width:26px; height:8px; border-radius:4px; background:var(--line); }
+.dots i.on { background:var(--gold); } .dots i.done { background:var(--matt); }
+.scene { display:grid; gap:18px; align-content:start; }
+.eyebrow { font-family:var(--mono); font-size:14px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+h2 { font-family:var(--display); font-weight:800; font-size:clamp(30px, 4.4vw, 58px); line-height:1.05; margin:0; text-wrap:balance; }
+.lead { font-size:clamp(19px, 2vw, 26px); line-height:1.4; margin:0; max-width:62ch; }
+.duo { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+.person { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; display:grid; gap:6px; border-top:8px solid var(--c); }
+.person b { font-family:var(--display); font-size:28px; color:var(--c); }
+.person .row { display:flex; justify-content:space-between; gap:10px; font-family:var(--mono); font-size:17px; border-bottom:1px dashed var(--line); padding:4px 0; }
+.votes { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
+.vote { font:inherit; font-family:var(--display); font-weight:800; font-size:clamp(22px, 2.6vw, 34px); padding:18px; border-radius:16px; border:3px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; text-align:left; display:flex; gap:12px; align-items:center; }
+.vote .k { font-family:var(--mono); font-size:16px; color:var(--muted); border:2px solid var(--line); border-radius:8px; padding:2px 8px; }
+.vote.right { border-color:var(--matt); background:var(--ok-soft); } .vote.wrong { border-color:var(--mark); background:var(--bad-soft); }
+.vote:disabled { cursor:default; }
+.reveal { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px 18px; font-size:clamp(18px, 2vw, 24px); line-height:1.45; }
+.reveal b { font-family:var(--display); }
+.math { font-family:var(--mono); font-size:clamp(16px, 1.7vw, 21px); line-height:1.7; }
+.chartbox { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:14px; display:grid; gap:10px; min-width:0; }
+.chartbox svg { width:100%; height:auto; display:block; }
+.counters { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:12px; }
+.ctr { border-radius:14px; padding:12px 16px; background:var(--surface); border:1px solid var(--line); border-left:8px solid var(--c); display:grid; gap:2px; }
+.ctr .n { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3vw, 40px); color:var(--c); font-variant-numeric:tabular-nums; }
+.ctr .l { font-family:var(--mono); font-size:14px; color:var(--muted); }
+.ctl { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.btn:focus-visible, .vote:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.form { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; align-items:end; }
+.form label { display:grid; gap:4px; font-weight:700; }
+.form input, .form select { font:inherit; font-family:var(--mono); padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+footer { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:14px; }
+.big-quote { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 52px); line-height:1.1; margin:0; text-wrap:balance; }
+.big-quote span { color:var(--matt); }
+ul.take { margin:0; padding-left:24px; font-size:clamp(19px, 2vw, 26px); line-height:1.6; }
+</style>
+
+<div class="app">
+  <header><h1>Minimum Payment <span>Trap</span></h1><div class="dots" id="dots" aria-hidden="true"></div></header>
+  <main class="scene" id="scene" aria-live="polite"></main>
+  <footer><span>Model: payment = 2% of the balance or $15, whichever is more. Interest = balance × APR ÷ 12 each month. Online calculators vary a little.</span>
+    <span class="ctl"><button class="btn" id="back">← Back</button><button class="btn go" id="fwd">Next →</button></span></footer>
+</div>
+
+<script>
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=x=>"$"+Math.round(x).toLocaleString("en-US");
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function sim(bal,apr,mode,fixed){ const pts=[bal], ci=[0]; let b=bal, I=0, m=0, paid=0;
+  while(b>0.005&&m<1200){ m++; const i=r2(b*apr/1200); let pay=mode==="min"?Math.max(r2(b*.02),15):fixed;
+    b=r2(b+i); if(pay<=i){ return {stuck:true, months:m, pts}; } pay=Math.min(pay,b); b=r2(b-pay); I+=i; paid+=pay; pts.push(b); ci.push(r2(I)); }
+  if(b>0.005) return {stuck:true, months:m, pts}; return {months:m, interest:r2(I), paid:r2(paid), pts, ci}; }
+const MATT=sim(10000,10,"min"), MARK=sim(10000,20,"min");
+const M300=sim(10000,10,"fixed",300), K300=sim(10000,20,"fixed",300);
+const yrs=m=>(m/12).toFixed(1);
+
+const SCENES=[
+ {t:"story"},
+ {t:"vote", key:"m1", eyebrow:"Month 1 · Matt (10% APR)", q:"Matt's first minimum payment is $200 (2% of $10,000). How much of that $200 goes to INTEREST?", opts:["$83.33","$200.00","$16.67","$1,000.00"], right:0,
+   why:`<div class="math">Interest = $10,000 × 10% ÷ 12 = <b>$83.33</b><br>Paying down the balance: $200 − $83.33 = <b>$116.67</b></div>Almost half of his first payment just pays the bank for borrowing.`},
+ {t:"vote", key:"m2", eyebrow:"Predict · Matt (10% APR)", q:"Paying only the minimum, how long will it take Matt to pay off $10,000?", opts:["About 2 years","About 5 years","About 10 years","About 24 years"], right:3,
+   why:`About <b>${yrs(MATT.months)} years</b> (${MATT.months} payments) and <b>${fmt(MATT.interest)}</b> in interest. Your slides say 24 years and $6,831.35. That's the same story.`},
+ {t:"chart", show:["matt"], eyebrow:"Watch it · Matt", q:"Matt's balance, month by month"},
+ {t:"vote", key:"m3", eyebrow:"Month 1 · Mark (20% APR)", q:"Mark has the same $200 first payment, but a 20% rate. How much of it actually pays down his balance?", opts:["$33.33","$166.67","$116.67","$200.00"], right:0,
+   why:`<div class="math">Interest = $10,000 × 20% ÷ 12 = $166.67<br>Paying down the balance: $200 − $166.67 = <b>$33.33</b></div>Only $33.33 of $200 makes a dent.`},
+ {t:"vote", key:"m4", eyebrow:"Predict · Mark (20% APR)", q:"Paying only the minimum, how long will it take Mark?", opts:["About 24 years","About 35 years","About 50 years","About 74 years"], right:3,
+   why:`About <b>${yrs(MARK.months)} years</b> and <b>${fmt(MARK.interest)}</b> in interest, almost 5 times what he borrowed. His bad credit (20% vs. 10%) costs him about <b>${fmt0(MARK.interest-MATT.interest)}</b> more than Matt.`},
+ {t:"chart", show:["matt","mark"], eyebrow:"Watch it · Matt vs. Mark", q:"Same $10,000. Same minimum payments. Different credit."},
+ {t:"vote", key:"m5", eyebrow:"The fix", q:"What if Mark pays $300 every month instead of the minimum?", opts:["About 4 years","About 20 years","About 40 years","He'd never pay it off"], right:0,
+   why:`<b>${yrs(K300.months)} years</b> and <b>${fmt(K300.interest)}</b> interest, instead of ${yrs(MARK.months)} years and ${fmt0(MARK.interest)}. Matt at $300: ${yrs(M300.months)} years, ${fmt(M300.interest)}.`},
+ {t:"chart", show:["k300","mark"], eyebrow:"Minimum vs. $300 a month · Mark (20%)", q:"Paying more than the minimum saves decades."},
+ {t:"calc"},
+ {t:"end"}
+];
+let S={i:0, picks:{}, calc:{bal:3000, apr:22, mode:"min", fixed:150}};
+const LINES={matt:{d:MATT,c:"--matt",n:"Matt · 10% · minimum"}, mark:{d:MARK,c:"--mark",n:"Mark · 20% · minimum"}, k300:{d:K300,c:"--matt",n:"Mark · 20% · $300/month"}};
+let anim=null;
+function chartSVG(series, maxMonths){
+  const W=1000,H=360,L=70,R=20,T=16,B=44, maxB=Math.max(...series.map(s=>s.d.pts[0]));
+  const x=m=>L+(W-L-R)*m/maxMonths, y=b=>T+(H-T-B)*(1-b/maxB);
+  let grid=""; const yStep=maxB>=8000?2500:maxB>=2000?1000:500; for(let v=0;v<=maxB+1;v+=yStep) grid+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L-8}" y="${y(v)+5}" text-anchor="end" font-size="15" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${fmt0(v)}</text>`;
+  const yrsMax=maxMonths/12, xs=yrsMax>40?10:yrsMax>15?5:yrsMax>6?2:1; for(let yv=0;yv<=yrsMax+.01;yv+=xs) grid+=`<text x="${x(yv*12)}" y="${H-16}" text-anchor="middle" font-size="15" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${yv}</text>`;
+  grid+=`<text x="${(L+W-R)/2}" y="${H}" text-anchor="middle" font-size="14" fill="var(--muted)">years</text>`;
+  const paths=series.map((s,k)=>`<path id="p${k}" fill="none" stroke="var(${s.c})" stroke-width="4" stroke-linejoin="round" d=""/><circle id="c${k}" r="7" fill="var(${s.c})" cx="${x(0)}" cy="${y(s.d.pts[0])}"/>`).join("");
+  return {svg:`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Balance over time">${grid}${paths}</svg>`, x, y};
+}
+function runChart(keys){
+  const series=keys.map(k=>LINES[k]); const maxM=Math.max(...series.map(s=>s.d.months));
+  const ch=chartSVG(series,maxM);
+  $("scene").querySelector("#chart").innerHTML=ch.svg;
+  const ctrs=series.map((s,k)=>`<div class="ctr" style="--c:var(${s.c})"><span class="l">${s.n}</span><span class="n" id="b${k}">${fmt0(s.d.pts[0])}</span><span class="l" id="t${k}">Month 0 · interest paid $0</span></div>`).join("");
+  $("scene").querySelector("#ctrs").innerHTML=ctrs;
+  cancelAnimationFrame(anim); let m=0; const speed=Math.max(1,maxM/420);
+  const step=()=>{ m=Math.min(maxM, m+speed); series.forEach((s,k)=>{ const mm=Math.min(Math.floor(m), s.d.months), pts=s.d.pts.slice(0,mm+1);
+      document.getElementById("p"+k).setAttribute("d", pts.map((b,i)=>(i?"L":"M")+ch.x(i).toFixed(1)+" "+ch.y(b).toFixed(1)).join(" "));
+      const c=document.getElementById("c"+k); c.setAttribute("cx",ch.x(mm)); c.setAttribute("cy",ch.y(pts[pts.length-1]));
+      const I=s.d.ci[mm];
+      $("b"+k).textContent=fmt0(pts[pts.length-1]); $("t"+k).textContent=`${mm>=s.d.months?"Paid off · ":""}Year ${(mm/12).toFixed(1)} · interest paid ${fmt0(I)}`; });
+    if(m<maxM) anim=requestAnimationFrame(step); };
+  if(reduce){ m=maxM-speed; } step();
+}
+function draw(){
+  cancelAnimationFrame(anim);
+  const sc=SCENES[S.i];
+  $("dots").innerHTML=SCENES.map((_,i)=>`<i class="${i<S.i?"done":i===S.i?"on":""}"></i>`).join("");
+  $("back").disabled=S.i===0; $("fwd").textContent=S.i===SCENES.length-1?"Start over":"Next →";
+  let h="";
+  if(sc.t==="story") h=`<div class="eyebrow">From your Unit 4 slides</div><h2>Same couch. Same car repair. Same $10,000.</h2>
+    <p class="lead">Matt and Mark both furnished a first apartment and then had a transmission fail. Each now owes $10,000 on a credit card. Each will pay only the minimum: 2% of the balance each month.</p>
+    <div class="duo"><div class="person" style="--c:var(--matt)"><b>Matt</b><span>Good credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>10%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div>
+    <div class="person" style="--c:var(--mark)"><b>Mark</b><span>Bad credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>20%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div></div>`;
+  else if(sc.t==="vote"){ const p=S.picks[sc.key];
+    h=`<div class="eyebrow">${sc.eyebrow}</div><h2>${esc(sc.q)}</h2>
+      <div class="votes">${sc.opts.map((o,k)=>`<button class="vote ${p!=null?(k===sc.right?"right":p===k?"wrong":""):""}" data-k="${k}" ${p!=null?"disabled":""}><span class="k">${"ABCD"[k]}</span>${esc(o)}</button>`).join("")}</div>
+      ${p!=null?`<div class="reveal">${sc.why}</div>`:`<p class="lead" style="color:var(--muted)">Vote with fingers (1–4), then tap the class answer. Keys A–D work too.</p>`}`; }
+  else if(sc.t==="chart") h=`<div class="eyebrow">${sc.eyebrow}</div><h2>${esc(sc.q)}</h2><div class="chartbox"><div id="chart"></div><div class="counters" id="ctrs"></div><div class="ctl"><button class="btn" id="replay">Replay</button></div></div>`;
+  else if(sc.t==="calc"){ const C=S.calc, r=sim(+C.bal||0,+C.apr||0,C.mode,+C.fixed||0);
+    h=`<div class="eyebrow">Your turn</div><h2>Try your own card.</h2>
+      <form class="form" id="cf" novalidate><label for="cb">Balance ($)<input id="cb" inputmode="decimal" value="${C.bal}"></label><label for="ca">APR (%)<input id="ca" inputmode="decimal" value="${C.apr}"></label>
+        <label for="cm">Payment plan<select id="cm"><option value="min" ${C.mode==="min"?"selected":""}>Minimum only (2% or $15)</option><option value="fixed" ${C.mode==="fixed"?"selected":""}>Same amount every month</option></select></label>
+        <label for="cx" ${C.mode==="fixed"?"":"hidden"}>Monthly payment ($)<input id="cx" inputmode="decimal" value="${C.fixed}"></label></form>
+      <div class="counters">${r.stuck?`<div class="ctr" style="--c:var(--mark)"><span class="n">Never</span><span class="l">The payment doesn't even cover the monthly interest, so the balance never goes down. Pay more!</span></div>`:
+        `<div class="ctr" style="--c:var(--ink)"><span class="l">Time to pay off</span><span class="n">${yrs(r.months)} yrs</span><span class="l">${r.months} payments</span></div>
+         <div class="ctr" style="--c:var(--mark)"><span class="l">Total interest</span><span class="n">${fmt0(r.interest)}</span><span class="l">on top of ${fmt0(+C.bal)}</span></div>
+         <div class="ctr" style="--c:var(--matt)"><span class="l">Total paid</span><span class="n">${fmt0(r.paid)}</span><span class="l">Pay in full each month: $0 interest</span></div>`}</div>`; }
+  else h=`<div class="eyebrow">The real lesson</div><p class="big-quote">Good credit saves money. <span>Avoiding credit card debt saves much more.</span></p>
+    <ul class="take"><li>Matt (10%): ${yrs(MATT.months)} years, ${fmt0(MATT.interest)} interest. Mark (20%): ${yrs(MARK.months)} years, ${fmt0(MARK.interest)}.</li><li>Paying $300 a month cut Mark's time to ${yrs(K300.months)} years.</li><li>Credit cards are a tool to build credit and earn a few rewards, not a way to borrow money. Pay in full, on time, every time.</li></ul>`;
+  $("scene").innerHTML=h;
+  if(sc.t==="vote"&&S.picks[sc.key]==null) document.querySelectorAll(".vote").forEach(b=>b.onclick=()=>{ S.picks[sc.key]=+b.dataset.k; draw(); });
+  if(sc.t==="chart"){ runChart(sc.show); $("replay").onclick=()=>runChart(sc.show); }
+  if(sc.t==="calc"){ const upd=()=>{ S.calc={bal:$("cb").value, apr:$("ca").value, mode:$("cm").value, fixed:$("cx")?$("cx").value:S.calc.fixed}; const f=document.activeElement&&document.activeElement.id; draw(); if(f&&$(f)){ const el=$(f); el.focus(); if(el.setSelectionRange&&el.type!=="select-one"){ const n=el.value.length; el.setSelectionRange(n,n);} } };
+    ["cb","ca","cx"].forEach(id=>$(id)&&$(id).addEventListener("change",upd)); $("cm").onchange=upd; $("cf").onsubmit=e=>{ e.preventDefault(); upd(); }; }
+}
+$("fwd").onclick=()=>{ if(S.i===SCENES.length-1){ S={i:0,picks:{},calc:S.calc}; } else S.i++; draw(); };
+$("back").onclick=()=>{ if(S.i>0){ S.i--; draw(); } };
+document.addEventListener("keydown",e=>{ if(e.target.closest&&e.target.closest("input,select")) return;
+  if(e.key==="ArrowRight"||e.key==="PageDown"){ $("fwd").click(); } else if(e.key==="ArrowLeft"||e.key==="PageUp"){ $("back").click(); }
+  else { const sc=SCENES[S.i], k="abcd".indexOf(e.key.toLowerCase()); if(sc.t==="vote"&&k>=0&&S.picks[sc.key]==null){ S.picks[sc.key]=k; draw(); } } });
+function start(d){ if(d&&d.S) S=d.S; draw(); }
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>
