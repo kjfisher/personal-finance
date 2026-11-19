@@ -1,0 +1,214 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Future Millionaires Arcade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: arcade hub. Navy hero with a ticker of real finance numbers; filter chips; shelves of game "cartridges" (on your own / with a partner / class games); a coming-soon shelf. */
+:root {
+  --bg:#F2F4F1; --surface:#FFFFFF; --ink:#14213D; --muted:#5A6478; --line:#D3D9D0;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --gold-ink:#14213D;
+  --money:#0F8B6C; --money-ink:#FFFFFF;
+  --t1:#1F6F54; --t2:#2F5FB8; --t3:#B8572F; --t4:#6B4FB0; --t5:#1E2B45; --t6:#9A6B00; --t7:#7A2E52; --t8:#2C7A8C; --t9:#4D5B2A; --t10:#7A2E1C; --t11:#2E6B5E; --t12:#3F2E73; --t13:#8C5A12; --t14:#1F5577; --t15:#0F6E54; --t16:#1A4664; --t17:#5E3A6E; --t18:#5B3FA6; --t19:#B23A26; --t20:#7A4A1A;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0B111D; --surface:#151E33; --ink:#E8EDF5; --muted:#97A3B9; --line:#26334F;
+  --hero:#101A30; --hero-ink:#F3F5F8; --gold:#F5C542; --money:#3CCB9F; --money-ink:#06261D; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0B111D; --surface:#151E33; --ink:#E8EDF5; --muted:#97A3B9; --line:#26334F;
+  --hero:#101A30; --hero-ink:#F3F5F8; --gold:#F5C542; --money:#3CCB9F; --money-ink:#06261D; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.inner { max-width:1180px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.hero { background:var(--hero); color:var(--hero-ink); }
+.hero .inner { padding-block:clamp(28px, 5vw, 56px) clamp(22px, 4vw, 40px); display:grid; gap:14px; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+.hero h1 { font-family:var(--display); font-weight:800; font-size:clamp(38px, 7vw, 84px); line-height:.95; margin:0; letter-spacing:-.015em; text-wrap:balance; }
+.hero h1 .tag { color:var(--gold); }
+.hero p { margin:0; max-width:60ch; font-size:clamp(17px, 1.8vw, 21px); line-height:1.45; opacity:.9; }
+.ticker { margin-top:10px; border-top:1px solid rgba(255,255,255,.15); padding-top:12px; display:flex; flex-wrap:wrap; gap:8px 22px; font-family:var(--mono); font-size:14px; }
+.ticker span b { color:var(--gold); font-weight:600; }
+main .inner { padding-block:24px 48px; display:grid; gap:30px; }
+.filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.filters .lbl { color:var(--muted); font-weight:700; margin-right:4px; }
+.chip { font:inherit; font-weight:700; padding:8px 16px; border-radius:999px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.chip[aria-pressed="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.chip:focus-visible, a:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.shelf { display:grid; gap:14px; }
+.shelf-h { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; border-bottom:2px solid var(--ink); padding-bottom:8px; }
+.shelf-h h2 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3vw, 36px); margin:0; }
+.shelf-h p { margin:0; color:var(--muted); }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; display:grid; grid-template-rows:auto 1fr; min-width:0; transition:transform .15s, box-shadow .15s; }
+.card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(20,33,61,.14); }
+.cart { color:#fff; padding:16px 18px 14px; position:relative; min-height:118px; display:grid; align-content:space-between; }
+.cart .big { font-family:var(--display); font-weight:800; font-size:clamp(34px, 3.4vw, 44px); line-height:1; letter-spacing:-.01em; overflow-wrap:anywhere; }
+.cart .unit { font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:.85; }
+.cart .new { position:absolute; right:14px; bottom:14px; background:var(--gold); color:#14213D; font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.1em; padding:2px 8px; border-radius:99px; }
+.cart::after { content:""; position:absolute; right:14px; top:14px; width:34px; height:10px; border-radius:3px; background:repeating-linear-gradient(90deg, rgba(255,255,255,.55) 0 3px, transparent 3px 6px); }
+.body { padding:16px 18px 18px; display:grid; gap:10px; align-content:start; }
+.body h3 { font-family:var(--display); font-weight:800; font-size:23px; margin:0; line-height:1.1; }
+.body p { margin:0; line-height:1.45; color:var(--ink); }
+.meta { display:flex; flex-wrap:wrap; gap:6px; }
+.meta span { font-size:13px; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
+.play { justify-self:start; margin-top:4px; display:inline-flex; align-items:center; gap:8px; font-weight:700; text-decoration:none; padding:10px 18px; border-radius:10px; background:var(--money); color:var(--money-ink); }
+.play:hover { filter:brightness(1.08); }
+.play.alt { background:transparent; color:var(--ink); border:2px solid var(--ink); }
+.blooket { display:grid; gap:6px; }
+.blooket .code { font-family:var(--mono); font-size:14px; color:var(--muted); }
+.soon { border:2px dashed var(--line); border-radius:16px; padding:18px; display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; justify-content:space-between; }
+.soon b { font-family:var(--display); font-size:22px; }
+.tips { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px; }
+.tip { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; }
+.tip .n { font-family:var(--mono); color:var(--money); font-weight:600; font-size:14px; letter-spacing:.08em; }
+.tip p { margin:6px 0 0; line-height:1.45; }
+footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 30px; }
+.empty { color:var(--muted); }
+@media (prefers-reduced-motion: reduce) { .card { transition:none; } .card:hover { transform:none; } }
+</style>
+
+<header class="hero"><div class="inner">
+  <div class="eyebrow">Personal Finance - Review Games</div>
+  <h1>Future Millionaires <span class="tag">Arcade</span></h1>
+  <p>Practice the money skills from class: paychecks, pay stubs, banking and credit. Pick a game on your iPad, challenge a partner, and walk into the quiz ready.</p>
+  <div class="ticker" aria-label="Numbers to know">
+    <span>FICA <b>7.65%</b></span><span>FICO range <b>300–850</b></span><span>Payment history <b>35%</b></span><span>Utilization goal <b>≤ 30%</b></span><span>FDIC insured <b>$250,000</b></span><span>Free reports <b>annualcreditreport.com</b></span>
+  </div>
+</div></header>
+
+<main><div class="inner">
+  <div class="filters" role="group" aria-label="Filter games">
+    <span class="lbl">Show:</span>
+    <button class="chip" data-f="all" aria-pressed="true">All games</button>
+    <button class="chip" data-f="u1" aria-pressed="false">Unit 1: Payroll Deductions</button>
+    <button class="chip" data-f="u2" aria-pressed="false">Unit 2: Pay Stubs</button>
+    <button class="chip" data-f="u3" aria-pressed="false">Unit 3: Banking</button>
+    <button class="chip" data-f="u4" aria-pressed="false">Unit 4: Credit</button>
+    <button class="chip" data-f="mid" aria-pressed="false">Midterm (Units 1–4)</button>
+  </div>
+
+  <section class="shelf" aria-labelledby="solo-h">
+    <div class="shelf-h"><h2 id="solo-h">Play on your own</h2><p>Grab your iPad. These work anytime, in class or at home.</p></div>
+    <div class="grid" id="solo"></div>
+  </section>
+
+  <section class="shelf" aria-labelledby="partner-h">
+    <div class="shelf-h"><h2 id="partner-h">Play with a partner</h2><p>One iPad, two players. Sit across from each other or side by side.</p></div>
+    <div class="grid" id="partner"></div>
+  </section>
+
+  <section class="shelf" aria-labelledby="class-h">
+    <div class="shelf-h"><h2 id="class-h">Class games</h2><p>We play these together on the board. Open them again to review.</p></div>
+    <div class="grid" id="class"></div>
+  </section>
+
+  <section class="shelf" aria-labelledby="tips-h">
+    <div class="shelf-h"><h2 id="tips-h">How to study with these games</h2></div>
+    <div class="tips">
+      <div class="tip"><div class="n">BEFORE</div><p>Open your guided notes. Find the topic you feel least sure about.</p></div>
+      <div class="tip"><div class="n">DURING</div><p>When you miss one, read the explanation and write the right answer in your notes.</p></div>
+      <div class="tip"><div class="n">AFTER</div><p>Play the same game again tomorrow. Try to beat your score or your time.</p></div>
+    </div>
+  </section>
+
+  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span>Next up: Unit 5</span></span></div>
+</div></main>
+<footer>Personal Finance - Future Millionaires Arcade</footer>
+
+<script>
+const GAMES=[
+ {f:"u1", where:"solo", isNew:true, name:"Paycheck Builder", big:"Gross → Net", color:"--t11", unit:"Unit 1 - Payroll Deductions", tags:["Solo","10 min per career"],
+  d:"Pick a career and build its monthly paycheck, one deduction at a time. Use your own career from the packet, then compare it with minimum wage.", url:"https://claude.ai/artifact/HsUxtt3cCr67zdin5i6Xtg"},
+ {f:"u1", where:"solo", isNew:true, name:"Check It!", big:"$ ___.__", color:"--t9", unit:"Unit 1 - Payroll Deductions", tags:["Solo","12 rounds"],
+  d:"Tap the parts of a check, write amounts in words, catch check-writing mistakes and fill in a direct deposit form.", url:"https://claude.ai/artifact/N16UftFH84zVJenBUu3LM2"},
+ {f:"u2", where:"solo", isNew:true, name:"Pay Stub Detective", big:"YTD?", color:"--t14", unit:"Unit 2 - Pay Stubs", tags:["Solo","6 cases"],
+  d:"Complete six real-looking pay stubs, read the YTD column and catch the line that payroll got wrong.", url:"https://claude.ai/artifact/HYwiVDpHAhki7kmHEiEeVy"},
+ {f:"u2", where:"solo", isNew:true, name:"Overtime Rush", big:"1.5×", color:"--t13", unit:"Unit 2 - Pay Stubs", tags:["Solo","8 timecards"],
+  d:"Work through timecards against the clock: overtime, a two-week pay period, commission and hourly vs. salary.", url:"https://claude.ai/artifact/WisVNEuCBGbFNhEhCyDwg8"},
+ {f:"u3", where:"solo", isNew:true, name:"Statement Sleuth", big:"–$35", color:"--t17", unit:"Unit 3 - Banking", tags:["Solo","5 statements"],
+  d:"Read real-looking bank statements: fill in balances, find the paycheck, catch the overdraft and add up the fees.", url:"https://claude.ai/artifact/7zi5cAiXLmTM3p2vfHdz2R"},
+ {f:"u3", where:"solo", isNew:true, name:"Savings Lab", big:"APY", color:"--t15", unit:"Unit 3 - Banking", tags:["Solo","8 cards"],
+  d:"Grow a CD with simple and compound interest, dodge fees and penalties, and pick the right account and bank.", url:"https://claude.ai/artifact/FiAtDMCTkA9P4q3mV8R4hG"},
+ {f:"u4", where:"solo", isNew:true, name:"Read the Fine Print", big:"APR", color:"--t18", unit:"Unit 4 - Credit", tags:["Solo","6 offers"],
+  d:"Compare credit card offers: earn the rewards, price out the interest, and figure out who each card is really for.", url:"https://claude.ai/artifact/1SP6xSShhDGXwScLszWtcz"},
+ {f:"mid", where:"solo", blooket:true, isNew:true, name:"Units 1–4 Blooket", big:"60 Qs", color:"--t20", unit:"Midterm - Units 1–4", tags:["Solo","Any game mode"],
+  d:"Fifteen questions from each unit: paychecks, pay stubs, banking and credit.", url:"https://play.blooket.com/"},
+ {f:"mid", where:"solo", name:"Money Math Sprint", big:"3:00", color:"--t1", unit:"Midterm - Units 1–4", tags:["Solo","3 min or untimed"],
+  d:"Race the clock on paycheck, pay stub, CD interest and credit utilization math. Wrong answers show the steps.", url:"https://claude.ai/artifact/9rLiym1jZH12k2jFepF5Qt"},
+ {f:"u1", where:"partner", isNew:true, name:"Deduction Duel", big:"7.65%", color:"--t3", unit:"Unit 1 - Payroll Deductions", tags:["2 players, 1 iPad","5–10 min"],
+  d:"Gross vs. net, FICA, benefits, 401(k) match and checks. Same question on both sides. First correct tap scores.", url:"https://claude.ai/artifact/7u6uX8YqjkQGFHmHr7qLkq"},
+ {f:"u2", where:"partner", isNew:true, name:"Pay Stub Duel", big:"YTD", color:"--t12", unit:"Unit 2 - Pay Stubs", tags:["2 players, 1 iPad","5–10 min"],
+  d:"Overtime, hourly vs. salary vs. commission, YTD and pay periods. First correct tap scores.", url:"https://claude.ai/artifact/KKc5xEkST5nRBeDCyNTAnw"},
+ {f:"u3", where:"partner", isNew:true, name:"Bank Duel", big:"FDIC", color:"--t16", unit:"Unit 3 - Banking", tags:["2 players, 1 iPad","5–10 min"],
+  d:"Accounts, FDIC, CDs, overdrafts and debit vs. credit. Same question on both sides. First correct tap scores.", url:"https://claude.ai/artifact/F4UQrVv4uxpKc9BPpiFS9s"},
+ {f:"u4", where:"partner", isNew:true, name:"Scam or Legit?", big:"Scam?", color:"--t19", unit:"Unit 4 - Credit", tags:["2 players, 1 iPad","5–10 min"],
+  d:"Read the text, call or email and decide fast. Then learn what to do if your identity is stolen.", url:"https://claude.ai/artifact/QhrqTp9Kzvcn1ohLoz1tGP"},
+ {f:"u4", where:"partner", name:"Credit Duel", big:"1 vs 1", color:"--t2", unit:"Unit 4 - Credit", tags:["2 players, 1 iPad","5–10 min"],
+  d:"Lay the iPad flat between you. Same question on both sides. First correct tap scores, and a wrong tap locks you out.", url:"https://claude.ai/artifact/MpraGNLfN3uV8tZfzcyoSz"},
+ {f:"u4", where:"partner", name:"Credit Vault Escape", big:"6 locks", color:"--t5", unit:"Unit 4 - Credit", tags:["Partners","15–20 min"],
+  d:"Work together to crack six credit locks and earn the vault code. Hints cost you a minute. Fastest escape wins.", url:"https://claude.ai/artifact/FmP9uiEcwYXD6eKXtr3Dm8"},
+ {f:"u4", where:"solo", blooket:true, name:"Credit Blooket", big:"27 Qs", color:"--t7", unit:"Unit 4 - Credit", tags:["Solo","Any game mode"],
+  d:"Blooket review on credit scores, bureaus, the FICO pie and utilization.", url:"https://play.blooket.com/"},
+ {f:"u1", where:"class", isNew:true, name:"Deduction Showdown", big:"500", color:"--t10", unit:"Unit 1 - Payroll Deductions", tags:["Teams","25–30 min"],
+  d:"Six categories from gross and net pay to checks and direct deposit, a hidden Double Points tile and a build-the-paycheck final round.", url:"https://claude.ai/artifact/1YF81Y9nYVjCdHF2zdRE6x"},
+ {f:"u2", where:"class", isNew:true, name:"Pay Stub Showdown", big:"500", color:"--t12", unit:"Unit 2 - Pay Stubs", tags:["Teams","25–30 min"],
+  d:"Overtime, pay types, commission, YTD, reading the stub and an Is It Right? category, with a build-the-stub final round.", url:"https://claude.ai/artifact/UtS4Nut1Kt3QTxQ9CiRKhg"},
+ {f:"u3", where:"class", isNew:true, name:"Bank Showdown", big:"500", color:"--t16", unit:"Unit 3 - Banking", tags:["Teams","25–30 min"],
+  d:"Accounts, interest and CDs, FDIC, overdrafts, debit vs. credit and reading a statement, with a grow-the-CD final round.", url:"https://claude.ai/artifact/K43PQ5jjuqKjhMdz5is3CT"},
+ {f:"mid", where:"class", name:"Future Millionaire", big:"$1M", color:"--t6", unit:"Midterm - Units 1–4", tags:["Whole class","15 min"],
+  d:"Climb the money ladder with 15 questions, three lifelines and three strikes.", url:"https://claude.ai/artifact/BzFhepsRRSSBoSvLoQJyrg"},
+ {f:"mid", where:"class", name:"Midterm Showdown", big:"500", color:"--t2", unit:"Midterm - Units 1–4", tags:["Teams","25–30 min"],
+  d:"Team board game covering paychecks, pay stubs, banking and credit, with a wager final round.", url:"https://claude.ai/artifact/GeALbxBCDVuBZJmaLCBnmV"},
+ {f:"u4", where:"class", isNew:true, name:"Minimum Payment Trap", big:"74 yrs", color:"--t19", unit:"Unit 4 - Credit", tags:["Whole class","15 min"],
+  d:"Predict, then watch Matt and Mark pay off $10,000 one minimum payment at a time. Then try your own card.", url:"https://claude.ai/artifact/ENSvkP59sD7AU1ByEqi9q3"},
+ {f:"u4", where:"class", name:"Credit Showdown", big:"500", color:"--t3", unit:"Unit 4 - Credit", tags:["Teams","25–30 min"],
+  d:"Six credit categories, a hidden Double Points tile and a final round where you bet your points.", url:"https://claude.ai/artifact/FfBnAC5GCnQU3PvBjDGjZt"},
+ {f:"u4", where:"class", name:"Climb to 850", big:"850", color:"--t8", unit:"Unit 4 - Credit", tags:["Whole class","15 min"],
+  d:"Make life choices from age 18 to 22 and watch your credit score rise or fall.", url:"https://claude.ai/artifact/St2gsJZaHxneLvuu7i8YrB"},
+ {f:"u4", where:"class", name:"Credit Corners", big:"4 corners", color:"--t4", unit:"Unit 4 - Credit", tags:["Get up and move","10–15 min"],
+  d:"Walk to the corner with your answer before the timer runs out. Survivor mode: last one standing wins.", url:"https://claude.ai/artifact/Hi43fGFWi3Z98fdznxWDVs"},
+ {f:"u4", where:"class", name:"You're the Lender", big:"Approved?", color:"--t9", unit:"Unit 4 - Credit", tags:["Whole class","15 min"],
+  d:"Read real-looking credit reports and decide who gets the car loan, and at what rate.", url:"https://claude.ai/artifact/3T94qg4N3WhrEdxibEx7FA"},
+ {f:"u1", where:"partner", isNew:true, name:"Paycheck Vault", big:"6 locks", color:"--t11", unit:"Unit 1 - Payroll Deductions", tags:["Partners or teams","15–20 min"],
+  d:"Crack six payroll locks to build Riya's paycheck from gross to net. Hints cost a minute. Fastest escape wins.", url:"https://claude.ai/artifact/71RkRurkGiZg8FekuapLQw"},
+ {f:"u2", where:"partner", isNew:true, name:"Pay Stub Vault", big:"6 locks", color:"--t12", unit:"Unit 2 - Pay Stubs", tags:["Partners or teams","15–20 min"],
+  d:"Overtime, pay types, commission, YTD and a pay stub to finish. Six locks, one vault code.", url:"https://claude.ai/artifact/KeYwG2NeLepoEB9QnQTLD6"},
+ {f:"u3", where:"partner", isNew:true, name:"Bank Vault", big:"6 locks", color:"--t16", unit:"Unit 3 - Banking", tags:["Partners or teams","15–20 min"],
+  d:"Pick accounts, read a statement, survive an overdraft and grow a CD to open the vault.", url:"https://claude.ai/artifact/3HAt1BVF8YGdM6vSXdbNNn"},
+ {f:"mid", where:"partner", isNew:true, name:"Midterm Vault", big:"6 locks", color:"--t20", unit:"Midterm - Units 1–4", tags:["Partners or teams","20 min"],
+  d:"One lock for every unit: paychecks, pay stubs, banking and credit. Escape before the midterm.", url:"https://claude.ai/artifact/TPGqRcagyyU6Zi8JKJnnkh"},
+ {f:"mid", where:"partner", isNew:true, name:"Midterm Duel", big:"1 vs 1", color:"--t6", unit:"Midterm - Units 1–4", tags:["2 players, 1 iPad","5–10 min"],
+  d:"32 questions from all four units. Same question on both sides. First correct tap scores.", url:"https://claude.ai/artifact/J9WLyFESPu7jrBRqhqyFQd"},
+ {f:"u1", where:"class", isNew:true, name:"Paycheck Corners", big:"4 corners", color:"--t11", unit:"Unit 1 - Payroll Deductions", tags:["Get up and move","10–15 min"],
+  d:"Gross or net? Tax or benefit? Walk to your corner before the timer runs out.", url:"https://claude.ai/artifact/WqERfM97QxP8XXiMMKTcY7"},
+ {f:"u2", where:"class", isNew:true, name:"Pay Stub Corners", big:"4 corners", color:"--t12", unit:"Unit 2 - Pay Stubs", tags:["Get up and move","10–15 min"],
+  d:"Hourly, salary or commission? Overtime or not? Pay period or pay date? Pick a corner.", url:"https://claude.ai/artifact/E3nrfQMZBByWoqvYZd4pSS"},
+ {f:"u3", where:"class", isNew:true, name:"Bank Corners", big:"4 corners", color:"--t16", unit:"Unit 3 - Banking", tags:["Get up and move","10–15 min"],
+  d:"Checking, savings, HYSA or CD? Earn or pay interest? Debit or credit? Move to your answer.", url:"https://claude.ai/artifact/7gf7pZcHC8UmvDguoQ5Rh7"},
+ {f:"mid", where:"class", isNew:true, name:"Midterm Corners", big:"4 corners", color:"--t20", unit:"Midterm - Units 1–4", tags:["Get up and move","15 min"],
+  d:"Twenty rounds, five from each unit. Survivor mode: last one standing wins.", url:"https://claude.ai/artifact/DpPBEm4VoxXZ1Acz7Kr1ZE"}
+];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function card(g){ return `<article class="card">
+  <div class="cart" style="background:var(${g.color})"><span class="unit">${esc(g.unit)}</span><span class="big">${esc(g.big)}</span>${g.isNew?`<span class="new">NEW</span>`:""}</div>
+  <div class="body"><h3>${esc(g.name)}</h3><div class="meta">${g.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div><p>${esc(g.d)}</p>
+  ${g.blooket?`<div class="blooket"><span class="code">Your teacher will give you the game code.</span><a class="play alt" href="${g.url}" target="_blank" rel="noopener">Join on Blooket</a></div>`
+    :`<a class="play" href="${g.url}" target="_blank" rel="noopener">Play ${esc(g.name)}</a>`}</div></article>`; }
+const UO={u1:1,u2:2,u3:3,u4:4,mid:5};
+let filter="all";
+try{ const s=localStorage.getItem("arcade-filter"); if(s&&document.querySelector(`.chip[data-f="${s}"]`)) filter=s; }catch(e){}
+function render(){
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed", String(c.dataset.f===filter)));
+  ["solo","partner","class"].forEach(w=>{ const list=GAMES.filter(g=>g.where===w && (filter==="all"||g.f===filter)).sort((a,b)=>UO[a.f]-UO[b.f]);
+    document.getElementById(w).innerHTML = list.length ? list.map(card).join("") : `<p class="empty">No games here for this filter.</p>`; });
+}
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{ filter=c.dataset.f; try{ localStorage.setItem("arcade-filter",filter); }catch(e){} render(); });
+render();
+</script>
+
+</body></html>
