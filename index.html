@@ -30,6 +30,13 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 .eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
 .hero h1 { font-family:var(--display); font-weight:800; font-size:clamp(38px, 7vw, 84px); line-height:.95; margin:0; letter-spacing:-.015em; text-wrap:balance; }
 .hero h1 .tag { color:var(--gold); }
+.agenda-btn { justify-self:start; display:grid; grid-template-columns:auto auto; column-gap:12px; align-items:baseline; text-decoration:none; background:var(--gold); color:var(--gold-ink); border-radius:14px; padding:12px 18px; max-width:100%; }
+.agenda-btn .lbl { grid-column:1 / -1; font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
+.agenda-btn b { font-family:var(--display); font-size:24px; }
+.agenda-btn .go { font-size:15px; font-weight:600; }
+.agenda-btn:hover { filter:brightness(1.05); }
+.agenda-btn:focus-visible { outline:3px solid var(--hero-ink); outline-offset:3px; }
+@media (max-width:480px){ .agenda-btn { grid-template-columns:1fr; } }
 .hero p { margin:0; max-width:60ch; font-size:clamp(17px, 1.8vw, 21px); line-height:1.45; opacity:.9; }
 .ticker { margin-top:10px; border-top:1px solid rgba(255,255,255,.15); padding-top:12px; display:flex; flex-wrap:wrap; gap:8px 22px; font-family:var(--mono); font-size:14px; }
 .ticker span b { color:var(--gold); font-weight:600; }
@@ -75,7 +82,8 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
 <header class="hero"><div class="inner">
   <div class="eyebrow">Personal Finance - Review Games</div>
   <h1>Future Millionaires <span class="tag">Arcade</span></h1>
-  <p>Practice the money skills from class: paychecks, pay stubs, banking and credit. Pick a game on your iPad, challenge a partner, and walk into the quiz ready.</p>
+  <p>Practice the money skills from class, from compounding and paychecks to cars, housing, investing, taxes and insurance. Pick a game on your iPad, challenge a partner, and walk into the quiz ready.</p>
+  <a class="agenda-btn" href="/daily-agenda/" target="_blank" rel="noopener"><span class="lbl">Today in class</span><b>Daily Agenda</b><span class="go">Learning target, plan &amp; today's games ↗</span></a>
   <div class="ticker" aria-label="Numbers to know">
     <span>FICA <b>7.65%</b></span><span>FICO range <b>300–850</b></span><span>Payment history <b>35%</b></span><span>Utilization goal <b>≤ 30%</b></span><span>FDIC insured <b>$250,000</b></span><span>Free reports <b>annualcreditreport.com</b></span>
   </div>
