@@ -1,0 +1,251 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Deal Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a dealer worksheet on the left (price, fees, loan terms); the work sheet on the right walks the math from sticker price to total interest. Choice questions use big tap buttons. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --card:#EEF2F7; --card-line:#B5C3D6; --card-ink:#1C2A3E; --punch:#B23A26;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#18212F; --card-line:#33435C; --card-ink:#E3EAF3; --punch:#FF7A63; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#18212F; --card-line:#33435C; --card-ink:#E3EAF3; --punch:#FF7A63; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1180px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; align-items:center; }
+.bar .stats b { color:var(--gold); font-variant-numeric:tabular-nums; }
+.wrap { max-width:1180px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.1fr); gap:20px; align-items:start; }
+@media (max-width:820px) { .game { grid-template-columns:1fr; } }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; grid-column:1/-1; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+/* timecard */
+.tc { background:var(--card); color:var(--card-ink); border:1px solid var(--card-line); border-radius:6px; padding:18px; font-family:var(--mono); font-size:15px; display:grid; gap:10px; min-width:0; position:relative; }
+.tc .tag { font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:.08em; padding:3px 10px; border-radius:99px; justify-self:start; background:var(--punch); color:var(--card); }
+.choices { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
+.ch { font:inherit; font-weight:700; padding:10px 16px; border-radius:10px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.ch.sel { border-color:var(--gold); background:rgba(224,168,0,.16); }
+.ch.right { border-color:var(--ok); background:var(--ok-soft); }
+.ch:disabled { cursor:default; }
+.field.wide { grid-template-columns:1fr; }
+.tc::before { content:""; }
+.plastic { position:relative; aspect-ratio:1.586; max-width:340px; width:100%; border-radius:14px; color:#fff; padding:14px 16px; display:grid; grid-template-rows:auto 1fr auto auto; font-family:var(--mono); box-shadow:0 10px 24px rgba(20,20,40,.25); background:linear-gradient(135deg,#3B2A7A,#6B4FB0); }
+.plastic.cash { background:linear-gradient(135deg,#0E5E4A,#1F9A78); } .plastic.travel { background:linear-gradient(135deg,#14213D,#2F5FB8); } .plastic.student { background:linear-gradient(135deg,#8C5A12,#D19A2E); } .plastic.secured { background:linear-gradient(135deg,#3A3F4B,#6B7280); }
+.plastic .pn { font-family:var(--display); font-weight:800; font-size:18px; }
+.plastic .chip { width:40px; height:30px; border-radius:6px; background:linear-gradient(135deg,#E8C766,#B8912E); align-self:center; }
+.plastic .num { font-size:17px; letter-spacing:.12em; }
+.plastic .holder { font-size:12px; letter-spacing:.1em; opacity:.85; }
+.tc .kind { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--punch); font-weight:600; }
+.tc h2 { font-family:var(--display); font-size:24px; margin:0; line-height:1.1; color:var(--card-ink); }
+.tc .who { display:flex; flex-wrap:wrap; gap:4px 16px; }
+.tc .who b { font-weight:600; }
+.tc table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.tc th, .tc td { border-bottom:1px dashed var(--card-line); padding:5px 4px; text-align:left; }
+.tc td:last-child, .tc th:last-child { text-align:right; }
+.tc th { font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; }
+.tc .stamp { color:var(--punch); font-weight:600; }
+.tc .rule { border:1px solid var(--card-line); border-radius:6px; padding:8px 10px; font-size:14px; line-height:1.4; font-family:var(--body); }
+.tc .story { font-family:var(--body); font-size:17px; line-height:1.45; }
+/* answer sheet */
+.sheet { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px, 2.6vw, 26px); display:grid; gap:12px; min-width:0; }
+.sheet .eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.field { display:grid; grid-template-columns:minmax(0, 1fr) minmax(120px, 190px); gap:10px; align-items:center; padding:8px 10px; border-radius:12px; border:2px solid transparent; }
+.field.ok { background:var(--ok-soft); border-color:var(--ok); }
+.field.no { background:var(--bad-soft); border-color:var(--bad); }
+.field.shown { background:var(--bad-soft); }
+.field .q { line-height:1.3; }
+.field .q small { display:block; color:var(--muted); font-family:var(--mono); font-size:13px; margin-top:2px; }
+.field .msg { grid-column:1/-1; font-size:15px; line-height:1.35; }
+.inp { display:flex; align-items:center; border:2px solid var(--line); border-radius:10px; background:var(--bg); padding:0 10px; min-width:0; }
+.inp:focus-within { border-color:var(--gold); }
+.inp span { font-family:var(--mono); color:var(--muted); }
+.inp input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:20px; padding:9px 6px; outline:none; }
+.inp input:disabled { color:var(--ink); }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); padding:8px 14px; }
+.btn:focus-visible, input:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.note { color:var(--muted); font-size:15px; margin:0; }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.steps { margin:0; padding-left:22px; line-height:1.6; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 68px); line-height:1; color:var(--ok); font-variant-numeric:tabular-nums; }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Deal <span>Desk</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=x=>"$"+x.toLocaleString("en-US");
+const n0=x=>x.toLocaleString("en-US");
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
+const SKILL={know:"Car-buying basics", otd:"Out-the-door price", fin:"Amount financed", cost:"Total cost of a loan", term:"Loan length", credit:"Credit score & rate", afford:"Can I afford it?", equity:"Upside down"};
+const pmt=(P,apr,n)=>{ const r=apr/1200; return r2(P*r/(1-Math.pow(1+r,-n))); };
+const bal=(P,apr,n,k)=>{ const r=apr/1200, p=pmt(P,apr,n); let b=P; for(let i=0;i<k;i++){ b=r2(b+r2(b*r)-p); } return b; };
+const CARS=["2022 compact sedan","2021 small SUV","2023 hybrid hatchback","2020 midsize sedan","2022 pickup truck","2021 crossover"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const TIERS=[["740–850","5.99%"],["581–739","14.99%"],["300–580","26.99%"]];
+const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
+function mkOTD(){ const P=rnd(24,64)*500, ttr=r2(P*.10), tot=r2(P+ttr);
+  return {kind:"Out-the-door price", title:pick(CARS), html:tbl([["Listed price",fmt0(P)],["Tax, title & registration","about 10% (our class estimate)"]])+`<div class="rule">The listed price is never the whole price. Add about 10% for tax, title and registration.</div>`,
+   F:[{k:"ttr", type:"otd", q:"Tax, title & registration (10%)", sub:`${fmt0(P)} × 0.10`, a:ttr, miss:[[P,"Take 10% of the price: × 0.10."],[P*10,"10% = 0.10."]]},
+      {k:"otd", type:"otd", q:"Total cost of the car", sub:"price + tax, title & registration", a:tot, miss:[[ttr,"Add it to the price."]]}]}; }
+function mkEst(){ const L=pick([10000,15000,20000,25000,30000]), est=L/5000*115;
+  return {kind:"Quick payment estimate", title:`${fmt0(L)} loan`, html:`<div class="rule">Pro tip from class: count about <b>$115 a month for every $5,000 borrowed</b> on a 5-year loan. Example: $20,000 loan ≈ $460 a month.</div>`,
+   F:[{k:"est", type:"cost", q:"Estimated monthly payment", sub:`(${fmt0(L)} ÷ 5,000) × $115`, a:est, miss:[[L/5000,"Multiply that by $115."],[115,"That's for $5,000. How many $5,000s are in this loan?"]]},
+      {k:"cu", type:"credit", choices:["A credit union","A loan shark","A hard money lender","A payday lender"], q:"Where should you get pre-approved first?", a:"A credit union", why:"Credit unions (and banks) usually have the best auto loan rates."}]}; }
+function mkKnow(){ const C=pick([["Toyota","Tacoma"],["Honda","Civic"],["Ford","F-150"],["Hyundai","Elantra"],["Subaru","Outback"]]);
+  return {kind:"Know before you go", title:`The ${C[0]} ${C[1]}`, html:tbl([["Make","The company that manufactures the car"],["Model","The type of car that company makes"],["Basic warranty","Bumper-to-bumper: almost everything except maintenance and damage"],["Powertrain warranty","Everything under the hood and under the car that makes it run"]]),
+   F:[{k:"mk", type:"know", choices:[C[0],C[1]], q:"Which is the MAKE?", a:C[0], why:`${C[0]} makes the car; ${C[1]} is the model.`},
+      {k:"pt", type:"know", choices:["Basic","Powertrain"], q:"Your transmission fails. Which warranty covers it?", a:"Powertrain", why:"The transmission is part of what makes the car run."},
+      {k:"tm", type:"know", choices:["Start of the month, Saturday","End of the month, midweek"], q:"Best timing for a deal?", a:"End of the month, midweek", why:"Dealers chase monthly goals, and midweek is less busy."},
+      {k:"hr", type:"know", choices:["Yes","No, only reported ones"], q:"Does a vehicle history report show every accident?", a:"No, only reported ones", why:"Get an inspection too."}]}; }
+function mkFin(){ const otd=rnd(30,70)*500+pick([0,125,250,375]), pct=pick([10,15,20]), trade=pick([0,1500,2500,4000]), down=r2(otd*pct/100), fin=r2(otd-down-trade);
+  return {kind:"Amount financed", title:`${pick(NAMES)}'s down payment`, html:tbl([["Out-the-door price",fmt(otd)],["Down payment",pct+"% of out-the-door"],["Trade-in value",trade?fmt0(trade):"No trade-in"]])+`<div class="rule">Amount financed = what you borrow = out-the-door − down payment − trade-in.</div>`,
+   F:[{k:"down", type:"fin", q:"Down payment ($)", sub:`${fmt(otd)} × ${pct/100}`, a:down, miss:[[otd*pct,"Change the percent to a decimal first."]]},
+      {k:"fin", type:"fin", q:"Amount financed (the loan)", a:fin, miss:[[otd-down,"Subtract the trade-in too."],[otd-trade,"Subtract the down payment too."],[otd+trade-down,"A trade-in LOWERS what you borrow."]]}]}; }
+function mkCost(){ const F0=rnd(24,52)*500, apr=pick([5.5,6.9,7.5,8.9,9.5]), n=pick([36,48,60]), p=pmt(F0,apr,n), tot=r2(p*n);
+  return {kind:"Total cost of a loan", title:`${fmt0(F0)} car loan`, html:tbl([["Amount financed",fmt0(F0)],["APR",apr+"%"],["Term",n+" months"],["Lender's monthly payment",fmt(p)]])+`<div class="rule">Total of payments = monthly payment × number of months. Interest = total of payments − amount financed.</div>`,
+   F:[{k:"tot", type:"cost", q:"Total of all payments", a:tot, tol:.05, miss:[[p*12,"That's only one year. Multiply by "+n+" months."],[p*n/12,"Multiply by the number of MONTHS."]]},
+      {k:"int", type:"cost", q:"Total interest paid", a:r2(tot-F0), tol:.05, miss:[[tot,"That's everything. Subtract the amount financed."],[F0*apr/100,"Use the payments: total of payments − amount financed."]]}]}; }
+function mkTerm(){ const F0=rnd(30,56)*500, apr=pick([6.5,7.9,8.5]), a=pmt(F0,apr,48), b=pmt(F0,apr,72), ia=r2(a*48-F0), ib=r2(b*72-F0);
+  return {kind:"Loan length", title:"48 months or 72 months?", html:tbl([["Amount financed",fmt0(F0)],["APR",apr+"%"],["48-month payment",fmt(a)],["72-month payment",fmt(b)]])+`<div class="rule">The dealer says: "I can get your payment down to ${fmt(b)}!"</div>`,
+   F:[{k:"i48", type:"term", q:"Total interest on the 48-month loan", sub:"payment × 48 − amount financed", a:ia, tol:.05, miss:[[a*48,"Subtract the amount financed."]]},
+      {k:"i72", type:"term", q:"Total interest on the 72-month loan", sub:"payment × 72 − amount financed", a:ib, tol:.05, miss:[[b*72,"Subtract the amount financed."]]},
+      {k:"d", type:"term", q:"How much MORE does the longer loan cost?", a:r2(ib-ia), tol:.1, miss:[[r2(a-b),"That's the payment difference. Compare the total interest."]]}],
+   note:"A longer loan lowers the monthly payment but costs more interest, and you can owe more than the car is worth for longer."}; }
+function mkCredit(){ const score=pick([812,768,745,702,655,600,575,540]), ti=TIERS.findIndex(t=>{ const [lo,hi]=t[0].split("–").map(Number); return score>=lo&&score<=hi; }), rate=parseFloat(TIERS[ti][1]);
+  const F0=rnd(32,48)*500, n=60, pBest=pmt(F0,5.99,n), pMe=pmt(F0,rate,n), extra=r2((pMe-pBest)*n);
+  return {kind:"Credit score & rate", title:`Score: ${score}`, html:`<table><tr><th>Credit score</th><th>Example APR</th></tr>${TIERS.map(t=>`<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`).join("")}</table><div class="rule">Rates from the Car Lending Poster. Real rates change. Loan: ${fmt0(F0)} for 60 months. Payment at 5.99%: ${fmt(pBest)}. Payment at ${rate}%: ${fmt(pMe)}.</div>`,
+   F:[{k:"rate", type:"credit", choices:TIERS.map(t=>t[1]), q:`What APR does a ${score} score get on this chart?`, a:TIERS[ti][1], why:`${score} falls in the ${TIERS[ti][0]} row.`},
+      ...(rate>5.99?[{k:"extra", type:"credit", q:"Over 60 months, how much MORE does this borrower pay than someone with an 800 score?", sub:"(their payment − best payment) × 60", a:extra, tol:.1, miss:[[r2(pMe-pBest),"That's per month. Multiply by 60."]]}]:[{k:"best", type:"credit", q:"Monthly payment at this rate", a:pBest, miss:[]}])]}; }
+function mkAfford(){ const inc=pick([2800,3200,3600,4000,4500]), max=r2(inc*.1), pay=rnd(18,36)*10+pick([0,4.5,9.25]), ins=pick([95,120,145,170]), gas=pick([60,80,110]), tot=r2(pay+ins+gas), ok=tot<=max;
+  return {kind:"Can I afford it?", title:`${fmt0(inc)} a month, before taxes`, html:tbl([["Car payment",fmt(pay)],["Insurance",fmt0(ins)+"/month"],["Gas",fmt0(gas)+"/month"]])+`<div class="rule">Guideline for this game: keep the car payment + insurance + gas at or under 10% of your gross monthly pay.</div>`,
+   F:[{k:"max", type:"afford", q:"Most you should spend on the car each month (10%)", a:max, miss:[[inc,"Take 10% of it: × 0.10."],[inc*.3,"The car guideline is 10%, not 30%."]]},
+      {k:"tot", type:"afford", q:"This car's total monthly cost", a:tot, miss:[[pay,"Add insurance and gas too."]]},
+      {k:"ok", type:"afford", choices:["Fits the guideline","Too expensive"], q:"Does it fit?", a:ok?"Fits the guideline":"Too expensive", why:ok?`${fmt(tot)} is under ${fmt(max)}.`:`${fmt(tot)} is over ${fmt(max)}. Look for a cheaper car, a bigger down payment or lower insurance.`}]}; }
+function mkDown(){ const price=rnd(36,60)*500, apr=pick([7.5,8.5,9.9]), n=60, f20=r2(price*.8), p0=pmt(price,apr,n), p20=pmt(f20,apr,n), i0=r2(p0*n-price), i20=r2(p20*n-f20);
+  return {kind:"Down payment power", title:`${fmt0(price)} car, ${apr}% for 60 months`, html:tbl([["$0 down: payment",fmt(p0)],["20% down: payment",fmt(p20)]])+`<div class="rule">Interest = payment × 60 − amount financed.</div>`,
+   F:[{k:"f20", type:"fin", q:"Amount financed with 20% down", a:f20, miss:[[price*.2,"That's the down payment. Subtract it from the price."]]},
+      {k:"save", type:"cost", q:"Interest saved by putting 20% down", sub:`(${fmt(p0)} × 60 − ${fmt0(price)}) − (${fmt(p20)} × 60 − ${fmt(f20)})`, a:r2(i0-i20), tol:.1, miss:[[r2(p0-p20),"That's the monthly savings. Compare total interest."]]}]}; }
+function mkUpside(){ const price=rnd(44,64)*500, apr=pick([8.9,9.9,11.5]), n=72, b12=bal(price,apr,n,12), val=r2(price*.8), neg=r2(b12-val);
+  return {kind:"Upside down", title:`One year after buying`, html:tbl([["Bought for (no money down)",fmt0(price)],["Loan",apr+"% for 72 months"],["Loan balance after 12 payments",fmt(b12)],["Value after 1 year","about 80% of the price (loses ~20%)"]]),
+   F:[{k:"val", type:"equity", q:"What is the car worth now?", a:val, miss:[[price*.2,"That's the value it LOST. Find 80% of the price."]]},
+      {k:"neg", type:"equity", q:"How much more do you owe than the car is worth?", sub:"loan balance − car value", a:neg, miss:[[val-b12,"Balance minus value: it should be a positive number here."]]},
+      {k:"name", type:"equity", choices:["Upside down (negative equity)","Right side up","Paid off","Pre-approved"], q:"What do lenders call this?", a:"Upside down (negative equity)", why:"You owe more than the car is worth. A bigger down payment and a shorter loan prevent it."}]}; }
+function makeRound(){ return [mkKnow(), mkOTD(), mkEst(), mkCost(), ...shuffle([mkFin(), mkTerm(), mkCredit(), mkAfford(), mkDown(), mkUpside()]).slice(0,3)]; }
+let G=null, best=null;
+try{ best=+localStorage.getItem("deal-desk-best")||null; }catch(e){}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 5: Cars & Lending</span>`; return; }
+  el.innerHTML=`<span>Deal <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
+  $("quit")&&($("quit").onclick=intro); }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 5 · Cars & Lending</div>
+    <h2>The sticker price is just the start.</h2>
+    <p>Seven deals: make vs. model and warranties, adding 10% for tax, title &amp; registration, the $115-per-$5,000 payment estimate, the true cost of a loan, and three more from down payments, 48 vs. 72 months, credit score rates, affordability and being upside down.</p>
+    <ol class="steps"><li><b>Total cost</b> ≈ price + 10% for tax, title &amp; registration. <b>Amount financed</b> = total − down payment − trade-in.</li><li><b>Total of payments</b> = monthly payment × months. <b>Interest</b> = total of payments − amount financed.</li><li>The lender gives you the monthly payment. Use a calculator and round to the cent.</li></ol>
+    <p>Typed answers: 10 points first try, 5 second. Tap answers: one try.${best?` <b>Your best: ${best}.</b>`:""}</p>
+    <div class="row"><button class="btn go" id="go">Start the first deal</button></div></div>`;
+  $("go").onclick=()=>{ G={cards:makeRound(), i:0, score:0, phase:"play", by:{}}; prep(); draw(); };
+}
+function prep(){ const c=G.cards[G.i]; c.st={}; c.tries={}; c.msg={}; c.val={}; c.done=false; }
+function card(o){ return `<div class="tc"><div class="kind">${o.kind}</div><h2>${o.title}</h2>${o.html}</div>`; }
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const c=G.cards[G.i], n=G.cards.length;
+  const fields=c.F.map(f=>{ const st=c.st[f.k], dis=st==="ok"||st==="shown";
+    if(f.choices) return `<div class="field wide ${st==="ok"?"ok":st==="shown"?"shown":""}"><div class="q">${esc(f.q)}</div>
+      <div class="choices" role="group">${f.choices.map(o=>{ let cl="ch"; if(dis&&o===f.a) cl+=" right"; else if(c.val[f.k]===o) cl+=" sel"; return `<button type="button" class="${cl}" data-k="${f.k}" data-o="${esc(o)}" ${dis?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`;
+    return `<div class="field ${st==="ok"?"ok":st==="shown"?"shown":c.msg[f.k]?"no":""}">
+      <label class="q" for="f-${f.k}">${esc(f.q)}${f.sub?`<small>${esc(f.sub)}</small>`:""}</label>
+      <div class="inp">${f.unit?"":"<span>$</span>"}<input id="f-${f.k}" inputmode="decimal" autocomplete="off" value="${esc(c.val[f.k]??"")}" ${dis?"disabled":""}>${f.unit?`<span>${f.unit}</span>`:""}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`; }).join("");
+  $("root").innerHTML=`<div class="game">
+    <div class="progress" aria-hidden="true"><i style="width:${(G.i+(c.done?1:0))/n*100}%"></i></div>
+    ${card(c)}
+    <form class="sheet" id="sheet" novalidate>
+      <div class="eyebrow">Deal ${G.i+1} of ${n}</div>
+      ${fields}
+      <div class="row">${c.done?`<button class="btn go" type="button" id="next">${G.i+1<n?"Next deal":"See my results"}</button>`:`<button class="btn go" type="submit">Check</button>`}</div>
+      <p class="note">Round money to the cent. Use a calculator.</p>
+    </form></div>`;
+  if(c.done){ $("next").onclick=next; $("next").focus({preventScroll:true}); return; }
+  $("sheet").onsubmit=e=>{ e.preventDefault(); check(); };
+  c.F.forEach(f=>{ if(f.choices) return; const el=$("f-"+f.k); el&&el.addEventListener("input",()=>{ c.val[f.k]=el.value; }); });
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{ c.val[b.dataset.k]=b.dataset.o; draw(); });
+}
+function check(){
+  const c=G.cards[G.i];
+  c.F.forEach(f=>{ if(c.st[f.k]==="ok"||c.st[f.k]==="shown") return; const b=G.by[f.type]||(G.by[f.type]=[0,0]);
+    if(f.choices){ const v=c.val[f.k]; if(!v){ c.msg[f.k]="Tap an answer."; return; } b[1]++;
+      if(v===f.a){ G.score+=10; b[0]++; c.st[f.k]="ok"; c.msg[f.k]=f.why; } else { c.st[f.k]="shown"; c.msg[f.k]="Best answer: "+f.a+". "+f.why; } return; }
+    const v=num(c.val[f.k]??""), tol=f.tol||.015; if(!c.tries[f.k]) b[1]++;
+    if(!isNaN(v)&&Math.abs(v-f.a)<=tol){ const pts=c.tries[f.k]?5:10; G.score+=pts; if(!c.tries[f.k]) b[0]++; c.st[f.k]="ok"; c.msg[f.k]=c.tries[f.k]?"Got it on the second try. +5":""; return; }
+    c.tries[f.k]=(c.tries[f.k]||0)+1;
+    const hit=isNaN(v)?null:(f.miss||[]).find(([x])=>Math.abs(v-r2(x))<=.02&&Math.abs(r2(x)-f.a)>tol);
+    const show=f.unit?n0(f.a)+" "+f.unit:fmt(f.a);
+    if(c.tries[f.k]>=2){ c.st[f.k]="shown"; c.val[f.k]=String(f.a); c.msg[f.k]=(hit?hit[1]+" ":"")+"Answer: "+show+"."; }
+    else c.msg[f.k]=isNaN(v)?"Type a number.":(hit?hit[1]:"Not quite. Check the card again.")+" Try again.";
+  });
+  c.done=c.F.every(f=>c.st[f.k]==="ok"||c.st[f.k]==="shown");
+  draw();
+}
+function next(){ G.i++; if(G.i>=G.cards.length){ G.phase="end"; if(!best||G.score>best){ best=G.score; try{ localStorage.setItem("deal-desk-best",String(best)); }catch(e){} } } else prep(); draw(); }
+function end(){
+  stats();
+  const max=G.cards.reduce((s,c)=>s+c.F.length*10,0);
+  const rows=Object.keys(SKILL).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    return `<div class="skill"><b>${SKILL[k]}</b><span class="v">${a} of ${t} first try</span>${p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Round complete</div>
+    <div class="big">${G.score} <span style="font-size:.45em;color:var(--muted)">/ ${max}</span></div>
+    <div class="skills">${rows}</div>
+    <p>Shop the total cost, not the monthly payment: price, fees, rate, term and down payment all change what you really pay.</p>
+    <div class="row"><button class="btn go" id="again">New deals</button></div></div>`;
+  $("again").onclick=intro;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

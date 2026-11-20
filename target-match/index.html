@@ -1,0 +1,190 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>18 by 18 Target Match</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: arcade header bar, mode picker, then a card grid (memory) or a scenario card with four target buttons. */
+:root{--bg:#EEF1F5;--panel:#FFFFFF;--ink:#16202E;--muted:#5C6676;--line:#D3D9E2;--bar:#14213D;--barInk:#F4F6FA;--gold:#E3A008;--good:#1F7A4D;--bad:#B33A2B;--back:#22355E;--backInk:#F4F6FA;--chip:#E6EBF2;
+ --display:"Bricolage Grotesque",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1522;--panel:#182133;--ink:#E7ECF4;--muted:#9AA6B8;--line:#2C3850;--bar:#0A1020;--barInk:#E7ECF4;--gold:#F2B83A;--good:#4FBF83;--bad:#F07A68;--back:#2B4170;--backInk:#E7ECF4;--chip:#223049;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1522;--panel:#182133;--ink:#E7ECF4;--muted:#9AA6B8;--line:#2C3850;--bar:#0A1020;--barInk:#E7ECF4;--gold:#F2B83A;--good:#4FBF83;--bad:#F07A68;--back:#2B4170;--backInk:#E7ECF4;--chip:#223049;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+header{background:var(--bar);color:var(--barInk);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,34px)}
+header h1 span{color:var(--gold)}
+.stat{font-family:var(--mono);font-size:14px;display:flex;gap:16px;align-items:center}
+.stat b{color:var(--gold)}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:600 16px var(--body);padding:11px 18px;border-radius:12px;cursor:pointer}
+.btn.go{background:var(--gold);border-color:var(--gold);color:#1A1406}
+header .btn{background:transparent;color:var(--barInk);border-color:rgba(255,255,255,.35);padding:8px 14px;font-size:14px}
+.btn:focus-visible,.card:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.intro{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:14px}
+.intro h2{margin:0;font-family:var(--display);font-size:clamp(24px,3.4vw,36px);text-wrap:balance}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.mode{border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;background:var(--chip)}
+.mode h3{margin:0;font-family:var(--display);font-size:22px}
+.mode p{margin:0;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.card{position:relative;min-height:118px;border-radius:14px;border:0;cursor:pointer;perspective:800px;background:transparent;padding:0;font:inherit;color:inherit}
+.inner{position:absolute;inset:0;transition:transform .35s;transform-style:preserve-3d}
+.card.up .inner,.card.done .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;display:grid;place-items:center;padding:12px;text-align:center}
+.back{background:var(--back);color:var(--backInk);font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.02em}
+.back small{display:block;font:500 11px var(--mono);letter-spacing:.12em;opacity:.7}
+.front{background:var(--panel);border:2px solid var(--line);transform:rotateY(180deg);font-weight:600;font-size:15px;line-height:1.3}
+.front .num{font:500 12px var(--mono);color:var(--muted);display:block;margin-bottom:4px}
+.front.t{border-color:var(--gold)}
+.card.done .front{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,var(--panel))}
+.card.miss .front{border-color:var(--bad)}
+.emoji{font-size:22px;display:block;margin-bottom:2px}
+.scen{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:16px}
+.scen .q{font-family:var(--display);font-weight:700;font-size:clamp(22px,3vw,32px);line-height:1.2;text-wrap:balance}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{text-align:left;border:2px solid var(--line);background:var(--chip);color:var(--ink);border-radius:14px;padding:14px 16px;font:600 17px var(--body);cursor:pointer;display:grid;gap:2px}
+.opt small{font:500 12px var(--mono);color:var(--muted)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--panel))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--panel))}
+.fb{border-radius:12px;padding:12px 14px;background:var(--chip);font-size:16px}
+.fb b{font-family:var(--display)}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+.end{text-align:center;display:grid;gap:12px;justify-items:center}
+.big{font-family:var(--display);font-weight:800;font-size:56px;color:var(--gold);line-height:1}
+.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px;text-align:left;width:100%}
+.list div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+.list b{display:block;font-size:15px}
+@media (prefers-reduced-motion:reduce){.inner{transition:none}}
+</style>
+<header><h1>18 by 18: <span>Target Match</span></h1><div class="stat" id="stat"></div></header>
+<main id="app"></main>
+<script>
+const T=[
+ [1,"Harness the power of compounding","🌱","Start early. Time does the heavy lifting."],
+ [2,"Spend less than you earn","🛍️","Create the gap. Protect the gap."],
+ [3,"Spend on what matters to you","✨","Use money intentionally to build the life you value."],
+ [4,"Expect the unexpected","😬","Build financial resilience before life tests it."],
+ [5,"Invest in yourself","🎓","Grow your skills and earning power."],
+ [6,"Use debt carefully","💸","Borrowing spends future you's income."],
+ [7,"Look beyond the monthly payments","📅","Understand the total cost before deciding."],
+ [8,"Know what you're really earning","💲","Understand take-home pay and total compensation."],
+ [9,"Match your money to when you'll need it","🏥","Give each dollar the right job for its time horizon."],
+ [10,"Become an owner","📈","Investing in stocks means owning businesses."],
+ [11,"Don't bet your future on one investment","🥚","Diversify. You don't need to pick the winner when you own many."],
+ [12,"Keep investing simple","🔤","You don't need to predict winners to build wealth."],
+ [13,"Small costs become big costs","‼️","Pay attention to fees and recurring costs."],
+ [14,"Master your money psychology","🧠","Your behavior can matter as much as your knowledge."],
+ [15,"Protect what you're building","🏡","Transfer financial risks you can't afford to absorb."],
+ [16,"Question financial advice","❓","Understand evidence, incentives, and credibility before acting."],
+ [17,"Use tax advantages to build wealth","💰","Keep more of your money working for future you."],
+ [18,"Build your path to financial freedom","💚","Use money to build security, choices, freedom, generosity and the life you value."]];
+const S=[
+ [1,"Maya starts putting $50 a month into a Roth IRA at 18 instead of waiting until she's 30."],
+ [1,"A penny doubled every day for 30 days ends up worth more than $5 million."],
+ [2,"Jordan takes home $3,000 a month, plans to spend $2,600, and saves the rest."],
+ [2,"Theo gets a raise but keeps his spending the same so he can save more."],
+ [3,"Ava cancels streaming services she never watches so she can afford a trip with her friends."],
+ [3,"Before buying, Kai asks: will this still matter to me next month?"],
+ [4,"Luis builds a 3-month emergency fund before buying new speakers."],
+ [4,"A tire blows out, and Nora pays for it from savings instead of a credit card."],
+ [5,"Rosa takes a certification course so she qualifies for a higher-paying job."],
+ [5,"Marcus picks a trade program that raises his earning power for the next 40 years."],
+ [6,"Imani only charges what she can pay off in full every month."],
+ [6,"Ezra skips a payday loan because it would eat his next two paychecks."],
+ [7,"The dealer says \"only $350 a month!\" and Lena asks for the total cost over 72 months."],
+ [7,"Jace compares two car loans by total interest paid, not by the monthly payment."],
+ [8,"Maddie compares two job offers by take-home pay and the 401(k) match, not just salary."],
+ [8,"Before budgeting, Theo reads his pay stub to see what's left after taxes and deductions."],
+ [9,"Kai keeps next month's rent in checking and his retirement money invested for 40 years."],
+ [9,"Ava will buy a car in one year, so she saves for it in a high-yield savings account instead of stocks."],
+ [10,"Luis buys shares of a company and becomes a part owner who shares in its profits."],
+ [10,"Nora learns that each share of stock is a small piece of a real business."],
+ [11,"Instead of putting everything in one hot stock, Rosa buys an S&P 500 index fund."],
+ [11,"Marcus spreads his money across hundreds of companies so one failure can't sink him."],
+ [12,"Imani picks one low-fee target-date fund and stops trying to pick winners."],
+ [12,"Ezra sets up automatic investing and checks his account once a year."],
+ [13,"A 1% fund fee instead of 0.1% costs Lena tens of thousands over 40 years."],
+ [13,"Jace finds a forgotten $15 subscription: that's $180 a year."],
+ [14,"When the market drops 20%, Maddie sticks to her plan instead of panic-selling."],
+ [14,"Theo waits 48 hours before buying something he saw in a friend's post."],
+ [15,"Kai pays $15 a month for renters insurance to protect $8,000 of belongings."],
+ [15,"Ava keeps health insurance so one hospital stay can't wipe out her savings."],
+ [16,"An influencer promises 50% returns in a month, so Luis checks who profits from the advice."],
+ [16,"Nora asks whether her advisor earns a commission on what he recommends."],
+ [17,"Rosa invests in a Roth IRA so her growth is tax-free in retirement."],
+ [17,"Marcus puts money in his pre-tax 401(k), which lowers his taxable income."],
+ [18,"Imani's plan: an emergency fund, no high-interest debt, steady investing, and giving to causes she cares about."],
+ [18,"Ezra writes a money plan built around security, choices, and generosity, not just being rich."]];
+const app=document.getElementById("app"), stat=document.getElementById("stat");
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let best={};try{best=JSON.parse(localStorage.getItem("target-match-best")||"{}")}catch(e){}
+function saveBest(k,v,lower){const o=best[k];if(o==null||(lower?v<o:v>o)){best[k]=v;try{localStorage.setItem("target-match-best",JSON.stringify(best))}catch(e){}return true}return false}
+function home(){
+  stat.innerHTML="";
+  app.innerHTML=`<section class="intro"><div class="eyebrow">Personal Finance · Final Exam · Learning targets</div>
+  <h2>18 money targets. Know them by heart.</h2>
+  <p style="margin:0;color:var(--muted)">Every target has a life rule. Match them from memory, then spot which target a real money decision is using.</p>
+  <div class="modes">
+   <div class="mode"><h3>Memory Match</h3><p>Flip two cards. Match each target (#1–18) to its life rule.</p>
+    <div class="row"><button class="btn go" data-m="6">6 pairs</button><button class="btn" data-m="9">9 pairs</button><button class="btn" data-m="18">All 18</button></div>
+    <div class="eyebrow">${best.m6!=null||best.m9!=null||best.m18!=null?`Fewest flips · 6: ${best.m6??"–"} · 9: ${best.m9??"–"} · 18: ${best.m18??"–"}`:"Fewest flips wins"}</div></div>
+   <div class="mode"><h3>Which Target?</h3><p>Read a real money decision. Pick the target it shows.</p>
+    <div class="row"><button class="btn go" data-w="12">12 decisions</button><button class="btn" data-w="36">All 36</button></div>
+    <div class="eyebrow">${best.w12!=null||best.w36!=null?`Best · 12: ${best.w12??"–"} · 36: ${best.w36??"–"}`:"One try per decision"}</div></div>
+   <div class="mode"><h3>Study List</h3><p>All 18 targets and life rules on one page.</p><div class="row"><button class="btn" id="study">Open the list</button></div></div>
+  </div></section>`;
+  app.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>memory(+b.dataset.m));
+  app.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>which(+b.dataset.w));
+  document.getElementById("study").onclick=study;
+}
+function study(){
+  stat.innerHTML=`<button class="btn" id="q">Menu</button>`;document.getElementById("q").onclick=home;
+  app.innerHTML=`<section class="intro"><h2>The 18 by 18 targets</h2><div class="list">${T.map(t=>`<div><b>#${t[0]} ${esc(t[1])}</b>${t[2]} ${esc(t[3])}</div>`).join("")}</div></section>`;
+}
+function memory(n){
+  const pick=shuffle(T).slice(0,n);
+  const cards=shuffle(pick.flatMap(t=>[{id:t[0],kind:"t",t},{id:t[0],kind:"r",t}]));
+  let open=[],flips=0,matched=0,lock=false;
+  const draw=()=>{stat.innerHTML=`<span>Pairs <b>${matched}/${n}</b></span><span>Flips <b>${flips}</b></span><button class="btn" id="q">Menu</button>`;document.getElementById("q").onclick=home};
+  app.innerHTML=`<div class="grid" id="g"></div>`;const g=document.getElementById("g");
+  cards.forEach((c,i)=>{const b=document.createElement("button");b.className="card";b.setAttribute("aria-label","Face-down card");
+    b.innerHTML=`<div class="inner"><div class="face back"><div><small>18 BY 18</small>?</div></div><div class="face front ${c.kind}">${c.kind==="t"?`<div><span class="num">TARGET #${c.t[0]}</span>${esc(c.t[1])}</div>`:`<div><span class="emoji">${c.t[2]}</span>${esc(c.t[3])}</div>`}</div></div>`;
+    b.onclick=()=>{if(lock||b.classList.contains("up")||b.classList.contains("done"))return;b.classList.add("up");b.setAttribute("aria-label",c.kind==="t"?`Target ${c.t[0]}: ${c.t[1]}`:c.t[3]);open.push([b,c]);
+      if(open.length===2){flips++;const [[b1,c1],[b2,c2]]=open;open=[];
+        if(c1.id===c2.id&&c1.kind!==c2.kind){matched++;b1.classList.add("done");b2.classList.add("done");draw();if(matched===n)setTimeout(()=>doneMem(n,flips),500)}
+        else{lock=true;b1.classList.add("miss");b2.classList.add("miss");draw();setTimeout(()=>{[b1,b2].forEach(x=>{x.classList.remove("up","miss");x.setAttribute("aria-label","Face-down card")});lock=false},1100)}}};
+    g.appendChild(b)});
+  draw();
+}
+function doneMem(n,flips){const nb=saveBest("m"+n,flips,true);
+  app.innerHTML=`<section class="intro end"><div class="eyebrow">Memory Match · ${n} pairs</div><div class="big">${flips} flips</div><p>Perfect is ${n} flips.${nb?" New best!":""}</p>
+  <div class="row"><button class="btn go" id="a">Play again</button><button class="btn" id="b">Try Which Target?</button><button class="btn" id="c">Menu</button></div></section>`;
+  document.getElementById("a").onclick=()=>memory(n);document.getElementById("b").onclick=()=>which(12);document.getElementById("c").onclick=home}
+function which(n){
+  const qs=shuffle(S).slice(0,n);let i=0,score=0,missed=[];
+  const show=()=>{const [tid,txt]=qs[i];const right=T[tid-1];const opts=shuffle([right,...shuffle(T.filter(t=>t[0]!==tid)).slice(0,3)]);
+    stat.innerHTML=`<span>Decision <b>${i+1}/${n}</b></span><span>Score <b>${score}</b></span><button class="btn" id="q">Menu</button>`;document.getElementById("q").onclick=home;
+    app.innerHTML=`<section class="scen"><div class="bar"><i style="width:${i/n*100}%"></i></div><div class="eyebrow">Which target is this?</div><div class="q">${esc(txt)}</div>
+    <div class="opts">${opts.map(t=>`<button class="opt" data-id="${t[0]}"><small>TARGET #${t[0]}</small>${esc(t[1])}</button>`).join("")}</div><div id="fb"></div></section>`;
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(app.querySelector(".opt.right"))return;const ok=+b.dataset.id===tid;
+      app.querySelectorAll(".opt").forEach(x=>{if(+x.dataset.id===tid)x.classList.add("right");x.disabled=true});
+      if(ok)score++;else{b.classList.add("wrong");missed.push(tid)}
+      document.getElementById("fb").innerHTML=`<div class="fb"><b>${ok?"Yes!":"Not quite."}</b> #${right[0]} ${esc(right[1])}: ${right[2]} ${esc(right[3])}</div><div class="row" style="margin-top:12px"><button class="btn go" id="nx">${i+1<n?"Next decision":"See results"}</button></div>`;
+      stat.querySelector("span:nth-child(2) b").textContent=score;
+      const nx=document.getElementById("nx");nx.focus();nx.onclick=()=>{i++;i<n?show():doneWhich(n,score,missed)}})};
+  show();
+}
+function doneWhich(n,score,missed){const nb=saveBest("w"+n,score,false);const u=[...new Set(missed)].sort((a,b)=>a-b);
+  app.innerHTML=`<section class="intro end"><div class="eyebrow">Which Target? · ${n} decisions</div><div class="big">${score}/${n}</div><p>${nb?"New best! ":""}${u.length?"Review these targets:":"You knew every target."}</p>
+  ${u.length?`<div class="list">${u.map(id=>{const t=T[id-1];return `<div><b>#${t[0]} ${esc(t[1])}</b>${t[2]} ${esc(t[3])}</div>`}).join("")}</div>`:""}
+  <div class="row"><button class="btn go" id="a">Play again</button><button class="btn" id="b">Memory Match</button><button class="btn" id="c">Menu</button></div></section>`;
+  document.getElementById("a").onclick=()=>which(n);document.getElementById("b").onclick=()=>memory(9);document.getElementById("c").onclick=home}
+home();
+</script>
+
+</body></html>

@@ -1,0 +1,168 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Life at 22</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: final-project planner. Left column = inputs in four steps (career → paycheck → living costs → saving). Right column = a live "monthly money map" that updates as students type: take-home pay, a stacked spending bar, 50/30/20 check, guideline flags and a project summary. */
+:root {
+  --bg:#F2F4F1; --surface:#FFFFFF; --ink:#14213D; --muted:#5A6478; --line:#D3D9D0;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --warn:#B8572F; --warn-soft:#F7E4DA;
+  --need:#2F5FB8; --want:#B8572F; --save:#0F8B6C; --tax:#6B4FB0;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0B111D; --surface:#151E33; --ink:#E8EDF5; --muted:#97A3B9; --line:#26334F; --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --warn:#F08A5D; --warn-soft:#3A2218;
+  --need:#6E9BF0; --want:#F08A5D; --save:#3CCB9F; --tax:#A68BEF; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0B111D; --surface:#151E33; --ink:#E8EDF5; --muted:#97A3B9; --line:#26334F; --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --warn:#F08A5D; --warn-soft:#3A2218;
+  --need:#6E9BF0; --want:#F08A5D; --save:#3CCB9F; --tax:#A68BEF; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.hero { background:var(--hero); color:var(--hero-ink); }
+.hero .inner { max-width:1240px; margin:0 auto; padding-block:22px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:6px; }
+.hero .eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+.hero h1 { font-family:var(--display); font-weight:800; font-size:clamp(32px, 5vw, 56px); margin:0; line-height:1; }
+.hero h1 span { color:var(--gold); }
+.hero p { margin:0; max-width:70ch; line-height:1.45; opacity:.9; }
+.wrap { max-width:1240px; margin:0 auto; padding-block:20px 48px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:20px; align-items:start; }
+@media (max-width:900px) { .wrap { grid-template-columns:1fr; } }
+.step { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; display:grid; gap:12px; }
+.step h2 { font-family:var(--display); font-weight:800; font-size:24px; margin:0; display:flex; gap:10px; align-items:center; }
+.step h2 .n { font-family:var(--mono); font-size:14px; width:30px; height:30px; border-radius:50%; background:var(--ink); color:var(--bg); display:inline-flex; align-items:center; justify-content:center; }
+.inputs { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px 14px; }
+label.f { display:grid; gap:4px; font-weight:700; font-size:15px; }
+label.f small { font-weight:400; color:var(--muted); }
+.f input, .f select { font:inherit; font-family:var(--mono); padding:9px 10px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); width:100%; }
+.f input:focus-visible, .f select:focus-visible, .btn:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.left { display:grid; gap:16px; min-width:0; }
+.map { position:sticky; top:12px; display:grid; gap:14px; min-width:0; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; display:grid; gap:10px; min-width:0; }
+.card h3 { font-family:var(--display); font-weight:800; font-size:22px; margin:0; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(36px, 5vw, 54px); line-height:1; font-variant-numeric:tabular-nums; }
+.lines { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.lines td { padding:5px 0; border-bottom:1px dashed var(--line); }
+.lines td:last-child { text-align:right; font-family:var(--mono); }
+.lines tr.t td { font-weight:700; border-bottom:2px solid var(--ink); }
+.bar { display:flex; height:30px; border-radius:8px; overflow:hidden; background:var(--line); }
+.bar div { height:100%; }
+.legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:14px; color:var(--muted); }
+.legend i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+.flags { display:grid; gap:8px; }
+.flag { border-radius:10px; padding:10px 12px; line-height:1.4; font-size:15px; }
+.flag.ok { background:var(--ok-soft); } .flag.warn { background:var(--warn-soft); }
+.flag b { font-family:var(--display); }
+.row { display:flex; gap:10px; flex-wrap:wrap; }
+.btn { font:inherit; font-weight:700; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.note { color:var(--muted); font-size:14px; margin:0; line-height:1.4; }
+.sum { font-size:16px; line-height:1.55; }
+</style>
+
+<header class="hero"><div class="inner">
+  <div class="eyebrow">Unit 10 · Final Project</div>
+  <h1>Life at <span>22</span></h1>
+  <p>Build the monthly money plan for your career. Your paycheck, rent, car, saving and fun all come from what you learned this semester. Everything updates as you type. Your plan saves on this iPad only. Screenshot the money map for your project.</p>
+</div></header>
+
+<div class="wrap">
+  <div class="left">
+    <section class="step"><h2><span class="n">1</span>My career</h2>
+      <div class="inputs">
+        <label class="f" for="job">Career<input id="job" maxlength="40"></label>
+        <label class="f" for="sal">Yearly salary ($)<small>Starting pay, $100,000 max</small><input id="sal" inputmode="decimal"></label>
+        <label class="f" for="city">Where I live<input id="city" maxlength="40"></label>
+      </div></section>
+    <section class="step"><h2><span class="n">2</span>My paycheck</h2>
+      <div class="inputs">
+        <label class="f" for="k401">401(k) %<small>Company matches up to 5%</small><select id="k401"><option>0</option><option>3</option><option>5</option><option>8</option><option>10</option></select></label>
+        <label class="f" for="med">Health insurance<select id="med"><option value="0">On a parent's plan</option><option value="150">Basic ($150/mo)</option><option value="250">Premium ($250/mo)</option></select></label>
+        <label class="f" for="life">Life insurance<select id="life"><option value="0">No</option><option value="10">Yes ($10/mo)</option></select></label>
+      </div>
+      <p class="note">Same rules as My First Paycheck: 2026 federal chart, Illinois 4.95%, FICA 7.65% on gross, pre-tax 401(k).</p></section>
+    <section class="step"><h2><span class="n">3</span>Living costs (per month)</h2>
+      <div class="inputs">
+        <label class="f" for="rent">Rent, my share ($)<input id="rent" inputmode="decimal"></label>
+        <label class="f" for="util">Utilities + internet ($)<input id="util" inputmode="decimal"></label>
+        <label class="f" for="rins">Renters insurance ($)<input id="rins" inputmode="decimal"></label>
+        <label class="f" for="food">Groceries ($)<input id="food" inputmode="decimal"></label>
+        <label class="f" for="phone">Phone ($)<input id="phone" inputmode="decimal"></label>
+        <label class="f" for="carp">Car payment or transit pass ($)<input id="carp" inputmode="decimal"></label>
+        <label class="f" for="cari">Car insurance ($)<input id="cari" inputmode="decimal"></label>
+        <label class="f" for="gas">Gas ($)<input id="gas" inputmode="decimal"></label>
+        <label class="f" for="loan">Student loan payment ($)<input id="loan" inputmode="decimal"></label>
+      </div></section>
+    <section class="step"><h2><span class="n">4</span>Saving &amp; fun (per month)</h2>
+      <div class="inputs">
+        <label class="f" for="ef">Emergency fund ($)<input id="ef" inputmode="decimal"></label>
+        <label class="f" for="roth">Roth IRA / investing ($)<input id="roth" inputmode="decimal"></label>
+        <label class="f" for="fun">Eating out &amp; fun ($)<input id="fun" inputmode="decimal"></label>
+        <label class="f" for="subs">Streaming &amp; subscriptions ($)<input id="subs" inputmode="decimal"></label>
+        <label class="f" for="shop">Shopping &amp; other ($)<input id="shop" inputmode="decimal"></label>
+        <label class="f" for="give">Giving ($)<input id="give" inputmode="decimal"></label>
+      </div>
+      <div class="row"><button class="btn" id="sample">Load the example (Accountant)</button><button class="btn" id="clear">Start blank</button></div></section>
+  </div>
+  <aside class="map" id="map" aria-live="polite"></aside>
+</div>
+
+<script>
+const IDS=["job","sal","city","k401","med","life","rent","util","rins","food","phone","carp","cari","gas","loan","ef","roth","fun","subs","shop","give"];
+const SAMPLE={job:"Accountant",sal:"65000",city:"Arlington Heights, IL",k401:"5",med:"150",life:"10",rent:"1150",util:"140",rins:"15",food:"350",phone:"65",carp:"310",cari:"130",gas:"110",loan:"180",ef:"200",roth:"150",fun:"250",subs:"30",shop:"100",give:"25"};
+const KEY="life-at-22-v1";
+const $=id=>document.getElementById(id);
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>(x<0?"−":"")+"$"+Math.abs(x).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const n=id=>{ const v=parseFloat(String($(id).value).replace(/[$,\s]/g,"")); return isNaN(v)?0:v; };
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function fedRate(y){ return y<16100?0:y<=25000?2:y<=35000?5:y<=45000?7:y<=60000?8:y<=70000?9:y<=85000?11:12; }
+function calc(){
+  const sal=Math.min(n("sal"),100000), g=r2(sal/12), kp=+$("k401").value, k=r2(g*kp/100), match=r2(g*Math.min(kp,5)/100), taxable=r2(g-k);
+  const fr=fedRate(sal), fed=r2(taxable*fr/100), st=r2(taxable*.0495), ss=r2(g*.062), med=r2(g*.0145), hi=+$("med").value, li=+$("life").value;
+  const taxes=r2(fed+st+ss+med), net=r2(g-k-taxes-hi-li);
+  const needs={Rent:n("rent"),"Utilities":n("util"),"Renters insurance":n("rins"),Groceries:n("food"),Phone:n("phone"),"Car or transit":n("carp"),"Car insurance":n("cari"),Gas:n("gas"),"Student loan":n("loan")};
+  const saves={"Emergency fund":n("ef"),"Roth IRA / investing":n("roth")}, wants={"Eating out & fun":n("fun"),Subscriptions:n("subs"),"Shopping & other":n("shop"),Giving:n("give")};
+  const sum=o=>r2(Object.values(o).reduce((a,b)=>a+b,0)), N=sum(needs), S=sum(saves), W=sum(wants), left=r2(net-N-S-W);
+  return {sal,g,kp,k,match,fr,fed,st,ss,med,hi,li,taxes,net,needs,saves,wants,N,S,W,left};
+}
+function draw(){
+  const c=calc(), job=$("job").value.trim()||"My career";
+  if(!c.sal){ $("map").innerHTML=`<div class="card"><h3>Your monthly money map</h3><p class="note">Enter a yearly salary in Step 1, or tap "Load the example" to see how it works.</p></div>`; return; }
+  const pct=x=>c.net>0?Math.max(0,x/c.net*100):0, rent=c.needs.Rent, car=c.needs["Car or transit"]+c.needs["Car insurance"]+c.needs.Gas;
+  const flags=[];
+  flags.push(c.left>=0?["ok",`<b>Balanced.</b> ${fmt(c.left)} left over each month. Give it a job (more savings?).`]:["warn",`<b>Over budget by ${fmt(-c.left)}.</b> Cut wants first, then look at rent or the car.`]);
+  flags.push(rent<=c.g*.3?["ok",`<b>Rent passes the 30% rule</b> (${fmt(rent)} ≤ ${fmt(r2(c.g*.3))}).`]:["warn",`<b>Rent is over 30%</b> of gross pay (limit ${fmt(r2(c.g*.3))}). Try a roommate or cheaper place.`]);
+  flags.push(car<=c.g*.1?["ok",`<b>Car costs pass the 10% guideline</b> (${fmt(car)} ≤ ${fmt(r2(c.g*.1))}).`]:["warn",`<b>Car costs are over 10%</b> of gross pay (limit ${fmt(r2(c.g*.1))}).`]);
+  flags.push(c.kp>=5?["ok",`<b>Full 401(k) match.</b> Your company adds ${fmt(c.match)} every month.`]:["warn",`<b>Free money left behind.</b> Raise your 401(k) to 5% to get the full match (+${fmt(r2(c.g*.05-c.match))}/mo from your company).`]);
+  const efGoal=r2(c.N*3), efMonths=c.saves["Emergency fund"]>0?Math.ceil(efGoal/c.saves["Emergency fund"]):null;
+  flags.push(efMonths?["ok",`<b>Emergency fund goal:</b> 3 months of needs = ${fmt(efGoal)}. At ${fmt(c.saves["Emergency fund"])}/mo you'll get there in ${efMonths} months.`]:["warn",`<b>No emergency fund yet.</b> Goal: 3 months of needs = ${fmt(efGoal)}.`]);
+  const line=(o)=>Object.entries(o).filter(([,v])=>v).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${fmt(v)}</td></tr>`).join("");
+  $("map").innerHTML=`
+   <div class="card"><h3>${esc(job)}${$("city").value.trim()?" · "+esc($("city").value.trim()):""}</h3>
+     <div class="note">Take-home pay each month</div><div class="big" style="color:var(--save)">${fmt(c.net)}</div>
+     <table class="lines"><tr><td>Gross monthly (${fmt(c.sal)} ÷ 12)</td><td>${fmt(c.g)}</td></tr><tr><td>401(k) ${c.kp}% (pre-tax)</td><td>−${fmt(c.k)}</td></tr>
+      <tr><td>Federal tax (${c.fr}% of taxable)</td><td>−${fmt(c.fed)}</td></tr><tr><td>Illinois tax 4.95%</td><td>−${fmt(c.st)}</td></tr><tr><td>Social Security + Medicare</td><td>−${fmt(r2(c.ss+c.med))}</td></tr>
+      ${c.hi?`<tr><td>Health insurance</td><td>−${fmt(c.hi)}</td></tr>`:""}${c.li?`<tr><td>Life insurance</td><td>−${fmt(c.li)}</td></tr>`:""}<tr class="t"><td>Take-home pay</td><td>${fmt(c.net)}</td></tr></table></div>
+   <div class="card"><h3>Where it goes</h3>
+     <div class="bar" role="img" aria-label="Needs ${Math.round(pct(c.N))}%, wants ${Math.round(pct(c.W))}%, savings ${Math.round(pct(c.S))}% of take-home"><div style="width:${Math.min(100,pct(c.N))}%;background:var(--need)"></div><div style="width:${Math.min(100,pct(c.W))}%;background:var(--want)"></div><div style="width:${Math.min(100,pct(c.S))}%;background:var(--save)"></div></div>
+     <div class="legend"><span><i style="background:var(--need)"></i>Needs ${Math.round(pct(c.N))}% (goal 50%)</span><span><i style="background:var(--want)"></i>Wants ${Math.round(pct(c.W))}% (goal 30%)</span><span><i style="background:var(--save)"></i>Savings ${Math.round(pct(c.S))}% (goal 20%)</span></div>
+     <table class="lines">${line(c.needs)}<tr class="t"><td>Needs</td><td>${fmt(c.N)}</td></tr>${line(c.wants)}<tr class="t"><td>Wants</td><td>${fmt(c.W)}</td></tr>${line(c.saves)}<tr class="t"><td>Savings</td><td>${fmt(c.S)}</td></tr>
+     <tr class="t"><td>${c.left>=0?"Left over":"Short"}</td><td>${fmt(c.left)}</td></tr></table></div>
+   <div class="card"><h3>Checkup</h3><div class="flags">${flags.map(f=>`<div class="flag ${f[0]}">${f[1]}</div>`).join("")}</div></div>
+   <div class="card"><h3>For your project write-up</h3><p class="sum">As a ${esc(job.toLowerCase())} earning ${fmt(c.sal)} a year, I take home ${fmt(c.net)} a month. I spend ${Math.round(pct(c.N))}% on needs, ${Math.round(pct(c.W))}% on wants and save ${Math.round(pct(c.S))}%, plus ${fmt(r2(c.k+c.match))} a month going into my 401(k) with my company's match.</p>
+     <p class="note">Screenshot this panel and the cards above for your final project.</p></div>`;
+}
+function save(){ try{ const o={}; IDS.forEach(id=>o[id]=$(id).value); localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
+function fill(o){ IDS.forEach(id=>{ if(o[id]!=null) $(id).value=o[id]; else if($(id).tagName!=="SELECT") $(id).value=""; }); draw(); }
+IDS.forEach(id=>$(id).addEventListener("input",()=>{ draw(); save(); }));
+$("sample").onclick=()=>{ fill(SAMPLE); save(); };
+$("clear").onclick=()=>{ fill({k401:"0",med:"0",life:"0"}); save(); };
+let stored=null; try{ stored=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
+fill(stored||SAMPLE);
+</script>
+
+</body></html>

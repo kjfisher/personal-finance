@@ -10,7 +10,7 @@
   --bg:#F2F4F1; --surface:#FFFFFF; --ink:#14213D; --muted:#5A6478; --line:#D3D9D0;
   --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --gold-ink:#14213D;
   --money:#0F8B6C; --money-ink:#FFFFFF;
-  --t1:#1F6F54; --t2:#2F5FB8; --t3:#B8572F; --t4:#6B4FB0; --t5:#1E2B45; --t6:#9A6B00; --t7:#7A2E52; --t8:#2C7A8C; --t9:#4D5B2A; --t10:#7A2E1C; --t11:#2E6B5E; --t12:#3F2E73; --t13:#8C5A12; --t14:#1F5577; --t15:#0F6E54; --t16:#1A4664; --t17:#5E3A6E; --t18:#5B3FA6; --t19:#B23A26; --t20:#7A4A1A;
+  --t1:#1F6F54; --t2:#2F5FB8; --t3:#B8572F; --t4:#6B4FB0; --t5:#1E2B45; --t6:#9A6B00; --t7:#7A2E52; --t8:#2C7A8C; --t9:#4D5B2A; --t10:#7A2E1C; --t11:#2E6B5E; --t12:#3F2E73; --t13:#8C5A12; --t14:#1F5577; --t15:#0F6E54; --t16:#1A4664; --t17:#5E3A6E; --t18:#5B3FA6; --t19:#B23A26; --t20:#7A4A1A; --u5:#9C3420; --u6:#2E5E3A; --u7:#1D4E89; --u8:#6B2E5E; --u9:#3E4A1E; --u10:#8C5A12; --fin:#14213D; --u0:#2F7D46; --cs:#8C3B5E;
   --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
   --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -85,11 +85,20 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
   <div class="filters" role="group" aria-label="Filter games">
     <span class="lbl">Show:</span>
     <button class="chip" data-f="all" aria-pressed="true">All games</button>
-    <button class="chip" data-f="u1" aria-pressed="false">Unit 1: Payroll Deductions</button>
+    <button class="chip" data-f="u0" aria-pressed="false">Unit 0: The Power of Compounding</button><button class="chip" data-f="u1" aria-pressed="false">Unit 1: Payroll Deductions</button>
     <button class="chip" data-f="u2" aria-pressed="false">Unit 2: Pay Stubs</button>
     <button class="chip" data-f="u3" aria-pressed="false">Unit 3: Banking</button>
     <button class="chip" data-f="u4" aria-pressed="false">Unit 4: Credit</button>
     <button class="chip" data-f="mid" aria-pressed="false">Midterm (Units 1–4)</button>
+    <button class="chip" data-f="u5" aria-pressed="false">Unit 5: Cars &amp; Lending</button>
+    <button class="chip" data-f="u6" aria-pressed="false">Unit 6: Real Estate</button>
+    <button class="chip" data-f="u7" aria-pressed="false">Unit 7: Investing</button>
+    <button class="chip" data-f="u8" aria-pressed="false">Unit 8: Federal Taxes</button>
+    <button class="chip" data-f="u9" aria-pressed="false">Unit 9: Insurance, Budgeting &amp; Estate</button>
+    <button class="chip" data-f="u10" aria-pressed="false">Unit 10: Final Project</button>
+    <button class="chip" data-f="fin" aria-pressed="false">Final Exam</button>
+    
+    <button class="chip" data-f="cs" aria-pressed="false">Case Studies</button>
   </div>
 
   <section class="shelf" aria-labelledby="solo-h">
@@ -116,12 +125,96 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
     </div>
   </section>
 
-  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span>Next up: Unit 5</span></span></div>
+  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span>New: Unit 0, Final Exam, Target Match &amp; Case Files</span></span></div>
 </div></main>
 <footer>Personal Finance - Future Millionaires Arcade</footer>
 
 <script>
 const GAMES=[
+ {f:"cs", where:"solo", isNew:true, name:"Case Files", big:"CER", color:"--cs", unit:"Case Studies", tags:["Claim · Evidence · Reasoning", "Units 0–9"],
+  d:"Read a real money decision, decide if it's smart, then pick the strongest evidence and reasoning. Shows a model CER after each case.", url:"/case-files/"},
+ {f:"fin", where:"solo", isNew:true, name:"18 by 18: Target Match", big:"18", color:"--fin", unit:"Final Exam - Units 1-9", tags:["Memory match", "Learning targets"],
+  d:"Match each 18 by 18 target to its life rule, then spot which target a real money decision shows.", url:"/target-match/"},
+ {f:"u0", where:"solo", isNew:true, name:"Growth on Growth", big:"2\u00d7", color:"--u0", unit:"Unit 0 - The Power of Compounding", tags:["18 by 18 #1", "Calculator"],
+  d:"The doubling penny, simple vs. compound growth, the Rule of 72 for investing, debt and inflation, and three investors who start at 18, 28 and 38.", url:"/growth-on-growth/"},
+ {f:"u0", where:"partner", isNew:true, name:"Compound Duel", big:"1 v 1", color:"--u0", unit:"Unit 0 - The Power of Compounding", tags:["Two players", "Split screen"],
+  d:"Head-to-head compounding questions on one iPad.", url:"/compound-duel/"},
+ {f:"u0", where:"class", isNew:true, name:"Compound Corners", big:"20", color:"--u0", unit:"Unit 0 - The Power of Compounding", tags:["Get up and move", "Timer"],
+  d:"Simple or compound? For me or against me? Plus Rule of 72 math rounds.", url:"/compound-corners/"},
+ {f:"u0", where:"class", isNew:true, name:"Compound Showdown", big:"6\u00d75", color:"--u0", unit:"Unit 0 - The Power of Compounding", tags:["Teams", "Projector"],
+  d:"Growth on growth, Rule of 72, the penny, for or against me, time, and money decisions.", url:"/compound-showdown/"},
+ {f:"fin", where:"class", isNew:true, name:"Final Showdown", big:"6\u00d75", color:"--fin", unit:"Final Exam - Units 1-9", tags:["Teams", "Projector"],
+  d:"Six categories across the whole semester, from paychecks to estate planning, plus a wager Final Round.", url:"/final-showdown/"},
+ {f:"fin", where:"class", isNew:true, name:"Final Corners", big:"20", color:"--fin", unit:"Final Exam - Units 1-9", tags:["Get up and move", "Timer"],
+  d:"Twenty rounds, two or more from every unit. Move to the corner with your answer.", url:"/final-corners/"},
+ {f:"fin", where:"partner", isNew:true, name:"Final Duel", big:"1 v 1", color:"--fin", unit:"Final Exam - Units 1-9", tags:["Two players", "Split screen"],
+  d:"Head-to-head review with questions from Units 1–9 on one iPad.", url:"/final-duel/"},
+ {f:"fin", where:"solo", isNew:true, name:"Final Vault", big:"6 locks", color:"--fin", unit:"Final Exam - Units 1-9", tags:["Escape room", "Math"],
+  d:"One lock per part of the course: paycheck, bank & credit, car & home, investing, taxes and budget.", url:"/final-vault/"},
+ {f:"fin", where:"solo", isNew:true, name:"Final Millionaire", big:"$1M", color:"--fin", unit:"Final Exam - Units 1-9", tags:["15 questions", "Lifelines"],
+  d:"Climb from $100 to $1,000,000 with questions from all nine units. Results show which units to study.", url:"/final-millionaire/"},
+ {f:"u10", where:"solo", isNew:true, name:"Life at 22", big:"$/month", color:"--u10", unit:"Unit 10 - Final Project", tags:["Project tool", "Saves on this iPad"],
+  d:"Build your career's monthly money plan: paycheck, rent, car, saving and fun, with live checks against the 30%, 10% and 50/30/20 guidelines.", url:"/life-at-22/"},
+ {f:"u9", where:"solo", isNew:true, name:"Budget Builder", big:"50/30/20", color:"--u9", unit:"Unit 9 - Insurance, Budgeting & Estate", tags:["Solo", "6 budgets"],
+  d:"Split pay 50/30/20, sort needs and wants, size an emergency fund and balance a real budget.", url:"/budget-builder/"},
+ {f:"u9", where:"solo", isNew:true, name:"Cover Me", big:"Deductible", color:"--u9", unit:"Unit 9 - Insurance, Budgeting & Estate", tags:["Solo", "6 cards"],
+  d:"What you really pay on a medical bill, premiums vs. deductibles, insurance types, life insurance and estate documents.", url:"/cover-me/"},
+ {f:"u9", where:"partner", isNew:true, name:"Life Duel", big:"Need?", color:"--u9", unit:"Unit 9 - Insurance, Budgeting & Estate", tags:["2 players, 1 iPad", "5–10 min"],
+  d:"Budgets, emergency funds, insurance and estate planning. First correct tap scores.", url:"/life-duel/"},
+ {f:"u9", where:"partner", isNew:true, name:"Life Vault", big:"6 locks", color:"--u9", unit:"Unit 9 - Insurance, Budgeting & Estate", tags:["Partners or teams", "15–20 min"],
+  d:"Six locks build Imani's budget, emergency fund, insurance and estate plan.", url:"/life-vault/"},
+ {f:"u9", where:"class", isNew:true, name:"Life Corners", big:"4 corners", color:"--u9", unit:"Unit 9 - Insurance, Budgeting & Estate", tags:["Get up and move", "10–15 min"],
+  d:"Need, want or savings? Which insurance? Which document? Walk to your answer.", url:"/life-corners/"},
+ {f:"u9", where:"class", isNew:true, name:"Life Showdown", big:"500", color:"--u9", unit:"Unit 9 - Insurance, Budgeting & Estate", tags:["Teams", "25–30 min"],
+  d:"Budgeting, emergency funds, health insurance, coverage types, life insurance and estate planning, with a plan-it final.", url:"/life-showdown/"},
+ {f:"u8", where:"solo", isNew:true, name:"File It", big:"1040", color:"--u8", unit:"Unit 8 - Federal Taxes", tags:["Solo", "7 forms"],
+  d:"Do a 2026 return: taxable income, tax by bracket, refund or owe, marginal vs. effective rate, forms, credits vs. deductions.", url:"/file-it/"},
+ {f:"u8", where:"solo", isNew:true, name:"Tax Trail", big:"FICA", color:"--u8", unit:"Unit 8 - Federal Taxes", tags:["Solo", "6 cards"],
+  d:"Payroll taxes, every tax on a paycheck, side-gig taxes, where tax dollars go and spotting IRS scams.", url:"/tax-trail/"},
+ {f:"u8", where:"partner", isNew:true, name:"Tax Duel", big:"W-4?", color:"--u8", unit:"Unit 8 - Federal Taxes", tags:["2 players, 1 iPad", "5–10 min"],
+  d:"Brackets, forms, refunds, credits and rates. First correct tap scores.", url:"/tax-duel/"},
+ {f:"u8", where:"partner", isNew:true, name:"Tax Vault", big:"6 locks", color:"--u8", unit:"Unit 8 - Federal Taxes", tags:["Partners or teams", "15–20 min"],
+  d:"Six locks walk through Theo's 2026 tax return, from W-2 to refund.", url:"/tax-vault/"},
+ {f:"u8", where:"class", isNew:true, name:"Tax Corners", big:"4 corners", color:"--u8", unit:"Unit 8 - Federal Taxes", tags:["Get up and move", "10–15 min"],
+  d:"Which form? Refund or owe? Credit or deduction? Walk to your answer.", url:"/tax-corners/"},
+ {f:"u8", where:"class", isNew:true, name:"Tax Showdown", big:"500", color:"--u8", unit:"Unit 8 - Federal Taxes", tags:["Teams", "25–30 min"],
+  d:"Taxable income, brackets, rates and myths, forms, refund or owe, credits and gigs, with a file-the-return final.", url:"/tax-showdown/"},
+ {f:"u7", where:"solo", isNew:true, name:"Grow It", big:"72", color:"--u7", unit:"Unit 7 - Investing & Retirement", tags:["Solo", "6 cards"],
+  d:"Compound growth year by year, the Rule of 72, starting at 22 vs. 32, the 401(k) match and Roth vs. traditional.", url:"/grow-it/"},
+ {f:"u7", where:"solo", isNew:true, name:"Portfolio Picker", big:"+20%", color:"--u7", unit:"Unit 7 - Investing & Retirement", tags:["Solo", "6 cards"],
+  d:"Stock gains and losses, dividends, ranking risk, diversification and the hidden cost of fees.", url:"/portfolio-picker/"},
+ {f:"u7", where:"partner", isNew:true, name:"Invest Duel", big:"Bull?", color:"--u7", unit:"Unit 7 - Investing & Retirement", tags:["2 players, 1 iPad", "5–10 min"],
+  d:"Stocks, bonds, index funds, compounding and retirement accounts. First correct tap scores.", url:"/invest-duel/"},
+ {f:"u7", where:"partner", isNew:true, name:"Invest Vault", big:"6 locks", color:"--u7", unit:"Unit 7 - Investing & Retirement", tags:["Partners or teams", "15–20 min"],
+  d:"Six locks build Nora's retirement plan, from compounding to risk.", url:"/invest-vault/"},
+ {f:"u7", where:"class", isNew:true, name:"Invest Corners", big:"4 corners", color:"--u7", unit:"Unit 7 - Investing & Retirement", tags:["Get up and move", "10–15 min"],
+  d:"Stock or bond? Traditional or Roth? Bull or bear? Walk to your answer.", url:"/invest-corners/"},
+ {f:"u7", where:"class", isNew:true, name:"Invest Showdown", big:"500", color:"--u7", unit:"Unit 7 - Investing & Retirement", tags:["Teams", "25–30 min"],
+  d:"Compound growth, starting early, retirement accounts, stocks and bonds, risk, and fees, with a free-money final.", url:"/invest-showdown/"},
+ {f:"u6", where:"solo", isNew:true, name:"Rent Ready", big:"30%", color:"--u6", unit:"Unit 6 - Real Estate", tags:["Solo", "6 listings"],
+  d:"Check apartments against the 30% rule, count your move-in cash, split costs with roommates and read the lease.", url:"/rent-ready/"},
+ {f:"u6", where:"solo", isNew:true, name:"House Hunt", big:"PITI", color:"--u6", unit:"Unit 6 - Real Estate", tags:["Solo", "6 homes"],
+  d:"Down payments and PMI, closing costs, the full monthly payment, the 28% rule and 15- vs. 30-year mortgages.", url:"/house-hunt/"},
+ {f:"u6", where:"partner", isNew:true, name:"Home Duel", big:"Rent?", color:"--u6", unit:"Unit 6 - Real Estate", tags:["2 players, 1 iPad", "5–10 min"],
+  d:"Leases, deposits, mortgages, PITI and equity. First correct tap scores.", url:"/home-duel/"},
+ {f:"u6", where:"partner", isNew:true, name:"Home Vault", big:"6 locks", color:"--u6", unit:"Unit 6 - Real Estate", tags:["Partners or teams", "15–20 min"],
+  d:"Six locks take Jada from her first apartment to owning a condo.", url:"/home-vault/"},
+ {f:"u6", where:"class", isNew:true, name:"Home Corners", big:"4 corners", color:"--u6", unit:"Unit 6 - Real Estate", tags:["Get up and move", "10–15 min"],
+  d:"Renter or homeowner? Rent or buy? Higher or lower? Walk to your answer.", url:"/home-corners/"},
+ {f:"u6", where:"class", isNew:true, name:"Home Showdown", big:"500", color:"--u6", unit:"Unit 6 - Real Estate", tags:["Teams", "25–30 min"],
+  d:"Renting, move-in money, buying basics, PITI, 15 vs. 30 years and rent or buy, with a can-they-buy-it final.", url:"/home-showdown/"},
+ {f:"u5", where:"solo", isNew:true, name:"Deal Desk", big:"OTD $", color:"--u5", unit:"Unit 5 - Cars & Lending", tags:["Solo", "8 deals"],
+  d:"Work real car deals: out-the-door price, down payment, total interest, 48 vs. 72 months and what your credit score costs you.", url:"/deal-desk/"},
+ {f:"u5", where:"solo", isNew:true, name:"Road Test", big:"$/mo", color:"--u5", unit:"Unit 5 - Cars & Lending", tags:["Solo", "6 cards"],
+  d:"Compare what cars really cost each month: payment, insurance, gas and repairs. Then insurance, depreciation and buy vs. lease.", url:"/road-test/"},
+ {f:"u5", where:"partner", isNew:true, name:"Car Duel", big:"APR", color:"--u5", unit:"Unit 5 - Cars & Lending", tags:["2 players, 1 iPad", "5–10 min"],
+  d:"Car prices, loans, credit, insurance and leasing. Same question on both sides. First correct tap scores.", url:"/car-duel/"},
+ {f:"u5", where:"partner", isNew:true, name:"Dealership Vault", big:"6 locks", color:"--u5", unit:"Unit 5 - Cars & Lending", tags:["Partners or teams", "15–20 min"],
+  d:"Six locks take Maya from sticker price to a loan she can afford. Hints cost a minute.", url:"/dealership-vault/"},
+ {f:"u5", where:"class", isNew:true, name:"Car Corners", big:"4 corners", color:"--u5", unit:"Unit 5 - Cars & Lending", tags:["Get up and move", "10–15 min"],
+  d:"Liability, collision or comprehensive? Higher or lower? Walk to your answer.", url:"/car-corners/"},
+ {f:"u5", where:"class", isNew:true, name:"Auto Showdown", big:"500", color:"--u5", unit:"Unit 5 - Cars & Lending", tags:["Teams", "25–30 min"],
+  d:"The real price, loan math, credit and rates, affordability, insurance and buy vs. lease, with a whole-deal final round.", url:"/auto-showdown/"},
  {f:"u1", where:"solo", isNew:true, name:"Paycheck Builder", big:"Gross → Net", color:"--t11", unit:"Unit 1 - Payroll Deductions", tags:["Solo","10 min per career"],
   d:"Pick a career and build its monthly paycheck, one deduction at a time. Use your own career from the packet, then compare it with minimum wage.", url:"/paycheck-builder/"},
  {f:"u1", where:"solo", isNew:true, name:"Check It!", big:"$ ___.__", color:"--t9", unit:"Unit 1 - Payroll Deductions", tags:["Solo","12 rounds"],
@@ -199,7 +292,7 @@ function card(g){ return `<article class="card">
   <div class="body"><h3>${esc(g.name)}</h3><div class="meta">${g.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div><p>${esc(g.d)}</p>
   ${g.blooket?`<div class="blooket"><span class="code">Your teacher will give you the game code.</span><a class="play alt" href="${g.url}" target="_blank" rel="noopener">Join on Blooket</a></div>`
     :`<a class="play" href="${g.url}" target="_blank" rel="noopener">Play ${esc(g.name)}</a>`}</div></article>`; }
-const UO={u1:1,u2:2,u3:3,u4:4,mid:5};
+const UO={u0:0,u1:1,u2:2,u3:3,u4:4,mid:5,u5:6,u6:7,u7:8,u8:9,u9:10,u10:11,fin:12,cs:13};
 let filter="all";
 try{ const s=localStorage.getItem("arcade-filter"); if(s&&document.querySelector(`.chip[data-f="${s}"]`)) filter=s; }catch(e){}
 function render(){

@@ -1,0 +1,234 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Growth on Growth</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a money-notebook card on the left; the work sheet on the right walks the math. Choice questions use big tap buttons. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --card:#EAF4EC; --card-line:#A9CDB2; --card-ink:#17321F; --punch:#2F7D46;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#16261B; --card-line:#2F5039; --card-ink:#DDEFE2; --punch:#6CCB8A; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#16261B; --card-line:#2F5039; --card-ink:#DDEFE2; --punch:#6CCB8A; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1180px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; align-items:center; }
+.bar .stats b { color:var(--gold); font-variant-numeric:tabular-nums; }
+.wrap { max-width:1180px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.1fr); gap:20px; align-items:start; }
+@media (max-width:820px) { .game { grid-template-columns:1fr; } }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; grid-column:1/-1; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+/* timecard */
+.tc { background:var(--card); color:var(--card-ink); border:1px solid var(--card-line); border-radius:6px; padding:18px; font-family:var(--mono); font-size:15px; display:grid; gap:10px; min-width:0; position:relative; }
+.tc .tag { font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:.08em; padding:3px 10px; border-radius:99px; justify-self:start; background:var(--punch); color:var(--card); }
+.choices { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
+.ch { font:inherit; font-weight:700; padding:10px 16px; border-radius:10px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.ch.sel { border-color:var(--gold); background:rgba(224,168,0,.16); }
+.ch.right { border-color:var(--ok); background:var(--ok-soft); }
+.ch:disabled { cursor:default; }
+.field.wide { grid-template-columns:1fr; }
+.tc::before { content:""; }
+.plastic { position:relative; aspect-ratio:1.586; max-width:340px; width:100%; border-radius:14px; color:#fff; padding:14px 16px; display:grid; grid-template-rows:auto 1fr auto auto; font-family:var(--mono); box-shadow:0 10px 24px rgba(20,20,40,.25); background:linear-gradient(135deg,#3B2A7A,#6B4FB0); }
+.plastic.cash { background:linear-gradient(135deg,#0E5E4A,#1F9A78); } .plastic.travel { background:linear-gradient(135deg,#14213D,#2F5FB8); } .plastic.student { background:linear-gradient(135deg,#8C5A12,#D19A2E); } .plastic.secured { background:linear-gradient(135deg,#3A3F4B,#6B7280); }
+.plastic .pn { font-family:var(--display); font-weight:800; font-size:18px; }
+.plastic .chip { width:40px; height:30px; border-radius:6px; background:linear-gradient(135deg,#E8C766,#B8912E); align-self:center; }
+.plastic .num { font-size:17px; letter-spacing:.12em; }
+.plastic .holder { font-size:12px; letter-spacing:.1em; opacity:.85; }
+.tc .kind { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--punch); font-weight:600; }
+.tc h2 { font-family:var(--display); font-size:24px; margin:0; line-height:1.1; color:var(--card-ink); }
+.tc .who { display:flex; flex-wrap:wrap; gap:4px 16px; }
+.tc .who b { font-weight:600; }
+.tc table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.tc th, .tc td { border-bottom:1px dashed var(--card-line); padding:5px 4px; text-align:left; }
+.tc td:last-child, .tc th:last-child { text-align:right; }
+.tc th { font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; }
+.tc .stamp { color:var(--punch); font-weight:600; }
+.tc .rule { border:1px solid var(--card-line); border-radius:6px; padding:8px 10px; font-size:14px; line-height:1.4; font-family:var(--body); }
+.tc .story { font-family:var(--body); font-size:17px; line-height:1.45; }
+/* answer sheet */
+.sheet { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px, 2.6vw, 26px); display:grid; gap:12px; min-width:0; }
+.sheet .eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.field { display:grid; grid-template-columns:minmax(0, 1fr) minmax(120px, 190px); gap:10px; align-items:center; padding:8px 10px; border-radius:12px; border:2px solid transparent; }
+.field.ok { background:var(--ok-soft); border-color:var(--ok); }
+.field.no { background:var(--bad-soft); border-color:var(--bad); }
+.field.shown { background:var(--bad-soft); }
+.field .q { line-height:1.3; }
+.field .q small { display:block; color:var(--muted); font-family:var(--mono); font-size:13px; margin-top:2px; }
+.field .msg { grid-column:1/-1; font-size:15px; line-height:1.35; }
+.inp { display:flex; align-items:center; border:2px solid var(--line); border-radius:10px; background:var(--bg); padding:0 10px; min-width:0; }
+.inp:focus-within { border-color:var(--gold); }
+.inp span { font-family:var(--mono); color:var(--muted); }
+.inp input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:20px; padding:9px 6px; outline:none; }
+.inp input:disabled { color:var(--ink); }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); padding:8px 14px; }
+.btn:focus-visible, input:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.note { color:var(--muted); font-size:15px; margin:0; }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.steps { margin:0; padding-left:22px; line-height:1.6; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 68px); line-height:1; color:var(--ok); font-variant-numeric:tabular-nums; }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Growth on <span>Growth</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=x=>"$"+x.toLocaleString("en-US");
+const n0=x=>x.toLocaleString("en-US");
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
+const SKILL={grow:"Growth on growth", r72:"Rule of 72", time:"Time is your superpower", force:"For me or against me", think:"Financial thinking"};
+const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
+const fv=(m,apr,y)=>{ const q=apr/1200, n=y*12; return r2(m*(Math.pow(1+q,n)-1)/q); };
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+function mkPenny(){ const d=pick([10,15,20,25]), v=r2(Math.pow(2,d-1)/100), v29=r2(Math.pow(2,28)/100);
+  return {kind:"Discover the magic", title:"1¢ doubled every day for 30 days", html:tbl([["Day 1","$0.01"],["Day 2","$0.02"],["Day 3","$0.04"],["Day 4","$0.08"],["Day 29",fmt(v29)],["Day 30","$5,368,709.12"]])+`<div class="rule">Each day the amount doubles. Day n = $0.01 × 2<sup>n − 1</sup>.</div>`,
+   F:[{k:"d", type:"grow", q:`What is it worth on day ${d}?`, sub:`$0.01 × 2^${d-1}`, a:v, miss:[[r2(Math.pow(2,d)/100),"Day 1 is 1¢, so use 2^"+(d-1)+"."],[r2(0.01*2*d),"That's adding, not doubling."]]},
+      {k:"w", type:"grow", choices:["The doubling penny","$1,000,000 today"], q:"Which would you rather have after 30 days?", a:"The doubling penny", why:"About $5.37 million beats $1 million."},
+      {k:"l", type:"grow", choices:["The first 10 days","The last day"], q:"When does the penny gain the MOST money?", a:"The last day", why:"Day 29 → 30 adds about $2.68 million. Compounding looks boring early and dramatic late."}]}; }
+function mkSimple(){ const P=pick([5000,10000,20000]), r=pick([5,10]), d=r/100, a3=r2(P+3*P*d), b1=r2(P*(1+d)), b2=r2(b1*(1+d)), b3=r2(b2*(1+d));
+  return {kind:"Simple vs. compound", title:`${fmt0(P)} at ${r}% a year`, html:tbl([["Account A (simple)",`Earns ${r}% of the ORIGINAL ${fmt0(P)} each year`],["Account B (compound)",`Earns ${r}% of the CURRENT balance each year`],["Year 1, both accounts",fmt(b1)]]),
+   F:[{k:"a3", type:"grow", q:"Account A after year 3", sub:`${fmt0(P)} + 3 × ${fmt0(P*d)}`, a:a3, miss:[[b3,"That's compound. A only earns on the original amount."]]},
+      {k:"b2", type:"grow", q:"Account B after year 2", sub:`${fmt(b1)} × ${1+d}`, a:b2, miss:[[r2(P+2*P*d),"That's simple growth. Grow the NEW balance."]]},
+      {k:"b3", type:"grow", q:"Account B after year 3", a:b3, tol:.02, miss:[[a3,"That's simple growth. Grow the year-2 balance."]]},
+      {k:"x", type:"grow", choices:["Growth earned on last year's growth","A bank fee","A bigger deposit"], q:"Where did Account B's extra money come from?", a:"Growth earned on last year's growth", why:"The earnings start earning too."}]}; }
+function mk72(){ const ir=pick([6,8,9,12]), dr=pick([18,24]), debt=pick([1500,2000,3000]), cash=pick([5000,10000,20000]);
+  return {kind:"Rule of 72", title:"Investing, debt and inflation", html:`<div class="rule"><b>Rule of 72:</b> 72 ÷ rate (%) ≈ years to double. It's an estimate, not a guarantee.</div>`+tbl([["Investment",`earning ${ir}% a year`],["Credit card debt",`${fmt0(debt)} at ${dr}%, minimum payments only`],["Cash in an account with no interest",`${fmt0(cash)}, inflation 3% a year`]]),
+   F:[{k:"i", type:"r72", q:"Years for the investment to double", unit:"years", a:r2(72/ir), miss:[[ir*72,"Divide 72 by the rate."]]},
+      {k:"d", type:"r72", q:"Years for the debt to double", unit:"years", a:r2(72/dr), miss:[[dr*72,"Divide 72 by the rate."]]},
+      {k:"o", type:"force", q:"What would you owe after one doubling?", a:debt*2, miss:[[debt*dr/100,"Doubling means × 2."]]},
+      {k:"p", type:"force", q:`After 24 years of 3% inflation (prices double), the ${fmt0(cash)} buys what ___ buys today.`, a:cash/2, miss:[[cash,"The dollar amount stays the same, but prices doubled. It buys half as much."],[cash*2,"Prices doubled, not your money."]]}]}; }
+function mkThree(){ const m=pick([100,150,200]), r=pick([7,8]), A=fv(m,r,44), B=fv(m,r,34), C=fv(m,r,24), nm=shuffle(NAMES);
+  return {kind:"Time is your superpower", title:`${fmt0(m)} a month at ${r}% until age 62`, html:tbl([[`${nm[0]} starts at 18 (44 years)`,fmt(A)],[`${nm[1]} starts at 28 (34 years)`,fmt(B)],[`${nm[2]} starts at 38 (24 years)`,fmt(C)]])+`<div class="rule">Values from a compound-interest calculator (compounded monthly). Returns are assumptions, not guarantees.</div>`,
+   F:[{k:"pa", type:"time", q:`How much did ${nm[0]} put in?`, sub:`${fmt0(m)} × 12 × 44`, a:m*12*44, miss:[[m*44,"Multiply by 12 months too."]]},
+      {k:"g", type:"time", q:`How much of ${nm[0]}'s money is growth?`, sub:"ending value − what was put in", a:r2(A-m*12*44), miss:[[A,"Subtract what was put in."]]},
+      {k:"x", type:"time", q:`Starting at 18 instead of 28 gave ${nm[0]} how much more?`, a:r2(A-B), miss:[[m*12*10,"That's only the extra money put in. Compare the ending values."]]},
+      {k:"c", type:"time", choices:["Save a lot more each month","Nothing, it's too late","Save the same amount"], q:`To catch up, ${nm[2]} (starting at 38) would have to...`, a:"Save a lot more each month", why:"A later start can still work, but fewer years means bigger contributions. Lost years can't be recovered."}]}; }
+function mkForce(){ const C=["Works for me","Works against me"], items=shuffle([["Investing $50 a month starting at 18","Works for me"],["A credit card balance you only pay the minimum on","Works against me"],["$5,000 sitting in cash for 20 years while prices rise","Works against me"],["Reinvesting the growth in a retirement account","Works for me"],["An unpaid payday loan","Works against me"],["Taking your employer's 401(k) match early in your career","Works for me"]]).slice(0,4);
+  return {kind:"For me or against me", title:"Compounding is neutral", html:`<div class="rule">The same math that grows an investment also grows debt, and inflation shrinks what cash can buy.</div>`,
+   F:items.map((it,i)=>({k:"f"+i, type:"force", choices:C, q:it[0], a:it[1], why:it[1]==="Works for me"?"Growth builds on growth.":"Interest or rising prices build against you."}))}; }
+function mkAva(){ const nm=pick(["Ava","Jordan","Maya","Eli"]);
+  return {kind:"Money decision", title:`${nm} can invest $100 a month`, html:`<div class="rule">${nm} says: "$100 a month is nothing. I'll wait until I make real money."</div>`+tbl([["Life rule","Start early. Time does the heavy lifting."],["The first $100K","Usually the hardest: your contributions do most of the work until the balance grows"]]),
+   F:[{k:"a", type:"think", choices:["Start now if the $100 is truly extra","Wait for a bigger paycheck","Never invest"], q:`Best advice for ${nm}?`, a:"Start now if the $100 is truly extra", why:"Early dollars get the most years to grow. Raise the amount later."},
+      {k:"m", type:"think", choices:["Emergency savings and high-interest debt","Favorite color","Shoe size"], q:"What should you ask before advising?", a:"Emergency savings and high-interest debt", why:"Also: job stability, an employer match and short-term goals."},
+      {k:"g", type:"think", choices:["No, returns are assumptions","Yes, always"], q:"Does starting early GUARANTEE becoming a millionaire?", a:"No, returns are assumptions", why:"Results depend on contributions, returns, fees, inflation and behavior."},
+      {k:"h", type:"think", choices:["$0 → $100K","$400K → $500K"], q:"Which $100K is usually the hardest to reach?", a:"$0 → $100K", why:"Later, a bigger balance produces more growth on its own."}]}; }
+function makeRound(){ return [mkPenny(), mkSimple(), mk72(), mkThree(), ...shuffle([mkForce(), mkAva()])]; }
+
+let G=null, best=null;
+try{ best=+localStorage.getItem("growth-on-growth-best")||null; }catch(e){}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 0: The Power of Compounding</span>`; return; }
+  el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
+  $("quit")&&($("quit").onclick=intro); }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 0 · 18 by 18 #1 · The Power of Compounding</div>
+    <h2>Start early. Time does the heavy lifting.</h2>
+    <p>Six cards: the doubling penny, simple vs. compound growth, the Rule of 72 for investing, debt and inflation, three investors who start at 18, 28 and 38, and when compounding works for you or against you.</p>
+    <ol class="steps"><li><b>Compound</b> = growth on the CURRENT balance. <b>Simple</b> = growth on the original amount only.</li><li><b>Rule of 72:</b> 72 ÷ rate ≈ years to double.</li><li>Returns are assumptions, not guarantees.</li></ol>
+    <p>Typed answers: 10 points first try, 5 second. Tap answers: one try.${best?` <b>Your best: ${best}.</b>`:""}</p>
+    <div class="row"><button class="btn go" id="go">Start the first card</button></div></div>`;
+  $("go").onclick=()=>{ G={cards:makeRound(), i:0, score:0, phase:"play", by:{}}; prep(); draw(); };
+}
+function prep(){ const c=G.cards[G.i]; c.st={}; c.tries={}; c.msg={}; c.val={}; c.done=false; }
+function card(o){ return `<div class="tc"><div class="kind">${o.kind}</div><h2>${o.title}</h2>${o.html}</div>`; }
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const c=G.cards[G.i], n=G.cards.length;
+  const fields=c.F.map(f=>{ const st=c.st[f.k], dis=st==="ok"||st==="shown";
+    if(f.choices) return `<div class="field wide ${st==="ok"?"ok":st==="shown"?"shown":""}"><div class="q">${esc(f.q)}</div>
+      <div class="choices" role="group">${f.choices.map(o=>{ let cl="ch"; if(dis&&o===f.a) cl+=" right"; else if(c.val[f.k]===o) cl+=" sel"; return `<button type="button" class="${cl}" data-k="${f.k}" data-o="${esc(o)}" ${dis?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`;
+    return `<div class="field ${st==="ok"?"ok":st==="shown"?"shown":c.msg[f.k]?"no":""}">
+      <label class="q" for="f-${f.k}">${esc(f.q)}${f.sub?`<small>${esc(f.sub)}</small>`:""}</label>
+      <div class="inp">${f.unit?"":"<span>$</span>"}<input id="f-${f.k}" inputmode="decimal" autocomplete="off" value="${esc(c.val[f.k]??"")}" ${dis?"disabled":""}>${f.unit?`<span>${f.unit}</span>`:""}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`; }).join("");
+  $("root").innerHTML=`<div class="game">
+    <div class="progress" aria-hidden="true"><i style="width:${(G.i+(c.done?1:0))/n*100}%"></i></div>
+    ${card(c)}
+    <form class="sheet" id="sheet" novalidate>
+      <div class="eyebrow">Card ${G.i+1} of ${n}</div>
+      ${fields}
+      <div class="row">${c.done?`<button class="btn go" type="button" id="next">${G.i+1<n?"Next card":"See my results"}</button>`:`<button class="btn go" type="submit">Check</button>`}</div>
+      <p class="note">Round money to the cent. Use a calculator.</p>
+    </form></div>`;
+  if(c.done){ $("next").onclick=next; $("next").focus({preventScroll:true}); return; }
+  $("sheet").onsubmit=e=>{ e.preventDefault(); check(); };
+  c.F.forEach(f=>{ if(f.choices) return; const el=$("f-"+f.k); el&&el.addEventListener("input",()=>{ c.val[f.k]=el.value; }); });
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{ c.val[b.dataset.k]=b.dataset.o; draw(); });
+}
+function check(){
+  const c=G.cards[G.i];
+  c.F.forEach(f=>{ if(c.st[f.k]==="ok"||c.st[f.k]==="shown") return; const b=G.by[f.type]||(G.by[f.type]=[0,0]);
+    if(f.choices){ const v=c.val[f.k]; if(!v){ c.msg[f.k]="Tap an answer."; return; } b[1]++;
+      if(v===f.a){ G.score+=10; b[0]++; c.st[f.k]="ok"; c.msg[f.k]=f.why; } else { c.st[f.k]="shown"; c.msg[f.k]="Best answer: "+f.a+". "+f.why; } return; }
+    const v=num(c.val[f.k]??""), tol=f.tol||.015; if(!c.tries[f.k]) b[1]++;
+    if(!isNaN(v)&&Math.abs(v-f.a)<=tol){ const pts=c.tries[f.k]?5:10; G.score+=pts; if(!c.tries[f.k]) b[0]++; c.st[f.k]="ok"; c.msg[f.k]=c.tries[f.k]?"Got it on the second try. +5":""; return; }
+    c.tries[f.k]=(c.tries[f.k]||0)+1;
+    const hit=isNaN(v)?null:(f.miss||[]).find(([x])=>Math.abs(v-r2(x))<=.02&&Math.abs(r2(x)-f.a)>tol);
+    const show=f.unit?n0(f.a)+" "+f.unit:fmt(f.a);
+    if(c.tries[f.k]>=2){ c.st[f.k]="shown"; c.val[f.k]=String(f.a); c.msg[f.k]=(hit?hit[1]+" ":"")+"Answer: "+show+"."; }
+    else c.msg[f.k]=isNaN(v)?"Type a number.":(hit?hit[1]:"Not quite. Check the card again.")+" Try again.";
+  });
+  c.done=c.F.every(f=>c.st[f.k]==="ok"||c.st[f.k]==="shown");
+  draw();
+}
+function next(){ G.i++; if(G.i>=G.cards.length){ G.phase="end"; if(!best||G.score>best){ best=G.score; try{ localStorage.setItem("growth-on-growth-best",String(best)); }catch(e){} } } else prep(); draw(); }
+function end(){
+  stats();
+  const max=G.cards.reduce((s,c)=>s+c.F.length*10,0);
+  const rows=Object.keys(SKILL).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    return `<div class="skill"><b>${SKILL[k]}</b><span class="v">${a} of ${t} first try</span>${p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Round complete</div>
+    <div class="big">${G.score} <span style="font-size:.45em;color:var(--muted)">/ ${max}</span></div>
+    <div class="skills">${rows}</div>
+    <p>Compounding rewards time. Start sooner than feels necessary: the years are part of the investment.</p>
+    <div class="row"><button class="btn go" id="again">New cards</button></div></div>`;
+  $("again").onclick=intro;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

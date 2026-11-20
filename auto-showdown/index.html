@@ -1,0 +1,179 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Auto Showdown</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: projector-first game board, 6 category columns over a team scoreboard; modal takes the full screen for each question. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --tile:#B23A26; --tile-hover:#C9462F; --tile-ink:#F5C542; --used:#DCE1E8; --used-ink:#A3ADBD;
+  --accent:#0F8B6C; --accent-ink:#FFFFFF; --bad:#C23B3B; --overlay:rgba(14,22,40,.72);
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --tile:#8F2E1E; --tile-hover:#A63724; --tile-ink:#F5C542; --used:#141C30; --used-ink:#3B4868;
+  --accent:#3CCB9F; --accent-ink:#06261D; --bad:#F07070; --overlay:rgba(3,6,14,.8); color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --tile:#8F2E1E; --tile-hover:#A63724; --tile-ink:#F5C542; --used:#141C30; --used-ink:#3B4868;
+  --accent:#3CCB9F; --accent-ink:#06261D; --bad:#F07070; --overlay:rgba(3,6,14,.8); color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; }
+.wrap { max-width:1400px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+header { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px; }
+.brand h1 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 48px); line-height:1; margin:0; letter-spacing:-.01em; }
+.brand p { margin:4px 0 0; color:var(--muted); font-size:15px; letter-spacing:.06em; text-transform:uppercase; }
+.controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+label.inline { display:flex; gap:6px; align-items:center; color:var(--muted); font-size:14px; }
+select, button, input { font:inherit; }
+select { padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink); }
+.btn { padding:8px 14px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn:hover { border-color:var(--ink); }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, .tile:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--tile-ink); outline-offset:2px; }
+.board-scroll { overflow-x:auto; }
+.board { display:grid; grid-template-columns:repeat(6, minmax(130px, 1fr)); gap:8px; min-width:820px; }
+.cat { background:var(--ink); color:var(--bg); font-family:var(--display); font-weight:800; text-align:center; padding:14px 8px; border-radius:10px; font-size:clamp(15px, 1.5vw, 21px); line-height:1.15; display:flex; align-items:center; justify-content:center; min-height:76px; text-wrap:balance; }
+.tile { background:var(--tile); color:var(--tile-ink); border:none; border-radius:10px; font-family:var(--display); font-weight:800; font-size:clamp(28px, 3.4vw, 52px); min-height:clamp(70px, 10vh, 110px); cursor:pointer; font-variant-numeric:tabular-nums; transition:transform .12s, background .12s; }
+.tile:hover:not(:disabled) { background:var(--tile-hover); transform:translateY(-2px); }
+.tile:disabled { background:var(--used); color:var(--used-ink); cursor:default; font-size:clamp(14px, 1.3vw, 18px); font-family:var(--body); }
+.teams { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; }
+.team { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:grid; gap:6px; }
+.team input { border:none; background:transparent; color:var(--muted); font-weight:700; font-size:15px; text-transform:uppercase; letter-spacing:.05em; width:100%; padding:2px 0; border-bottom:1px dashed var(--line); }
+.team .score { font-family:var(--display); font-weight:800; font-size:clamp(30px, 3.2vw, 46px); line-height:1; font-variant-numeric:tabular-nums; }
+.team .score.neg { color:var(--bad); }
+.team .adj { display:flex; gap:6px; }
+.team .adj button { flex:1; padding:4px 0; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; font-weight:700; }
+.foot { color:var(--muted); font-size:13px; }
+.overlay { position:fixed; inset:0; background:var(--overlay); display:flex; align-items:center; justify-content:center; padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); z-index:20; }
+.card { background:var(--surface); color:var(--ink); border-radius:16px; width:min(1100px, 100%); max-height:100%; overflow:auto; padding:clamp(18px, 3vw, 40px); display:grid; gap:18px; }
+.card .meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:14px; font-weight:700; }
+.dd { background:var(--tile-ink); color:#14213D; padding:3px 10px; border-radius:999px; letter-spacing:.06em; }
+.question { font-family:var(--display); font-weight:600; font-size:clamp(24px, 3.4vw, 46px); line-height:1.2; margin:0; text-wrap:balance; }
+.answer { border-top:2px solid var(--line); padding-top:14px; font-size:clamp(20px, 2.4vw, 32px); line-height:1.3; }
+.answer b { color:var(--accent); }
+.award { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.award .lbl { color:var(--muted); font-size:14px; margin-right:4px; }
+.award .row { display:flex; gap:4px; }
+.award .ok { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.award .no { color:var(--bad); }
+.wager { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; }
+.wager label { display:grid; gap:4px; font-weight:700; }
+.wager input { padding:8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:20px; width:100%; }
+.actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+@media (prefers-reduced-motion: reduce) { .tile { transition:none; } .tile:hover:not(:disabled) { transform:none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>Auto Showdown</h1><p>Personal Finance - Unit 5 Review</p></div>
+    <div class="controls">
+      <label class="inline" for="teamCount">Teams
+        <select id="teamCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></label>
+      <button class="btn primary" id="finalBtn">Final Round</button>
+      <button class="btn" id="resetBtn">New game</button>
+    </div>
+  </header>
+  <div class="board-scroll"><div class="board" id="board" aria-label="Question board"></div></div>
+  <div class="teams" id="teams"></div>
+  <div class="foot">Click a tile to open the question. Click a team's name to rename it. One tile hides a Double Points bonus. Use +100 / −100 to fix any score. Calculators are allowed on the math tiles.</div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="qText" id="card"></div>
+</div>
+
+<script>
+const CATS = [{"name": "The Real Price", "q": [["Our class adds about what % to the price for tax, title & registration?", "<b>10%</b>"], ["A car is $19,000. Estimate tax, title & registration.", "19,000 × 0.10 = <b>$1,900</b>"], ["Make vs. model: name both for a Honda Civic.", "Make = <b>Honda</b>, model = <b>Civic</b>"], ["$21,500 car. Estimate the total with tax, title & registration.", "21,500 × 1.10 = <b>$23,650</b>"], ["Quick estimate: $115 a month per $5,000 borrowed. About how much is the payment on $25,000?", "5 × $115 = <b>$575</b> a month"]]}, {"name": "Loan Math", "q": [["What does APR stand for?", "<b>Annual Percentage Rate</b>"], ["Total of payments = ?", "<b>Monthly payment × number of months</b>"], ["$310 a month for 48 months. Total of payments?", "<b>$14,880</b>"], ["You borrowed $13,000 and paid $14,880 in all. How much interest?", "<b>$1,880</b>"], ["$16,000 at 7%: $383.14/mo for 48 months or $272.78/mo for 72. Total interest for each and the difference?", "48: <b>$2,390.72</b>. 72: <b>$3,640.16</b>. Difference <b>$1,249.44</b>"]]}, {"name": "Credit & Rates", "q": [["A higher credit score gets a ____ interest rate.", "<b>Lower</b>"], ["Why do lenders charge some borrowers more?", "They're <b>riskier</b>: lower scores, late payments, high debt"], ["Name TWO ways to get a lower rate on a car loan.", "Any two: <b>better credit score</b>, <b>shorter term</b>, <b>bigger down payment</b>, <b>pre-approval / shop lenders</b>, credit union"], ["Why get pre-approved before visiting a dealer?", "You know your <b>rate and budget</b> and can <b>compare</b> the dealer's offer"], ["$20,000 for 60 months: $382.02/mo at 5.5% vs. $465.37/mo at 14%. How much more does the 14% borrower pay?", "(465.37 − 382.02) × 60 = <b>$5,001</b>"]]}, {"name": "Can I Afford It?", "q": [["Guideline: total car costs should stay at or under what % of gross monthly pay?", "<b>10%</b>"], ["Gross pay $3,400 a month. Most to spend on car costs?", "<b>$340</b>"], ["Name the FOUR monthly costs of owning a car.", "<b>Payment, insurance, gas, maintenance/repairs</b>"], ["900 miles a month, 30 mpg, $3.50 a gallon. Monthly gas?", "900 ÷ 30 × 3.50 = <b>$105</b>"], ["Payment $265, insurance $140, gas $90, gross pay $4,200. Does it fit the 10% guideline?", "Total <b>$495</b> vs. limit $420: <b>No, too expensive</b>"]]}, {"name": "Insurance", "q": [["What is a premium?", "What you <b>pay for insurance</b> each month or year"], ["What is a deductible?", "What <b>you pay first</b> on a claim"], ["Which coverage pays for damage you cause to others?", "<b>Liability</b>"], ["A tree falls on your parked car. Which coverage? A deer runs into you?", "<b>Comprehensive</b> for both"], ["Name THREE things that can raise a teen's car insurance premium.", "Any three: <b>tickets</b>, <b>crashes</b>, <b>expensive or sporty car</b>, <b>lower deductible</b>, <b>adding coverage</b>, age/inexperience"]]}, {"name": "Buy, Lease or Used?", "q": [["When you lease, do you own the car at the end?", "<b>No</b>, you return it (unless you buy it out)"], ["Name one drawback of leasing.", "<b>Mileage limits</b>, wear fees, <b>no ownership</b>, always a payment"], ["Why does a used car often cost less over time?", "The first owner took the <b>biggest depreciation</b> hit"], ["$28,000 new car loses about 20% in year 1, then 15% of what's left in year 2. Value after 2 years?", "22,400 → <b>$19,040</b>"], ["What does being 'upside down' on a loan mean, and name TWO ways to avoid it.", "You <b>owe more than the car is worth</b>. Avoid: <b>bigger down payment</b>, <b>shorter loan</b>, buy used, don't roll old debt in"]]}];
+const VALUES=[100,200,300,400,500];
+const FINAL={"cat": "Final Round: The Whole Deal", "q": "$22,000 car. Add 10% for tax, title & registration. You put $4,200 down. What is the amount financed, and where should you get pre-approved first?", "a": "22,000 × 1.10 = <b>$24,200</b> − $4,200 = <b>$20,000</b> financed. Get pre-approved at a <b>credit union</b> (or bank)."};
+const KEY="auto-showdown-v1";
+let S;
+function fresh(n){ const dd=[Math.floor(Math.random()*6), 2+Math.floor(Math.random()*3)];
+  return {teams:Array.from({length:n},(_,i)=>({name:"Team "+(i+1),score:0})), used:{}, dd, finalDone:false}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s && s.teams) return s; }catch(e){} return null; }
+const $=id=>document.getElementById(id);
+const escA=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+
+function renderBoard(){
+  const b=$("board"); b.innerHTML="";
+  CATS.forEach(c=>{ const d=document.createElement("div"); d.className="cat"; d.textContent=c.name; b.appendChild(d); });
+  VALUES.forEach((v,r)=>CATS.forEach((c,ci)=>{
+    const t=document.createElement("button"); t.className="tile"; const k=ci+"-"+r;
+    if(S.used[k]){ t.disabled=true; t.textContent="Done"; t.setAttribute("aria-label",c.name+" "+v+", done"); }
+    else { t.textContent=v; t.setAttribute("aria-label",c.name+" for "+v); t.onclick=()=>openQ(ci,r); }
+    b.appendChild(t); }));
+}
+function renderTeams(){
+  const w=$("teams"); w.innerHTML="";
+  S.teams.forEach((t,i)=>{
+    const d=document.createElement("div"); d.className="team";
+    d.innerHTML=`<input id="team-name-${i}" aria-label="Team ${i+1} name" value="${escA(t.name)}">
+      <div class="score ${t.score<0?'neg':''}">${t.score}</div>
+      <div class="adj"><button data-d="-100" aria-label="Subtract 100 from ${escA(t.name)}">−100</button><button data-d="100" aria-label="Add 100 to ${escA(t.name)}">+100</button></div>`;
+    d.querySelector("input").oninput=e=>{ t.name=e.target.value||("Team "+(i+1)); save(); };
+    d.querySelectorAll(".adj button").forEach(btn=>btn.onclick=()=>{ t.score+=+btn.dataset.d; save(); renderTeams(); });
+    w.appendChild(d); });
+}
+function close(){ $("overlay").hidden=true; renderBoard(); renderTeams(); }
+function openQ(ci,r){
+  const c=CATS[ci], [q,a]=c.q[r], isDD=(S.dd[0]===ci && S.dd[1]===r), val=VALUES[r]*(isDD?2:1), k=ci+"-"+r;
+  const card=$("card");
+  card.innerHTML=`<div class="meta"><span>${c.name}</span><span>${isDD?'<span class="dd">Double Points!</span> ':''}${val} points</span></div>
+    <p class="question" id="qText">${q}</p>
+    <div class="answer" id="ans" hidden>${a}</div>
+    <div class="award" id="award" hidden><span class="lbl">Who got it?</span>
+      ${S.teams.map((t,i)=>`<span class="row"><button class="btn ok" data-i="${i}" data-s="1">✓ ${escA(t.name)}</button><button class="btn no" data-i="${i}" data-s="-1" aria-label="${escA(t.name)} wrong, minus ${val}">✗</button></span>`).join("")}</div>
+    <div class="actions"><button class="btn primary" id="reveal">Reveal answer</button><button class="btn" id="done">Nobody / Close</button></div>`;
+  $("overlay").hidden=false; $("reveal").focus();
+  S.used[k]=true; save();
+  $("reveal").onclick=()=>{ $("ans").hidden=false; $("award").hidden=false; $("reveal").hidden=true; };
+  $("done").onclick=close;
+  card.querySelectorAll("#award button").forEach(btn=>btn.onclick=()=>{
+    S.teams[+btn.dataset.i].score += val*(+btn.dataset.s); save();
+    if(+btn.dataset.s>0) close(); else { btn.disabled=true; renderTeams(); } });
+}
+function openFinal(){
+  const card=$("card");
+  card.innerHTML=`<div class="meta"><span>${FINAL.cat}</span><span>Wager up to your score</span></div>
+    <p class="question" id="qText">Each team: write down your wager before you see the question.</p>
+    <div class="wager">${S.teams.map((t,i)=>`<label for="wager-${i}">${escA(t.name)}<input id="wager-${i}" type="number" min="0" step="100" value="0"></label>`).join("")}</div>
+    <div class="actions"><button class="btn primary" id="showQ">Lock wagers and show question</button><button class="btn" id="done">Close</button></div>`;
+  $("overlay").hidden=false; $("done").onclick=close;
+  $("showQ").onclick=()=>{
+    const w=S.teams.map((t,i)=>Math.max(0, Math.min(Math.max(t.score,0), Math.round(+$("wager-"+i).value||0))));
+    card.innerHTML=`<div class="meta"><span>${FINAL.cat}</span><span>Wagers locked</span></div>
+      <p class="question" id="qText">${FINAL.q}</p>
+      <div class="answer" id="ans" hidden>${FINAL.a}</div>
+      <div class="award" id="award" hidden><span class="lbl">Mark each team:</span>
+        ${S.teams.map((t,i)=>`<span class="row" id="fr-${i}"><button class="btn ok" data-i="${i}" data-s="1">✓ ${escA(t.name)} (+${w[i]})</button><button class="btn no" data-i="${i}" data-s="-1" aria-label="${escA(t.name)} wrong, minus ${w[i]}">✗</button></span>`).join("")}</div>
+      <div class="actions"><button class="btn primary" id="reveal">Reveal answer</button><button class="btn" id="done">Finish</button></div>`;
+    $("reveal").onclick=()=>{ $("ans").hidden=false; $("award").hidden=false; $("reveal").hidden=true; };
+    $("done").onclick=close;
+    card.querySelectorAll("#award button").forEach(btn=>btn.onclick=()=>{
+      const i=+btn.dataset.i; S.teams[i].score += w[i]*(+btn.dataset.s); save(); renderTeams();
+      $("fr-"+i).querySelectorAll("button").forEach(b=>b.disabled=true); });
+  };
+}
+$("finalBtn").onclick=openFinal;
+$("resetBtn").onclick=()=>{ const b=$("resetBtn");
+  if(b.dataset.confirm){ S=fresh(+$("teamCount").value); save(); renderBoard(); renderTeams(); b.textContent="New game"; delete b.dataset.confirm; }
+  else { b.dataset.confirm=1; b.textContent="Click again to clear scores"; setTimeout(()=>{ b.textContent="New game"; delete b.dataset.confirm; },3000); } };
+$("teamCount").onchange=e=>{ const n=+e.target.value;
+  while(S.teams.length<n) S.teams.push({name:"Team "+(S.teams.length+1),score:0});
+  S.teams.length=n; save(); renderTeams(); };
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("overlay").hidden) close(); });
+$("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") close(); });
+
+function start(d){ S=(d&&d.S)||load()||fresh(4); $("teamCount").value=S.teams.length; renderBoard(); renderTeams(); }
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

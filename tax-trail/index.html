@@ -1,0 +1,225 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tax Trail</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a tax card on the left; the work sheet on the right follows payroll taxes, side-gig taxes, where taxes go and smart filing habits. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --card:#F2F1E8; --card-line:#C9C6A8; --card-ink:#2B2A1C; --punch:#3E4A1E;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#1F1F17; --card-line:#45452F; --card-ink:#EDEBD8; --punch:#B7C77A; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#1F1F17; --card-line:#45452F; --card-ink:#EDEBD8; --punch:#B7C77A; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1180px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; align-items:center; }
+.bar .stats b { color:var(--gold); font-variant-numeric:tabular-nums; }
+.wrap { max-width:1180px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.1fr); gap:20px; align-items:start; }
+@media (max-width:820px) { .game { grid-template-columns:1fr; } }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; grid-column:1/-1; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+/* timecard */
+.tc { background:var(--card); color:var(--card-ink); border:1px solid var(--card-line); border-radius:6px; padding:18px; font-family:var(--mono); font-size:15px; display:grid; gap:10px; min-width:0; position:relative; }
+.tc .tag { font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:.08em; padding:3px 10px; border-radius:99px; justify-self:start; background:var(--punch); color:var(--card); }
+.choices { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
+.ch { font:inherit; font-weight:700; padding:10px 16px; border-radius:10px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.ch.sel { border-color:var(--gold); background:rgba(224,168,0,.16); }
+.ch.right { border-color:var(--ok); background:var(--ok-soft); }
+.ch:disabled { cursor:default; }
+.field.wide { grid-template-columns:1fr; }
+.tc::before { content:""; }
+.plastic { position:relative; aspect-ratio:1.586; max-width:340px; width:100%; border-radius:14px; color:#fff; padding:14px 16px; display:grid; grid-template-rows:auto 1fr auto auto; font-family:var(--mono); box-shadow:0 10px 24px rgba(20,20,40,.25); background:linear-gradient(135deg,#3B2A7A,#6B4FB0); }
+.plastic.cash { background:linear-gradient(135deg,#0E5E4A,#1F9A78); } .plastic.travel { background:linear-gradient(135deg,#14213D,#2F5FB8); } .plastic.student { background:linear-gradient(135deg,#8C5A12,#D19A2E); } .plastic.secured { background:linear-gradient(135deg,#3A3F4B,#6B7280); }
+.plastic .pn { font-family:var(--display); font-weight:800; font-size:18px; }
+.plastic .chip { width:40px; height:30px; border-radius:6px; background:linear-gradient(135deg,#E8C766,#B8912E); align-self:center; }
+.plastic .num { font-size:17px; letter-spacing:.12em; }
+.plastic .holder { font-size:12px; letter-spacing:.1em; opacity:.85; }
+.tc .kind { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--punch); font-weight:600; }
+.tc h2 { font-family:var(--display); font-size:24px; margin:0; line-height:1.1; color:var(--card-ink); }
+.tc .who { display:flex; flex-wrap:wrap; gap:4px 16px; }
+.tc .who b { font-weight:600; }
+.tc table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.tc th, .tc td { border-bottom:1px dashed var(--card-line); padding:5px 4px; text-align:left; }
+.tc td:last-child, .tc th:last-child { text-align:right; }
+.tc th { font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; }
+.tc .stamp { color:var(--punch); font-weight:600; }
+.tc .rule { border:1px solid var(--card-line); border-radius:6px; padding:8px 10px; font-size:14px; line-height:1.4; font-family:var(--body); }
+.tc .story { font-family:var(--body); font-size:17px; line-height:1.45; }
+/* answer sheet */
+.sheet { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px, 2.6vw, 26px); display:grid; gap:12px; min-width:0; }
+.sheet .eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.field { display:grid; grid-template-columns:minmax(0, 1fr) minmax(120px, 190px); gap:10px; align-items:center; padding:8px 10px; border-radius:12px; border:2px solid transparent; }
+.field.ok { background:var(--ok-soft); border-color:var(--ok); }
+.field.no { background:var(--bad-soft); border-color:var(--bad); }
+.field.shown { background:var(--bad-soft); }
+.field .q { line-height:1.3; }
+.field .q small { display:block; color:var(--muted); font-family:var(--mono); font-size:13px; margin-top:2px; }
+.field .msg { grid-column:1/-1; font-size:15px; line-height:1.35; }
+.inp { display:flex; align-items:center; border:2px solid var(--line); border-radius:10px; background:var(--bg); padding:0 10px; min-width:0; }
+.inp:focus-within { border-color:var(--gold); }
+.inp span { font-family:var(--mono); color:var(--muted); }
+.inp input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:20px; padding:9px 6px; outline:none; }
+.inp input:disabled { color:var(--ink); }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); padding:8px 14px; }
+.btn:focus-visible, input:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.note { color:var(--muted); font-size:15px; margin:0; }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.steps { margin:0; padding-left:22px; line-height:1.6; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 68px); line-height:1; color:var(--ok); font-variant-numeric:tabular-nums; }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Tax <span>Trail</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=x=>"$"+x.toLocaleString("en-US");
+const n0=x=>x.toLocaleString("en-US");
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
+const SKILL={pay:"Payroll vs. income tax", gig:"Side gigs", where:"Where taxes go", smart:"Smart filing"};
+const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+function mkPayroll(){ const g=rnd(180,420)*10, ss=r2(g*.062), med=r2(g*.0145), fica=r2(ss+med);
+  return {kind:"Payroll taxes", title:`${fmt0(g)} paycheck`, html:tbl([["Social Security","6.2% of gross"],["Medicare","1.45% of gross"],["FICA","Social Security + Medicare"],["Federal income tax","Depends on your W-4 and income"]])+`<div class="rule">Payroll taxes (FICA) fund Social Security and Medicare. Income tax is figured on your 1040.</div>`,
+   F:[{k:"ss", type:"pay", q:"Social Security", a:ss, miss:[[g*.62,"6.2% = 0.062."]]},
+      {k:"med", type:"pay", q:"Medicare", a:med, miss:[[g*.145,"1.45% = 0.0145."]]},
+      {k:"fica", type:"pay", q:"Total FICA", a:fica, miss:[[g*.0765*10,"7.65% = 0.0765."]]}]}; }
+function mkGig(){ const inc=rnd(15,60)*100, se=r2(inc*.9235*.153), save=r2(inc*.25), nm=pick(NAMES);
+  return {kind:"Side gigs", title:`${nm} earns ${fmt0(inc)} from a side gig`, html:tbl([["Pay type","Contractor, paid with a 1099-NEC"],["Tax withheld","$0"],["Self-employment tax","15.3% on 92.35% of net earnings"],["Rule of thumb","Set aside about 25% for taxes"]])+`<div class="rule">Contractors pay both halves of Social Security and Medicare.</div>`,
+   F:[{k:"se", type:"gig", q:"Self-employment tax", sub:`${fmt0(inc)} × 0.9235 × 0.153`, a:se, tol:.03, miss:[[inc*.153,"First multiply by 0.9235."],[inc*.0765,"Contractors pay 15.3%, both halves."]]},
+      {k:"save", type:"gig", q:"Money to set aside at 25%", a:save, miss:[]},
+      {k:"form", type:"gig", choices:["1099-NEC","W-2","W-4","None, gig pay isn't taxed"], q:"Which form shows this income?", a:"1099-NEC", why:"Side-gig income is taxable even without a W-2."}]}; }
+function mkWhere(){ const O=["Federal income tax","FICA","State & local tax","Sales tax"];
+  return {kind:"Where taxes go", title:"Follow the money", html:tbl([["Federal income tax","Defense, Medicaid & health, interest on debt, veterans, education, science"],["FICA","Social Security and Medicare"],["State & local","Schools, roads, police, parks"],["Sales tax","Paid when you buy things"]]),
+   F:[{k:"w1", type:"where", choices:O, q:"Funds your grandparents' Medicare.", a:"FICA", why:"Medicare is half of FICA."},
+      {k:"w2", type:"where", choices:O, q:"Paid at the register when you buy shoes.", a:"Sales tax", why:"Not taken from your paycheck."},
+      {k:"w3", type:"where", choices:O, q:"Pays for your local public high school.", a:"State & local tax", why:"Property and state taxes fund schools."},
+      {k:"w4", type:"where", choices:O, q:"Pays for national defense.", a:"Federal income tax", why:"Defense is a big federal budget item."}]}; }
+function mkSmart(){ return {kind:"Smart filing", title:"File it right", html:tbl([["IRS Free File","Free filing options for many people"],["Keep records","W-2s, 1099s and receipts for about 3 years"],["Scams","The IRS doesn't demand payment by gift card or threaten arrest by phone"]]),
+   F:[{k:"s1", type:"smart", choices:["Yes, set money aside for taxes","No, it's never taxed"], q:"You earn tips and cash from a side job. Is it taxable?", a:"Yes, set money aside for taxes", why:"All income is taxable, even cash."},
+      {k:"s2", type:"smart", choices:["Hang up and contact the IRS directly","Pay with gift cards","Give your SSN","Wire money right away"], q:"A caller says you owe the IRS and must pay today with gift cards.", a:"Hang up and contact the IRS directly", why:"It's a scam."},
+      {k:"s3", type:"smart", choices:["File anyway to get a refund of withheld tax","Don't file, it's lost","Call your bank","Wait 10 years"], q:"You earned $6,000 part-time and had $300 federal tax withheld. You owe $0 tax.", a:"File anyway to get a refund of withheld tax", why:"You only get withheld money back if you file."},
+      {k:"s4", type:"smart", choices:["April 15","The day you get your W-2","December 31","Whenever"], q:"File (or request an extension) by...", a:"April 15", why:"Late filing and late payment can bring penalties."}]}; }
+function mkSplit(){ const g=rnd(30,70)*100, fed=pick([8,9,10,11]), st=4.95, f=r2(g*fed/100), s=r2(g*st/100), fica=r2(g*.0765), tot=r2(f+s+fica), net=r2(g-tot);
+  return {kind:"Where does my paycheck go?", title:`${fmt0(g)} monthly gross (Illinois)`, html:tbl([["Federal income tax",fed+"% (from withholding)"],["Illinois income tax","4.95%"],["FICA","7.65%"]])+`<div class="rule">For this card, figure every tax on gross pay.</div>`,
+   F:[{k:"f", type:"pay", q:"Federal income tax", a:f, miss:[]},{k:"s", type:"pay", q:"Illinois income tax", a:s, miss:[[g*.495,"4.95% = 0.0495."]]},{k:"fica", type:"pay", q:"FICA", a:fica, miss:[]},{k:"net", type:"pay", q:"Pay after all taxes", a:net, miss:[[g-f,"Subtract ALL the taxes."]]}]}; }
+function makeRound(){ return [mkPayroll(), mkWhere(), mkGig(), ...shuffle([mkSmart(), mkSplit(), mkPayroll()])]; }
+
+let G=null, best=null;
+try{ best=+localStorage.getItem("tax-trail-best")||null; }catch(e){}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 8: Federal Taxes</span>`; return; }
+  el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
+  $("quit")&&($("quit").onclick=intro); }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 8 · Taxes in real life</div>
+    <h2>Where does your tax money come from, and where does it go?</h2>
+    <p>Six cards: FICA on a paycheck, every tax on a monthly paycheck, side-gig taxes, where tax dollars go, and filing smart (and spotting IRS scams).</p>
+    <ol class="steps"><li><b>FICA</b> = Social Security 6.2% + Medicare 1.45%.</li><li>Side-gig contractors pay <b>self-employment tax</b>: 15.3% on 92.35% of earnings.</li><li>The IRS never demands gift cards.</li></ol>
+    <p>Typed answers: 10 points first try, 5 second. Tap answers: one try.${best?` <b>Your best: ${best}.</b>`:""}</p>
+    <div class="row"><button class="btn go" id="go">Hit the trail</button></div></div>`;
+  $("go").onclick=()=>{ G={cards:makeRound(), i:0, score:0, phase:"play", by:{}}; prep(); draw(); };
+}
+function prep(){ const c=G.cards[G.i]; c.st={}; c.tries={}; c.msg={}; c.val={}; c.done=false; }
+function card(o){ return `<div class="tc"><div class="kind">${o.kind}</div><h2>${o.title}</h2>${o.html}</div>`; }
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const c=G.cards[G.i], n=G.cards.length;
+  const fields=c.F.map(f=>{ const st=c.st[f.k], dis=st==="ok"||st==="shown";
+    if(f.choices) return `<div class="field wide ${st==="ok"?"ok":st==="shown"?"shown":""}"><div class="q">${esc(f.q)}</div>
+      <div class="choices" role="group">${f.choices.map(o=>{ let cl="ch"; if(dis&&o===f.a) cl+=" right"; else if(c.val[f.k]===o) cl+=" sel"; return `<button type="button" class="${cl}" data-k="${f.k}" data-o="${esc(o)}" ${dis?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`;
+    return `<div class="field ${st==="ok"?"ok":st==="shown"?"shown":c.msg[f.k]?"no":""}">
+      <label class="q" for="f-${f.k}">${esc(f.q)}${f.sub?`<small>${esc(f.sub)}</small>`:""}</label>
+      <div class="inp">${f.unit?"":"<span>$</span>"}<input id="f-${f.k}" inputmode="decimal" autocomplete="off" value="${esc(c.val[f.k]??"")}" ${dis?"disabled":""}>${f.unit?`<span>${f.unit}</span>`:""}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`; }).join("");
+  $("root").innerHTML=`<div class="game">
+    <div class="progress" aria-hidden="true"><i style="width:${(G.i+(c.done?1:0))/n*100}%"></i></div>
+    ${card(c)}
+    <form class="sheet" id="sheet" novalidate>
+      <div class="eyebrow">Card ${G.i+1} of ${n}</div>
+      ${fields}
+      <div class="row">${c.done?`<button class="btn go" type="button" id="next">${G.i+1<n?"Next card":"See my results"}</button>`:`<button class="btn go" type="submit">Check</button>`}</div>
+      <p class="note">Round money to the cent. Use a calculator.</p>
+    </form></div>`;
+  if(c.done){ $("next").onclick=next; $("next").focus({preventScroll:true}); return; }
+  $("sheet").onsubmit=e=>{ e.preventDefault(); check(); };
+  c.F.forEach(f=>{ if(f.choices) return; const el=$("f-"+f.k); el&&el.addEventListener("input",()=>{ c.val[f.k]=el.value; }); });
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{ c.val[b.dataset.k]=b.dataset.o; draw(); });
+}
+function check(){
+  const c=G.cards[G.i];
+  c.F.forEach(f=>{ if(c.st[f.k]==="ok"||c.st[f.k]==="shown") return; const b=G.by[f.type]||(G.by[f.type]=[0,0]);
+    if(f.choices){ const v=c.val[f.k]; if(!v){ c.msg[f.k]="Tap an answer."; return; } b[1]++;
+      if(v===f.a){ G.score+=10; b[0]++; c.st[f.k]="ok"; c.msg[f.k]=f.why; } else { c.st[f.k]="shown"; c.msg[f.k]="Best answer: "+f.a+". "+f.why; } return; }
+    const v=num(c.val[f.k]??""), tol=f.tol||.015; if(!c.tries[f.k]) b[1]++;
+    if(!isNaN(v)&&Math.abs(v-f.a)<=tol){ const pts=c.tries[f.k]?5:10; G.score+=pts; if(!c.tries[f.k]) b[0]++; c.st[f.k]="ok"; c.msg[f.k]=c.tries[f.k]?"Got it on the second try. +5":""; return; }
+    c.tries[f.k]=(c.tries[f.k]||0)+1;
+    const hit=isNaN(v)?null:(f.miss||[]).find(([x])=>Math.abs(v-r2(x))<=.02&&Math.abs(r2(x)-f.a)>tol);
+    const show=f.unit?n0(f.a)+" "+f.unit:fmt(f.a);
+    if(c.tries[f.k]>=2){ c.st[f.k]="shown"; c.val[f.k]=String(f.a); c.msg[f.k]=(hit?hit[1]+" ":"")+"Answer: "+show+"."; }
+    else c.msg[f.k]=isNaN(v)?"Type a number.":(hit?hit[1]:"Not quite. Check the card again.")+" Try again.";
+  });
+  c.done=c.F.every(f=>c.st[f.k]==="ok"||c.st[f.k]==="shown");
+  draw();
+}
+function next(){ G.i++; if(G.i>=G.cards.length){ G.phase="end"; if(!best||G.score>best){ best=G.score; try{ localStorage.setItem("tax-trail-best",String(best)); }catch(e){} } } else prep(); draw(); }
+function end(){
+  stats();
+  const max=G.cards.reduce((s,c)=>s+c.F.length*10,0);
+  const rows=Object.keys(SKILL).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    return `<div class="skill"><b>${SKILL[k]}</b><span class="v">${a} of ${t} first try</span>${p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Round complete</div>
+    <div class="big">${G.score} <span style="font-size:.45em;color:var(--muted)">/ ${max}</span></div>
+    <div class="skills">${rows}</div>
+    <p>All income is taxable, and filing is how you get your withheld money back.</p>
+    <div class="row"><button class="btn go" id="again">New cards</button></div></div>`;
+  $("again").onclick=intro;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

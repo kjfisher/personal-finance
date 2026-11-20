@@ -1,0 +1,194 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Case Files</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: arcade header bar, mode picker, then a card grid (memory) or a scenario card with four target buttons. */
+:root{--bg:#EEF1F5;--panel:#FFFFFF;--ink:#16202E;--muted:#5C6676;--line:#D3D9E2;--bar:#14213D;--barInk:#F4F6FA;--gold:#E3A008;--good:#1F7A4D;--bad:#B33A2B;--back:#22355E;--backInk:#F4F6FA;--chip:#E6EBF2;
+ --display:"Bricolage Grotesque",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1522;--panel:#182133;--ink:#E7ECF4;--muted:#9AA6B8;--line:#2C3850;--bar:#0A1020;--barInk:#E7ECF4;--gold:#F2B83A;--good:#4FBF83;--bad:#F07A68;--back:#2B4170;--backInk:#E7ECF4;--chip:#223049;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1522;--panel:#182133;--ink:#E7ECF4;--muted:#9AA6B8;--line:#2C3850;--bar:#0A1020;--barInk:#E7ECF4;--gold:#F2B83A;--good:#4FBF83;--bad:#F07A68;--back:#2B4170;--backInk:#E7ECF4;--chip:#223049;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+header{background:var(--bar);color:var(--barInk);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,34px)}
+header h1 span{color:var(--gold)}
+.stat{font-family:var(--mono);font-size:14px;display:flex;gap:16px;align-items:center}
+.stat b{color:var(--gold)}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:600 16px var(--body);padding:11px 18px;border-radius:12px;cursor:pointer}
+.btn.go{background:var(--gold);border-color:var(--gold);color:#1A1406}
+header .btn{background:transparent;color:var(--barInk);border-color:rgba(255,255,255,.35);padding:8px 14px;font-size:14px}
+.btn:focus-visible,.card:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.intro{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:14px}
+.intro h2{margin:0;font-family:var(--display);font-size:clamp(24px,3.4vw,36px);text-wrap:balance}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.mode{border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px;background:var(--chip)}
+.mode h3{margin:0;font-family:var(--display);font-size:22px}
+.mode p{margin:0;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.card{position:relative;min-height:118px;border-radius:14px;border:0;cursor:pointer;perspective:800px;background:transparent;padding:0;font:inherit;color:inherit}
+.inner{position:absolute;inset:0;transition:transform .35s;transform-style:preserve-3d}
+.card.up .inner,.card.done .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;display:grid;place-items:center;padding:12px;text-align:center}
+.back{background:var(--back);color:var(--backInk);font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.02em}
+.back small{display:block;font:500 11px var(--mono);letter-spacing:.12em;opacity:.7}
+.front{background:var(--panel);border:2px solid var(--line);transform:rotateY(180deg);font-weight:600;font-size:15px;line-height:1.3}
+.front .num{font:500 12px var(--mono);color:var(--muted);display:block;margin-bottom:4px}
+.front.t{border-color:var(--gold)}
+.card.done .front{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,var(--panel))}
+.card.miss .front{border-color:var(--bad)}
+.emoji{font-size:22px;display:block;margin-bottom:2px}
+.scen{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:16px}
+.scen .q{font-family:var(--display);font-weight:700;font-size:clamp(22px,3vw,32px);line-height:1.2;text-wrap:balance}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{text-align:left;border:2px solid var(--line);background:var(--chip);color:var(--ink);border-radius:14px;padding:14px 16px;font:600 17px var(--body);cursor:pointer;display:grid;gap:2px}
+.opt small{font:500 12px var(--mono);color:var(--muted)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--panel))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--panel))}
+.fb{border-radius:12px;padding:12px 14px;background:var(--chip);font-size:16px}
+.fb b{font-family:var(--display)}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+.end{text-align:center;display:grid;gap:12px;justify-items:center}
+.big{font-family:var(--display);font-weight:800;font-size:56px;color:var(--gold);line-height:1}
+.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px;text-align:left;width:100%}
+.list div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+.list b{display:block;font-size:15px}
+@media (prefers-reduced-motion:reduce){.inner{transition:none}}
+</style>
+<style>
+.ev{display:grid;gap:8px}
+.evb{text-align:left;border:2px solid var(--line);background:var(--chip);color:var(--ink);border-radius:12px;padding:12px 14px;font:500 16px var(--body);cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.evb .box{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--muted);display:grid;place-items:center;font-weight:700;font-size:14px;margin-top:1px}
+.evb[aria-pressed="true"]{border-color:var(--gold)}
+.evb[aria-pressed="true"] .box{background:var(--gold);border-color:var(--gold);color:#1A1406}
+.evb.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--panel))}
+.evb.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--panel))}
+.evb:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.story{font-size:clamp(18px,2.2vw,22px);line-height:1.45;background:var(--chip);border-radius:14px;padding:16px 18px;border-left:6px solid var(--gold)}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.steps span{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:99px;background:var(--chip);color:var(--muted)}
+.steps span.on{background:var(--gold);color:#1A1406}
+.steps span.ok{background:color-mix(in srgb,var(--good) 25%,var(--panel));color:var(--ink)}
+.model{background:var(--chip);border-radius:12px;padding:14px 16px;font-size:16px;text-align:left}
+.model p{margin:4px 0}
+.units{display:flex;flex-wrap:wrap;gap:6px}
+.units .btn{padding:8px 12px;font-size:14px}
+.units .btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+</style>
+<header><h1>Case <span>Files</span></h1><div class="stat" id="stat"></div></header>
+<main id="app"></main>
+<script>
+const C=[
+ {u:0,n:"Dev, 18",t:"$50 a month, starting now",s:"Dev just started his first job. He sets up an automatic $50 a month into a Roth IRA index fund. His friend says, \"$50 is nothing, wait until you're 30 and making real money.\" Dev keeps investing anyway.",smart:true,
+  ev:[["Starting at 18 gives his money about 44 years to grow before retirement.",1],["His growth will start earning growth of its own (compounding).",1],["Stocks go up every single year, so he can't lose.",0],["$50 is too small to make any difference.",0],["He picked a blue theme in his investing app.",0]],
+  re:["Because time does the heavy lifting, small early contributions can grow into much more than he puts in.","Because starting early guarantees he'll be a millionaire.","Because investing means he never needs a budget."],r:0},
+ {u:1,n:"Sofia, 22",t:"Rent based on her salary",s:"Sofia accepts a job paying $52,000 a year. She divides by 12, gets $4,333 a month, and signs a lease for $1,600 rent, figuring she'll still have $2,733 left for everything else.",smart:false,
+  ev:[["$4,333 is gross pay: federal and state tax, Social Security and Medicare (7.65%) come out first.",1],["Her net pay will be much lower, so $1,600 is a bigger share of what she actually takes home.",1],["The apartment has a pool and a gym.",0],["Social Security and Medicare are optional deductions.",0],["She'll be paid every two weeks.",0]],
+  re:["She should budget from net pay, not gross, or she could come up short every month.","Rent should always be exactly half of gross pay.","Taxes only come out in April, so her paychecks will be full."],r:0},
+ {u:2,n:"Malik, 17",t:"The pay stub looks fine",s:"Malik earns $18 an hour and worked 46 hours this week. His pay stub shows $828 gross pay. He figures the computer did the math, so he doesn't check it.",smart:false,
+  ev:[["Overtime pays 1.5 × $18 = $27 an hour for the 6 hours over 40.",1],["Correct gross pay is $720 + $162 = $882, so the stub is $54 short.",1],["YTD stands for year to date.",0],["Overtime is paid at double time for everyone.",0],["Pay stubs are never wrong because payroll is automatic.",0]],
+  re:["Checking every stub catches payroll mistakes, so he gets the $54 he earned.","He should ignore it because overtime doesn't count until next year.","He should quit because the employer stole from him on purpose."],r:0},
+ {u:3,n:"Ana, 21",t:"Where the emergency fund lives",s:"Ana keeps her $3,000 emergency fund in a high-yield savings account at an FDIC-insured online bank. Her paycheck goes by direct deposit into checking, which she uses for everyday spending.",smart:true,
+  ev:[["A high-yield savings account earns more interest than a regular savings account.",1],["FDIC insurance protects up to $250,000 per depositor, per bank.",1],["A 5-year CD is the best place for money you might need tomorrow.",0],["Online banks never charge any fees at all.",0],["Her debit card is purple.",0]],
+  re:["Her emergency money is safe, easy to reach and still earning interest.","Her money is locked away so she can never spend it.","Checking accounts earn the most interest, so she should move it all there."],r:0},
+ {u:4,n:"Erik, 19",t:"Four store cards in a month",s:"Erik opens four store cards in one month to get discounts. He maxes out one of them and pays the minimum \"when I remember.\" He says his score doesn't matter until he buys a house.",smart:false,
+  ev:[["Late or missed payments hurt payment history, the biggest part of a score (35%).",1],["Maxing a card raises utilization, which hurts amounts owed (30%).",1],["Store cards have fun logos.",0],["Checking your own credit score lowers it.",0],["Credit Karma is one of the three credit bureaus.",0]],
+  re:["His score will drop, so car loans and apartments will cost more or he could be denied.","His score only matters for houses, so it's fine.","Store cards can't affect a credit score."],r:0},
+ {u:4,n:"Jada, 18",t:"Building credit the slow way",s:"Jada opens a secured credit card with a $500 limit. She puts only her $40 phone bill on it and sets up autopay to pay the full balance every month.",smart:true,
+  ev:[["Paying in full and on time builds payment history (35%).",1],["Using $40 of $500 keeps utilization under 30%, which helps amounts owed.",1],["Secured cards come in many colors.",0],["She should check her score daily because checking it raises it.",0],["Paying the minimum is better than paying in full.",0]],
+  re:["She builds a strong score without ever paying interest.","She'll have perfect credit after one month.","Autopay means she never has to read a statement."],r:0},
+ {u:5,n:"Priya, 22",t:"Buying a first car",s:"Priya gets pre-approved at her credit union, adds about 10% for tax, title and registration to her budget, chooses a 48-month loan instead of 72, and shops near the end of the month.",smart:true,
+  ev:[["Pre-approval gives her a rate to compare, so she can negotiate like a cash buyer.",1],["A 48-month loan costs less total interest than a 72-month loan.",1],["She likes red cars.",0],["Dealer financing is always the cheapest option.",0],["Tax, title and registration are included free at every dealership.",0]],
+  re:["She knows the total cost and keeps interest low, so she pays less for the same car.","A shorter loan always has a lower monthly payment.","Shopping at the end of the month makes the car free."],r:0},
+ {u:6,n:"Noah, 23",t:"Buying a house this month",s:"Noah started a new job three months ago. He has no savings, plans to put 3% down, opened two store cards for furniture, and wants to skip pre-approval and just make offers.",smart:false,
+  ev:[["Lenders look for a stable job (about 2 years) and a safety net of savings.",1],["Under 20% down means no premium pricing and a bigger loan.",1],["The house is a 3/2.",0],["PITI stands for Price, Inspection, Title, Income.",0],["New store cards help you qualify for a mortgage.",0]],
+  re:["Without savings or steady income, one surprise could make him miss mortgage payments.","Buying is always better than renting, no matter what.","A realtor will pay his down payment."],r:0},
+ {u:7,n:"Lily, 24",t:"All in on one stock",s:"Lily's employer matches 4% in her 401(k), but she skips it to get a bigger paycheck. In her own account she puts everything into one stock her cousin says is \"going to the moon.\"",smart:false,
+  ev:[["One stock isn't diversified: if that company struggles, she loses big.",1],["Skipping the match turns down free money from her employer.",1],["A share of stock is part ownership of a company.",0],["Target-date funds are only for teachers.",0],["Her cousin is really nice.",0]],
+  re:["She takes on more risk and gets less free money, so she'll likely have less at retirement.","One stock is safer because it's easier to follow.","The match only matters after age 50."],r:0},
+ {u:8,n:"Sam, 22",t:"The giant refund",s:"Sam sets his W-4 so a lot of extra tax comes out of every paycheck. He loves getting a $3,000 refund every April and calls it \"free money from the IRS.\"",smart:false,
+  ev:[["A big refund means he overpaid tax all year.",1],["It's an interest-free loan to the government; he could have kept about $250 a month.",1],["Taxes are due April 15.",0],["Refunds are bonus money the IRS adds.",0],["The W-2 is the form that sets withholding.",0]],
+  re:["Adjusting his W-4 puts more money in each paycheck to save or invest now.","He should stop filing taxes so the IRS keeps it.","A bigger refund lowers his tax bracket."],r:0},
+ {u:9,n:"Mia, 25",t:"Protecting her family",s:"Mia uses a 50/30/20 budget, keeps a 3-month emergency fund, pays $15 a month for renters insurance, and has a will that names a guardian for her son.",smart:true,
+  ev:[["Renters insurance protects her belongings for a small premium.",1],["A will names who cares for her son and who receives her property.",1],["Estate planning is only for rich people.",0],["Collision insurance covers a stolen laptop.",0],["She likes using budgeting apps.",0]],
+  re:["Her plan protects her money and her family from big, unexpected costs.","She'll never have an unexpected expense again.","A will lets her skip paying taxes."],r:0},
+ {u:9,n:"Chris, 21",t:"Dropping car insurance",s:"Chris financed a car last month. To save $140 a month, he cancels his insurance and says, \"I'm a good driver, nothing will happen.\"",smart:false,
+  ev:[["Lenders require liability plus full coverage (collision and comprehensive) on a financed car.",1],["One accident could cost thousands he can't afford.",1],["His car is blue.",0],["Liability insurance pays to fix your own car.",0],["Insurance premiums never change.",0]],
+  re:["Insurance transfers a risk he can't afford to absorb, and driving without it breaks his loan terms.","Good drivers never need insurance.","He can buy insurance after an accident."],r:0},
+];
+const UN={0:"Unit 0 · Compounding",1:"Unit 1 · Payroll",2:"Unit 2 · Pay Stubs",3:"Unit 3 · Banking",4:"Unit 4 · Credit",5:"Unit 5 · Cars",6:"Unit 6 · Housing",7:"Unit 7 · Investing",8:"Unit 8 · Taxes",9:"Unit 9 · Insurance & Budget"};
+const app=document.getElementById("app"), stat=document.getElementById("stat");
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let best=null;try{best=localStorage.getItem("case-files-best")}catch(e){}
+let pickU=new Set();
+function home(){
+  stat.innerHTML="";
+  app.innerHTML=`<section class="intro"><div class="eyebrow">Personal Finance · Case Studies · Claim, Evidence, Reasoning</div>
+  <h2>Read the case. Make the call. Back it up.</h2>
+  <p style="margin:0;color:var(--muted)">Each case is a real money decision from Units 0–9. <b>Claim:</b> is it smart? <b>Evidence:</b> pick the 2 strongest facts. <b>Reasoning:</b> pick why it matters for their future. 4 points per case.</p>
+  <div class="eyebrow">Choose units (none = all)</div>
+  <div class="units">${Object.entries(UN).map(([k,v])=>`<button class="btn" data-u="${k}" aria-pressed="${pickU.has(+k)}">${v}</button>`).join("")}</div>
+  <div class="row"><button class="btn go" id="g5">5 cases</button><button class="btn" id="gall">Every case</button></div>
+  ${best?`<div class="eyebrow">Your best: ${esc(best)}</div>`:""}</section>`;
+  app.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const u=+b.dataset.u;pickU.has(u)?pickU.delete(u):pickU.add(u);b.setAttribute("aria-pressed",pickU.has(u))});
+  const pool=()=>C.filter(c=>!pickU.size||pickU.has(c.u));
+  document.getElementById("g5").onclick=()=>run(shuffle(pool()).slice(0,5));
+  document.getElementById("gall").onclick=()=>run(shuffle(pool()));
+}
+function run(cases){
+  let i=0,score=0,log=[];
+  const head=(step)=>{stat.innerHTML=`<span>Case <b>${i+1}/${cases.length}</b></span><span>Points <b>${score}</b></span><button class="btn" id="q">Menu</button>`;document.getElementById("q").onclick=home;
+    return `<div class="bar"><i style="width:${i/cases.length*100}%"></i></div>
+    <div class="steps">${["Claim","Evidence","Reasoning"].map((s,k)=>`<span class="${k===step?"on":k<step?"ok":""}">${k+1}. ${s}</span>`).join("")}</div>
+    <div class="eyebrow">${UN[cases[i].u]} · ${esc(cases[i].n)}</div><div class="q">${esc(cases[i].t)}</div><div class="story">${esc(cases[i].s)}</div>`};
+  const claim=()=>{const c=cases[i];let pts={c:0,e:0,r:0};
+    app.innerHTML=`<section class="scen">${head(0)}<div class="eyebrow">Claim: is this plan smart?</div>
+    <div class="opts"><button class="opt" data-v="1">Smart plan</button><button class="opt" data-v="0">Not a smart plan</button></div><div id="fb"></div></section>`;
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(app.querySelector(".opt[disabled]"))return;const ok=(+b.dataset.v===1)===c.smart;
+      app.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if((+x.dataset.v===1)===c.smart)x.classList.add("right")});if(!ok)b.classList.add("wrong");
+      if(ok){pts.c=1;score++}
+      fb(ok?"Right call.":"Look again.",`This plan is ${c.smart?"<b>smart</b>":"<b>not smart</b>"}. Now find the evidence.`,()=>evidence(pts))})};
+  const evidence=(pts)=>{const c=cases[i];const ev=shuffle(c.ev);let sel=new Set();
+    app.innerHTML=`<section class="scen">${head(1)}<div class="eyebrow">Evidence: pick the 2 strongest facts that support "${c.smart?"smart":"not smart"}"</div>
+    <div class="ev">${ev.map((e,k)=>`<button class="evb" data-k="${k}" aria-pressed="false"><span class="box"></span><span>${esc(e[0])}</span></button>`).join("")}</div>
+    <div class="row"><button class="btn go" id="chk" disabled>Check my evidence</button></div><div id="fb"></div></section>`;
+    const chk=document.getElementById("chk");
+    app.querySelectorAll(".evb").forEach(b=>b.onclick=()=>{if(chk.dataset.done)return;const k=+b.dataset.k;
+      if(sel.has(k))sel.delete(k);else{if(sel.size===2)return;sel.add(k)}
+      b.setAttribute("aria-pressed",sel.has(k));b.querySelector(".box").textContent=sel.has(k)?"✓":"";chk.disabled=sel.size!==2});
+    chk.onclick=()=>{chk.dataset.done=1;chk.disabled=true;let got=0;
+      app.querySelectorAll(".evb").forEach(b=>{const k=+b.dataset.k;b.disabled=true;if(ev[k][1])b.classList.add("right");else if(sel.has(k))b.classList.add("wrong");if(sel.has(k)&&ev[k][1])got++});
+      pts.e=got;score+=got;
+      fb(got===2?"Strong evidence.":got===1?"One of two.":"Not the strongest.",got===2?"Both facts support the claim.":"The green facts are the strongest. Red ones are either wrong or don't prove the claim.",()=>reason(pts))}};
+  const reason=(pts)=>{const c=cases[i];const order=shuffle([0,1,2]);
+    app.innerHTML=`<section class="scen">${head(2)}<div class="eyebrow">Reasoning: why does it matter for their future?</div>
+    <div class="opts" style="grid-template-columns:1fr">${order.map(k=>`<button class="opt" data-k="${k}">${esc(c.re[k])}</button>`).join("")}</div><div id="fb"></div></section>`;
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(app.querySelector(".opt[disabled]"))return;const ok=+b.dataset.k===c.r;
+      app.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(+x.dataset.k===c.r)x.classList.add("right")});if(!ok)b.classList.add("wrong");
+      if(ok){pts.r=1;score++}log.push([c,pts.c+pts.e+pts.r]);
+      const strong=c.ev.filter(e=>e[1]).map(e=>e[0]);
+      document.getElementById("fb").innerHTML=`<div class="model"><div class="eyebrow">Model CER</div><p><b>Claim:</b> ${esc(c.n.split(",")[0])}'s plan is ${c.smart?"smart":"not smart"}.</p><p><b>Evidence:</b> ${esc(strong[0])} ${esc(strong[1])}</p><p><b>Reasoning:</b> ${esc(c.re[c.r])}</p></div>
+      <div class="row" style="margin-top:12px"><button class="btn go" id="nx">${i+1<cases.length?"Next case":"See results"}</button></div>`;
+      stat.querySelector("span:nth-child(2) b").textContent=score;const nx=document.getElementById("nx");nx.focus();nx.onclick=()=>{i++;i<cases.length?claim():done()}})};
+  const fb=(h,t,next)=>{document.getElementById("fb").innerHTML=`<div class="fb"><b>${h}</b> ${t}</div><div class="row" style="margin-top:12px"><button class="btn go" id="nx">Next step</button></div>`;
+    stat.querySelector("span:nth-child(2) b").textContent=score;const nx=document.getElementById("nx");nx.focus();nx.onclick=next};
+  const done=()=>{const max=cases.length*4, pct=Math.round(score/max*100);const txt=`${score}/${max} (${pct}%)`;
+    let prev=0;try{prev=parseInt((localStorage.getItem("case-files-best")||"0").split("(")[1])||0}catch(e){}
+    if(pct>=prev){best=txt;try{localStorage.setItem("case-files-best",txt)}catch(e){}}
+    stat.innerHTML=`<button class="btn" id="q">Menu</button>`;document.getElementById("q").onclick=home;
+    app.innerHTML=`<section class="intro end"><div class="eyebrow">Case Files · results</div><div class="big">${score}/${max}</div><p>${pct>=90?"Ready for any CER on the quiz.":pct>=70?"Solid. Review the cases below that cost you points.":"Keep practicing: the strongest evidence names a course concept AND what it does."}</p>
+    <div class="list">${log.map(([c,p])=>`<div><b>${esc(c.t)} · ${p}/4</b>${UN[c.u]}</div>`).join("")}</div>
+    <div class="row"><button class="btn go" id="a">New cases</button><button class="btn" id="b">Menu</button></div></section>`;
+    document.getElementById("a").onclick=()=>run(shuffle(C.filter(c=>!pickU.size||pickU.has(c.u))).slice(0,5));document.getElementById("b").onclick=home};
+  claim();
+}
+home();
+</script>
+
+</body></html>

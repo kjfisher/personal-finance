@@ -1,0 +1,128 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Compound Corners</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: projector screen. Statement on top, big countdown ring, then one tile per room corner. Students walk to a corner; wrong corners sit down in Survivor mode. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800; --bad:#C23B3B;
+  --c1:#2F6FDB; --c2:#D64545; --c3:#E0A800; --c4:#1F9E6E; --cink:#FFFFFF;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
+.wrap { max-width:1400px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:10px; }
+h1 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 48px); line-height:1; margin:0; }
+header p { margin:4px 0 0; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:15px; }
+.controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.btn { font:inherit; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn:hover { border-color:var(--ink); }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, select:focus-visible, input:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+select, input { font:inherit; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink); }
+label.inline { display:flex; gap:6px; align-items:center; color:var(--muted); font-size:15px; }
+.stage { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px, 3vw, 36px); display:grid; gap:20px; }
+.top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:14px; }
+.qrow { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:24px; align-items:center; }
+@media (max-width:700px) { .qrow { grid-template-columns:minmax(0,1fr); } }
+.kind { display:inline-block; padding:3px 12px; border-radius:999px; border:1px solid var(--gold); font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px; }
+.stmt { font-family:var(--display); font-weight:600; font-size:clamp(26px, 3.6vw, 52px); line-height:1.15; margin:0; text-wrap:balance; }
+.ring { width:clamp(110px, 12vw, 160px); aspect-ratio:1; max-width:100%; position:relative; }
+.ring svg { width:100%; height:100%; transform:rotate(-90deg); }
+.ring .n { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:800; font-size:clamp(40px, 5vw, 64px); font-variant-numeric:tabular-nums; }
+.corners { display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+.corner { border-radius:16px; padding:18px; color:var(--cink); display:grid; gap:6px; min-height:130px; align-content:start; transition:opacity .25s, transform .25s; border:4px solid transparent; }
+.corner .where { font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; opacity:.9; }
+.corner .lab { font-family:var(--display); font-weight:800; font-size:clamp(24px, 2.6vw, 38px); line-height:1.1; }
+.corner.dim { opacity:.22; transform:scale(.97); }
+.corner.win { border-color:var(--ink); transform:scale(1.02); }
+.why { border-top:2px solid var(--line); padding-top:14px; font-size:clamp(19px, 2vw, 27px); line-height:1.4; }
+.why b { color:var(--accent); }
+.row { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+.surv { display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-weight:700; }
+.surv .count { font-family:var(--display); font-size:28px; font-variant-numeric:tabular-nums; }
+.surv button { font:inherit; font-weight:700; width:40px; height:40px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.end { text-align:center; display:grid; gap:12px; justify-items:center; }
+.end h2 { font-family:var(--display); font-weight:800; font-size:clamp(32px, 5vw, 64px); margin:0; }
+.foot { color:var(--muted); font-size:14px; }
+@media (prefers-reduced-motion: reduce) { .corner { transition:none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div><h1>Compound Corners</h1><p>Personal Finance - Unit 0 Review - Get up and move</p></div>
+    <div class="controls">
+      <label class="inline" for="secs">Timer <select id="secs"><option value="10">10 sec</option><option value="15">15 sec</option><option value="20">20 sec</option><option value="30">30 sec</option></select></label>
+      <label class="inline" for="mode">Mode <select id="mode"><option value="practice">Practice</option><option value="survivor">Survivor</option></select></label>
+      <button class="btn" id="restart">Restart</button>
+    </div>
+  </header>
+  <section class="stage" id="stage" aria-live="polite"></section>
+  <div class="foot">Before you start, assign each color to a corner of the room. Read the statement, start the timer, and students walk to their answer. Math rounds get 30 seconds automatically if the timer is shorter. In Survivor mode, students in a wrong corner sit down.</div>
+</div>
+
+<script>
+const ROUNDS=[{"k": "Simple or compound?", "s": "Earns interest on the original amount only.", "o": ["Simple", "Compound"], "c": 0, "w": "<b>Simple.</b>"}, {"k": "Simple or compound?", "s": "Earns interest on past interest too.", "o": ["Simple", "Compound"], "c": 1, "w": "<b>Compound.</b>"}, {"k": "Simple or compound?", "s": "Graph is a straight line.", "o": ["Simple", "Compound"], "c": 0, "w": "<b>Simple.</b>"}, {"k": "Simple or compound?", "s": "Graph curves up and gets steeper.", "o": ["Simple", "Compound"], "c": 1, "w": "<b>Compound.</b>"}, {"k": "For me or against me?", "s": "Investing $50 a month starting at 18.", "o": ["Works for me", "Works against me"], "c": 0, "w": "<b>For me.</b>"}, {"k": "For me or against me?", "s": "Paying only the minimum on a credit card.", "o": ["Works for me", "Works against me"], "c": 1, "w": "<b>Against me.</b>"}, {"k": "For me or against me?", "s": "$5,000 in cash for 20 years while prices rise.", "o": ["Works for me", "Works against me"], "c": 1, "w": "<b>Against me</b>: inflation."}, {"k": "For me or against me?", "s": "Reinvesting growth in a retirement account.", "o": ["Works for me", "Works against me"], "c": 0, "w": "<b>For me.</b>"}, {"k": "Math", "s": "Rule of 72: years to double at 8%?", "o": ["16", "8", "9", "72"], "c": 2, "w": "72 ÷ 8 = <b>9</b>.", "m": 1}, {"k": "Math", "s": "Rule of 72: years to double at 4%?", "o": ["4", "24", "12", "18"], "c": 3, "w": "72 ÷ 4 = <b>18</b>.", "m": 1}, {"k": "Math", "s": "Debt at 24%: years to double?", "o": ["24", "3", "12", "6"], "c": 1, "w": "72 ÷ 24 = <b>3</b>.", "m": 1}, {"k": "Math", "s": "$10,000 at 10% compound: after 2 years?", "o": ["$20,000", "$11,000", "$12,100", "$12,000"], "c": 2, "w": "<b>$12,100.</b>", "m": 1}, {"k": "Math", "s": "1¢ doubling: value on day 8?", "o": ["$0.08", "$1.28", "$0.64", "$2.56"], "c": 1, "w": "0.01 × 2<sup>7</sup> = <b>$1.28</b>.", "m": 1}, {"k": "Math", "s": "Prices double. $10,000 buys what ___ buys today?", "o": ["$20,000", "$2,500", "$5,000", "$10,000"], "c": 2, "w": "<b>$5,000.</b>", "m": 1}, {"k": "Which one?", "s": "Who ends with the most at 62 (same $100/month)?", "o": ["Starts at 18", "Starts at 28", "Starts at 38"], "c": 0, "w": "<b>18</b>: the most years to grow."}, {"k": "Which one?", "s": "Which $100K is usually hardest?", "o": ["The first", "The second", "The fifth"], "c": 0, "w": "<b>The first.</b>"}, {"k": "True or false?", "s": "Starting early guarantees a million dollars.", "o": ["True", "False"], "c": 1, "w": "<b>False</b>: returns are assumptions."}, {"k": "True or false?", "s": "$100 a month is too small to matter.", "o": ["True", "False"], "c": 1, "w": "<b>False</b>: time makes small amounts grow."}, {"k": "Which one?", "s": "Penny doubling 30 days or $1,000,000 today?", "o": ["The penny", "The million"], "c": 0, "w": "<b>The penny</b>: about $5.37 million."}, {"k": "Which one?", "s": "Rule of 72 gives...", "o": ["An estimate", "An exact answer"], "c": 0, "w": "<b>An estimate.</b>"}];
+const COLORS=["--c1","--c2","--c3","--c4"], WHERE=["Blue corner","Red corner","Gold corner","Green corner"];
+const $=id=>document.getElementById(id);
+let G, tick=null;
+$("secs").value="15";
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function fresh(){ return {order:shuffle(ROUNDS.map((_,i)=>i)), i:0, phase:"ready", left:0, standing:30}; }
+function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
+function secsFor(r){ const s=+$("secs").value; return r.m?Math.max(s,30):s; }
+function ringSvg(frac){ const r=44, c=2*Math.PI*r;
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/>
+  ${frac>0?`<circle cx="50" cy="50" r="${r}" fill="none" stroke="${frac<.34?'var(--bad)':'var(--accent)'}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(c*frac).toFixed(1)} ${c.toFixed(1)}"/>`:""}</svg>`; }
+function render(){
+  const st=$("stage"), surv=$("mode").value==="survivor";
+  if(G.i>=G.order.length){ stopTick();
+    st.innerHTML=`<div class="end"><span class="kind">Game over</span><h2>${surv?`${G.standing} still standing!`:"Nice work!"}</h2>
+      <p class="why" style="border:none">You finished all ${G.order.length} rounds.${surv?" Everyone standing is a Compound Corners champion.":""}</p>
+      <button class="btn primary" id="again">Play again (new order)</button></div>`;
+    $("again").onclick=()=>{ G=fresh(); render(); }; return; }
+  const r=ROUNDS[G.order[G.i]], secs=secsFor(r), revealed=G.phase==="reveal";
+  const frac= G.phase==="timing" ? G.left/secs : (revealed?0:1);
+  let h=`<div class="top"><span>Round ${G.i+1} of ${G.order.length}</span>${surv?`<span class="surv">Standing: <button id="sm" aria-label="One fewer standing">−</button><span class="count">${G.standing}</span><button id="sp" aria-label="One more standing">+</button></span>`:""}</div>
+    <div class="qrow"><div><span class="kind">${r.k}</span><p class="stmt">${r.s}</p></div>
+      <div class="ring" role="timer" aria-label="${G.phase==="timing"?G.left+' seconds left':'timer'}">${ringSvg(frac)}<div class="n">${G.phase==="timing"?G.left:revealed?"0":secs}</div></div></div>
+    <div class="corners">${r.o.map((o,k)=>`<div class="corner ${revealed?(k===r.c?'win':'dim'):''}" style="background:var(${COLORS[k]})"><span class="where">${WHERE[k]}</span><span class="lab">${o}</span></div>`).join("")}</div>`;
+  if(revealed) h+=`<div class="why">${r.w}</div>`;
+  h+=`<div class="row">${G.phase==="ready"?`<button class="btn primary" id="go">Start timer: go to your corner!</button><button class="btn" id="now">Reveal now</button>`:
+     G.phase==="timing"?`<button class="btn" id="now">Reveal now</button>`:
+     `<button class="btn primary" id="next">${G.i===G.order.length-1?"Finish":"Next round"}</button>`}</div>`;
+  st.innerHTML=h;
+  $("go")&&($("go").onclick=startTimer);
+  $("now")&&($("now").onclick=reveal);
+  $("next")&&($("next").onclick=()=>{ G.i++; G.phase="ready"; render(); $("go")?.focus(); });
+  $("sm")&&($("sm").onclick=()=>{ G.standing=Math.max(0,G.standing-1); render(); });
+  $("sp")&&($("sp").onclick=()=>{ G.standing++; render(); });
+}
+function startTimer(){ G.phase="timing"; G.left=secsFor(ROUNDS[G.order[G.i]]); render();
+  stopTick(); tick=setInterval(()=>{ G.left--; if(G.left<=0) reveal(); else render(); },1000); }
+function reveal(){ stopTick(); G.phase="reveal"; render(); $("next")?.focus(); }
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="SELECT"||e.target.tagName==="INPUT") return;
+  if(e.key===" "||e.key==="Enter"){ const b=$("go")||$("next")||$("now"); if(b && document.activeElement!==b){ e.preventDefault(); b.click(); } } });
+$("restart").onclick=()=>{ const b=$("restart");
+  if(b.dataset.c){ stopTick(); G=fresh(); render(); b.textContent="Restart"; delete b.dataset.c; }
+  else { b.dataset.c=1; b.textContent="Click again to restart"; setTimeout(()=>{ b.textContent="Restart"; delete b.dataset.c; },3000); } };
+$("mode").onchange=render;
+function start(d){ G=(d&&d.G)||fresh(); if(G.phase==="timing") G.phase="ready"; render(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

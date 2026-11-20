@@ -1,0 +1,232 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cover Me</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: an insurance or estate-planning card on the left; the work sheet on the right figures deductibles and coinsurance and matches the right protection. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --card:#EEF3F6; --card-line:#B3C7D3; --card-ink:#18303D; --punch:#2C7A8C;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#152129; --card-line:#2E4654; --card-ink:#E0ECF2; --punch:#6FC7DA; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --card:#152129; --card-line:#2E4654; --card-ink:#E0ECF2; --punch:#6FC7DA; color-scheme:dark }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; margin:0; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .inner { max-width:1180px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .stats { display:flex; gap:16px; font-family:var(--mono); font-size:15px; flex-wrap:wrap; align-items:center; }
+.bar .stats b { color:var(--gold); font-variant-numeric:tabular-nums; }
+.wrap { max-width:1180px; margin:0 auto; padding-block:20px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.game { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.1fr); gap:20px; align-items:start; }
+@media (max-width:820px) { .game { grid-template-columns:1fr; } }
+.progress { height:8px; background:var(--line); border-radius:99px; overflow:hidden; grid-column:1/-1; }
+.progress i { display:block; height:100%; background:var(--ok); transition:width .3s; }
+/* timecard */
+.tc { background:var(--card); color:var(--card-ink); border:1px solid var(--card-line); border-radius:6px; padding:18px; font-family:var(--mono); font-size:15px; display:grid; gap:10px; min-width:0; position:relative; }
+.tc .tag { font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:.08em; padding:3px 10px; border-radius:99px; justify-self:start; background:var(--punch); color:var(--card); }
+.choices { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
+.ch { font:inherit; font-weight:700; padding:10px 16px; border-radius:10px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.ch.sel { border-color:var(--gold); background:rgba(224,168,0,.16); }
+.ch.right { border-color:var(--ok); background:var(--ok-soft); }
+.ch:disabled { cursor:default; }
+.field.wide { grid-template-columns:1fr; }
+.tc::before { content:""; }
+.plastic { position:relative; aspect-ratio:1.586; max-width:340px; width:100%; border-radius:14px; color:#fff; padding:14px 16px; display:grid; grid-template-rows:auto 1fr auto auto; font-family:var(--mono); box-shadow:0 10px 24px rgba(20,20,40,.25); background:linear-gradient(135deg,#3B2A7A,#6B4FB0); }
+.plastic.cash { background:linear-gradient(135deg,#0E5E4A,#1F9A78); } .plastic.travel { background:linear-gradient(135deg,#14213D,#2F5FB8); } .plastic.student { background:linear-gradient(135deg,#8C5A12,#D19A2E); } .plastic.secured { background:linear-gradient(135deg,#3A3F4B,#6B7280); }
+.plastic .pn { font-family:var(--display); font-weight:800; font-size:18px; }
+.plastic .chip { width:40px; height:30px; border-radius:6px; background:linear-gradient(135deg,#E8C766,#B8912E); align-self:center; }
+.plastic .num { font-size:17px; letter-spacing:.12em; }
+.plastic .holder { font-size:12px; letter-spacing:.1em; opacity:.85; }
+.tc .kind { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--punch); font-weight:600; }
+.tc h2 { font-family:var(--display); font-size:24px; margin:0; line-height:1.1; color:var(--card-ink); }
+.tc .who { display:flex; flex-wrap:wrap; gap:4px 16px; }
+.tc .who b { font-weight:600; }
+.tc table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.tc th, .tc td { border-bottom:1px dashed var(--card-line); padding:5px 4px; text-align:left; }
+.tc td:last-child, .tc th:last-child { text-align:right; }
+.tc th { font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; }
+.tc .stamp { color:var(--punch); font-weight:600; }
+.tc .rule { border:1px solid var(--card-line); border-radius:6px; padding:8px 10px; font-size:14px; line-height:1.4; font-family:var(--body); }
+.tc .story { font-family:var(--body); font-size:17px; line-height:1.45; }
+/* answer sheet */
+.sheet { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px, 2.6vw, 26px); display:grid; gap:12px; min-width:0; }
+.sheet .eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.field { display:grid; grid-template-columns:minmax(0, 1fr) minmax(120px, 190px); gap:10px; align-items:center; padding:8px 10px; border-radius:12px; border:2px solid transparent; }
+.field.ok { background:var(--ok-soft); border-color:var(--ok); }
+.field.no { background:var(--bad-soft); border-color:var(--bad); }
+.field.shown { background:var(--bad-soft); }
+.field .q { line-height:1.3; }
+.field .q small { display:block; color:var(--muted); font-family:var(--mono); font-size:13px; margin-top:2px; }
+.field .msg { grid-column:1/-1; font-size:15px; line-height:1.35; }
+.inp { display:flex; align-items:center; border:2px solid var(--line); border-radius:10px; background:var(--bg); padding:0 10px; min-width:0; }
+.inp:focus-within { border-color:var(--gold); }
+.inp span { font-family:var(--mono); color:var(--muted); }
+.inp input { flex:1; min-width:0; border:none; background:transparent; color:var(--ink); font-family:var(--mono); font-size:20px; padding:9px 6px; outline:none; }
+.inp input:disabled { color:var(--ink); }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.bar .btn { color:var(--hero-ink); background:transparent; border-color:rgba(255,255,255,.3); padding:8px 14px; }
+.btn:focus-visible, input:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.note { color:var(--muted); font-size:15px; margin:0; }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 30px); display:grid; gap:14px; }
+.panel h2 { font-family:var(--display); font-weight:800; font-size:clamp(28px, 4vw, 44px); margin:0; line-height:1.05; text-wrap:balance; }
+.panel p { margin:0; line-height:1.45; max-width:65ch; }
+.steps { margin:0; padding-left:22px; line-height:1.6; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 7vw, 68px); line-height:1; color:var(--ok); font-variant-numeric:tabular-nums; }
+.skills { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.skill { border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px; }
+.skill b { font-family:var(--display); font-size:18px; }
+.skill .v { font-family:var(--mono); font-size:15px; }
+.pill { justify-self:start; font-size:13px; font-weight:700; padding:2px 10px; border-radius:99px; }
+.pill.g { background:var(--ok-soft); color:var(--ok); } .pill.a { background:rgba(224,168,0,.18); color:var(--ink); } .pill.r { background:var(--bad-soft); color:var(--bad); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition:none; } }
+</style>
+
+<header class="bar"><div class="inner"><h1>Cover <span>Me</span></h1><div class="stats" id="stats"></div></div></header>
+<div class="wrap" id="root"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
+const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt0=x=>"$"+x.toLocaleString("en-US");
+const n0=x=>x.toLocaleString("en-US");
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
+const SKILL={trust:"Trusts & health plans", health:"Health insurance math", type:"Types of insurance", life:"Life insurance", estate:"Estate planning"};
+const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
+function mkHealth(){ const ded=pick([500,1000,1500,2000]), co=pick([10,20,30]), oop=pick([4000,5000,6000]), bill=pick([1800,3200,6500,9000,24000]);
+  const after=Math.max(0,bill-ded), coins=r2(after*co/100), raw=r2(Math.min(bill,ded)+coins), you=Math.min(raw,oop);
+  const F=[{k:"d", type:"health", q:"You pay the deductible first. How much of the deductible do you pay on this bill?", a:Math.min(bill,ded), miss:[]},
+     {k:"c", type:"health", q:`Your ${co}% coinsurance on the rest`, sub:`(bill − deductible) × ${co/100}`, a:coins, miss:[[bill*co/100,"Subtract the deductible first."]]},
+     {k:"y", type:"health", q:"Total YOU pay (never more than the out-of-pocket max)", a:you, miss:[[raw,"Check the out-of-pocket maximum."],[bill,"Insurance pays its share after the deductible."]]}];
+  return {kind:"Health insurance math", title:`A ${fmt0(bill)} hospital bill`, html:tbl([["Deductible",fmt0(ded)],["Coinsurance","You pay "+co+"%, insurance pays "+(100-co)+"%"],["Out-of-pocket maximum",fmt0(oop)+" per year"]])+`<div class="rule">Order: deductible → coinsurance → stop at the out-of-pocket max.</div>`, F}; }
+function mkPrem(){ const p=pick([180,240,310]), ded=pick([500,3000]), alt=ded===500?3000:500, p2=ded===500?p-pick([60,80]):p+pick([60,80]);
+  return {kind:"Premiums", title:"Two health plans", html:tbl([["Plan A",`${fmt0(p)}/month premium, ${fmt0(ded)} deductible`],["Plan B",`${fmt0(p2)}/month premium, ${fmt0(alt)} deductible`]]),
+   F:[{k:"a", type:"health", q:"Plan A yearly premiums", a:p*12, miss:[[p,"Multiply by 12 months."]]},{k:"b", type:"health", q:"Plan B yearly premiums", a:p2*12, miss:[[p2,"Multiply by 12."]]},
+      {k:"x", type:"type", choices:["Lower premium","Higher premium"], q:"A higher deductible usually comes with a...", a:"Lower premium", why:"You take on more cost when you need care, so the monthly price drops."}]}; }
+function mkTypes(){ const O=["Health","Auto","Renters/Homeowners","Disability","Life"];
+  return {kind:"Types of insurance", title:"Match the coverage", html:tbl([["Premium","What you pay to have insurance"],["Deductible","What you pay first on a claim"],["Policy","The insurance contract"],["Beneficiary","Who receives a life insurance payout"]]),
+   F:[{k:"t1", type:"type", choices:O, q:"Replaces part of your paycheck if you can't work after an injury", a:"Disability", why:"Disability insurance protects your income."},
+      {k:"t2", type:"type", choices:O, q:"Covers your stolen laptop from your apartment", a:"Renters/Homeowners", why:"Renters insurance covers your belongings."},
+      {k:"t3", type:"type", choices:O, q:"Pays your family if you die", a:"Life", why:"Paid to your beneficiary."},
+      {k:"t4", type:"type", choices:O, q:"Lowers the cost of a doctor visit", a:"Health", why:"Health insurance."}]}; }
+function mkLife(){ const inc=pick([45000,52000,60000,75000]), need=inc*10, nm=pick(["Maria","Devon","Hana","Andre"]);
+  return {kind:"Life insurance", title:`${nm} earns ${fmt0(inc)} and has two kids`, html:tbl([["Term life","Covers a set time (like 20 years). Much cheaper. No cash value."],["Whole life","Covers your whole life. Builds cash value. Much more expensive."],["Rule of thumb","About 10 × yearly income"]]),
+   F:[{k:"n", type:"life", q:"Life insurance needed (10 × income)", a:need, miss:[[inc,"Multiply by 10."]]},{k:"k", type:"life", choices:["Term life","Whole life"], q:"Cheapest way to cover the years the kids depend on them?", a:"Term life", why:"Term covers the years your family depends on your income, for much less."},
+      {k:"s", type:"life", choices:["Usually no","Yes, always"], q:"Does a single 18-year-old with no dependents usually need life insurance?", a:"Usually no", why:"Life insurance replaces income for people who depend on you."}]}; }
+function mkEstate(){ const O=["Will","Beneficiary","Power of attorney","Healthcare directive"];
+  return {kind:"Estate planning", title:"Plan for the unexpected", html:tbl([["Will","Says who gets your property and who cares for your kids"],["Beneficiary","Person named on an account or policy to receive it"],["Power of attorney","Lets someone handle your money if you can't"],["Healthcare directive","States your medical wishes if you can't speak"],["Probate","The court process for settling an estate"]]),
+   F:[{k:"e1", type:"estate", choices:O, q:"Names who raises your children if you die", a:"Will", why:"A will can name a guardian."},
+      {k:"e2", type:"estate", choices:O, q:"The person you list on your 401(k) to receive it", a:"Beneficiary", why:"Beneficiary designations go straight to that person."},
+      {k:"e3", type:"estate", choices:O, q:"Lets your sister pay your bills while you're in a coma", a:"Power of attorney", why:"A financial power of attorney."},
+      {k:"e4", type:"estate", choices:O, q:"Says whether you want life support", a:"Healthcare directive", why:"Also called a living will."}]}; }
+function mkTrust(){ const O=["Grantor","Trustee","Beneficiary","Executor"], P=["HMO","PPO","CDHP/HSA"];
+  return {kind:"Trusts & health plans", title:"Who does what?", html:tbl([["Grantor","Creates the trust"],["Trustee","Manages the assets in the trust"],["Beneficiary","Receives the assets"],["Executor","Carries out the wishes in a will"],["Revocable living trust","Can usually be updated"],["Irrevocable trust","Generally can't be easily changed"],["HMO · PPO · CDHP/HSA","Network doctors, lower cost · more flexibility, higher cost · higher deductible, lower premium, HSA eligible"]]),
+   F:[{k:"g", type:"estate", choices:O, q:"In the Mock Trust, you create the trust. You are the...", a:"Grantor", why:"You're also the trustee in the class version."},
+      {k:"b", type:"estate", choices:O, q:"Your little brother will receive your trading cards. He is the...", a:"Beneficiary", why:"Beneficiaries receive the assets."},
+      {k:"e", type:"estate", choices:O, q:"The person named in a will to carry out your wishes", a:"Executor", why:"Wills name an executor."},
+      {k:"p", type:"trust", choices:["Avoid probate","Avoid income tax","Guarantee growth"], q:"A big reason to use a trust instead of only a will?", a:"Avoid probate", why:"Probate is the court process of validating a will."},
+      {k:"h", type:"trust", choices:P, q:"You want lower cost and don't mind using network doctors. Which plan?", a:"HMO", why:"HMOs keep costs lower with a network."}]}; }
+function makeRound(){ return [mkHealth(), mkTypes(), mkTrust(), ...shuffle([mkPrem(), mkLife(), mkEstate()])]; }
+let G=null, best=null;
+try{ best=+localStorage.getItem("cover-me-best")||null; }catch(e){}
+function stats(){ const el=$("stats");
+  if(!G){ el.innerHTML=`<span>Unit 9: Insurance, Budgeting & Estate</span>`; return; }
+  el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
+  $("quit")&&($("quit").onclick=intro); }
+function intro(){
+  G=null; stats();
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 9 · Insurance & estate planning</div>
+    <h2>Protect your money, your health and the people you love.</h2>
+    <p>Six cards: what you really pay on a medical bill, premiums vs. deductibles, types of insurance, life insurance, and wills, beneficiaries and powers of attorney.</p>
+    <ol class="steps"><li><b>Medical bill:</b> you pay the deductible, then coinsurance, up to the out-of-pocket max.</li><li><b>Higher deductible</b> usually means a lower premium.</li><li><b>Term life</b> is the low-cost way to protect people who depend on you.</li></ol>
+    <p>Typed answers: 10 points first try, 5 second. Tap answers: one try.${best?` <b>Your best: ${best}.</b>`:""}</p>
+    <div class="row"><button class="btn go" id="go">Get covered</button></div></div>`;
+  $("go").onclick=()=>{ G={cards:makeRound(), i:0, score:0, phase:"play", by:{}}; prep(); draw(); };
+}
+function prep(){ const c=G.cards[G.i]; c.st={}; c.tries={}; c.msg={}; c.val={}; c.done=false; }
+function card(o){ return `<div class="tc"><div class="kind">${o.kind}</div><h2>${o.title}</h2>${o.html}</div>`; }
+function draw(){
+  stats();
+  if(!G) return intro();
+  if(G.phase==="end") return end();
+  const c=G.cards[G.i], n=G.cards.length;
+  const fields=c.F.map(f=>{ const st=c.st[f.k], dis=st==="ok"||st==="shown";
+    if(f.choices) return `<div class="field wide ${st==="ok"?"ok":st==="shown"?"shown":""}"><div class="q">${esc(f.q)}</div>
+      <div class="choices" role="group">${f.choices.map(o=>{ let cl="ch"; if(dis&&o===f.a) cl+=" right"; else if(c.val[f.k]===o) cl+=" sel"; return `<button type="button" class="${cl}" data-k="${f.k}" data-o="${esc(o)}" ${dis?"disabled":""}>${esc(o)}</button>`; }).join("")}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`;
+    return `<div class="field ${st==="ok"?"ok":st==="shown"?"shown":c.msg[f.k]?"no":""}">
+      <label class="q" for="f-${f.k}">${esc(f.q)}${f.sub?`<small>${esc(f.sub)}</small>`:""}</label>
+      <div class="inp">${f.unit?"":"<span>$</span>"}<input id="f-${f.k}" inputmode="decimal" autocomplete="off" value="${esc(c.val[f.k]??"")}" ${dis?"disabled":""}>${f.unit?`<span>${f.unit}</span>`:""}</div>
+      ${c.msg[f.k]?`<div class="msg">${esc(c.msg[f.k])}</div>`:""}</div>`; }).join("");
+  $("root").innerHTML=`<div class="game">
+    <div class="progress" aria-hidden="true"><i style="width:${(G.i+(c.done?1:0))/n*100}%"></i></div>
+    ${card(c)}
+    <form class="sheet" id="sheet" novalidate>
+      <div class="eyebrow">Card ${G.i+1} of ${n}</div>
+      ${fields}
+      <div class="row">${c.done?`<button class="btn go" type="button" id="next">${G.i+1<n?"Next card":"See my results"}</button>`:`<button class="btn go" type="submit">Check</button>`}</div>
+      <p class="note">Round money to the cent. Use a calculator.</p>
+    </form></div>`;
+  if(c.done){ $("next").onclick=next; $("next").focus({preventScroll:true}); return; }
+  $("sheet").onsubmit=e=>{ e.preventDefault(); check(); };
+  c.F.forEach(f=>{ if(f.choices) return; const el=$("f-"+f.k); el&&el.addEventListener("input",()=>{ c.val[f.k]=el.value; }); });
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{ c.val[b.dataset.k]=b.dataset.o; draw(); });
+}
+function check(){
+  const c=G.cards[G.i];
+  c.F.forEach(f=>{ if(c.st[f.k]==="ok"||c.st[f.k]==="shown") return; const b=G.by[f.type]||(G.by[f.type]=[0,0]);
+    if(f.choices){ const v=c.val[f.k]; if(!v){ c.msg[f.k]="Tap an answer."; return; } b[1]++;
+      if(v===f.a){ G.score+=10; b[0]++; c.st[f.k]="ok"; c.msg[f.k]=f.why; } else { c.st[f.k]="shown"; c.msg[f.k]="Best answer: "+f.a+". "+f.why; } return; }
+    const v=num(c.val[f.k]??""), tol=f.tol||.015; if(!c.tries[f.k]) b[1]++;
+    if(!isNaN(v)&&Math.abs(v-f.a)<=tol){ const pts=c.tries[f.k]?5:10; G.score+=pts; if(!c.tries[f.k]) b[0]++; c.st[f.k]="ok"; c.msg[f.k]=c.tries[f.k]?"Got it on the second try. +5":""; return; }
+    c.tries[f.k]=(c.tries[f.k]||0)+1;
+    const hit=isNaN(v)?null:(f.miss||[]).find(([x])=>Math.abs(v-r2(x))<=.02&&Math.abs(r2(x)-f.a)>tol);
+    const show=f.unit?n0(f.a)+" "+f.unit:fmt(f.a);
+    if(c.tries[f.k]>=2){ c.st[f.k]="shown"; c.val[f.k]=String(f.a); c.msg[f.k]=(hit?hit[1]+" ":"")+"Answer: "+show+"."; }
+    else c.msg[f.k]=isNaN(v)?"Type a number.":(hit?hit[1]:"Not quite. Check the card again.")+" Try again.";
+  });
+  c.done=c.F.every(f=>c.st[f.k]==="ok"||c.st[f.k]==="shown");
+  draw();
+}
+function next(){ G.i++; if(G.i>=G.cards.length){ G.phase="end"; if(!best||G.score>best){ best=G.score; try{ localStorage.setItem("cover-me-best",String(best)); }catch(e){} } } else prep(); draw(); }
+function end(){
+  stats();
+  const max=G.cards.reduce((s,c)=>s+c.F.length*10,0);
+  const rows=Object.keys(SKILL).filter(k=>G.by[k]).map(k=>{ const [a,t]=G.by[k], p=a/t;
+    return `<div class="skill"><b>${SKILL[k]}</b><span class="v">${a} of ${t} first try</span>${p>=.8?`<span class="pill g">Got it</span>`:p>=.6?`<span class="pill a">Almost</span>`:`<span class="pill r">Study this</span>`}</div>`; }).join("");
+  $("root").innerHTML=`<div class="panel">
+    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Round complete</div>
+    <div class="big">${G.score} <span style="font-size:.45em;color:var(--muted)">/ ${max}</span></div>
+    <div class="skills">${rows}</div>
+    <p>Insurance protects against costs you could not handle alone. A will and beneficiaries make sure your money goes where you choose.</p>
+    <div class="row"><button class="btn go" id="again">New cards</button></div></div>`;
+  $("again").onclick=intro;
+}
+function start(d){ if(d&&d.G){ G=d.G; draw(); } else intro(); }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>
