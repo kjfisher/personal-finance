@@ -97,7 +97,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
     <button class="chip" data-f="u2" aria-pressed="false">Unit 2: Pay Stubs</button>
     <button class="chip" data-f="u3" aria-pressed="false">Unit 3: Banking</button>
     <button class="chip" data-f="u4" aria-pressed="false">Unit 4: Credit</button>
-    <button class="chip" data-f="mid" aria-pressed="false">Midterm (Units 1–4)</button>
+    <button class="chip" data-f="mid" aria-pressed="false">Midterm (Units 0–4)</button>
     <button class="chip" data-f="u5" aria-pressed="false">Unit 5: Cars &amp; Lending</button>
     <button class="chip" data-f="u6" aria-pressed="false">Unit 6: Real Estate</button>
     <button class="chip" data-f="u7" aria-pressed="false">Unit 7: Investing</button>
@@ -237,9 +237,9 @@ const GAMES=[
   d:"Grow a CD with simple and compound interest, dodge fees and penalties, and pick the right account and bank.", url:"/savings-lab/"},
  {f:"u4", where:"solo", isNew:true, name:"Read the Fine Print", big:"APR", color:"--t18", unit:"Unit 4 - Credit", tags:["Solo","6 offers"],
   d:"Compare credit card offers: earn the rewards, price out the interest, and figure out who each card is really for.", url:"/read-the-fine-print/"},
- {f:"mid", where:"solo", blooket:true, isNew:true, name:"Units 1–4 Blooket", big:"60 Qs", color:"--t20", unit:"Midterm - Units 1–4", tags:["Solo","Any game mode"],
+ {f:"mid", where:"solo", blooket:true, isNew:true, name:"Units 1–4 Blooket", big:"60 Qs", color:"--t20", unit:"Midterm - Units 0–4", tags:["Solo","Any game mode"],
   d:"Fifteen questions from each unit: paychecks, pay stubs, banking and credit.", url:"https://play.blooket.com/"},
- {f:"mid", where:"solo", name:"Money Math Sprint", big:"3:00", color:"--t1", unit:"Midterm - Units 1–4", tags:["Solo","3 min or untimed"],
+ {f:"mid", where:"solo", name:"Money Math Sprint", big:"3:00", color:"--t1", unit:"Midterm - Units 0–4", tags:["Solo","3 min or untimed"],
   d:"Race the clock on paycheck, pay stub, CD interest and credit utilization math. Wrong answers show the steps.", url:"/money-math-sprint/"},
  {f:"u1", where:"partner", isNew:true, name:"Deduction Duel", big:"7.65%", color:"--t3", unit:"Unit 1 - Payroll Deductions", tags:["2 players, 1 iPad","5–10 min"],
   d:"Gross vs. net, FICA, benefits, 401(k) match and checks. Same question on both sides. First correct tap scores.", url:"/deduction-duel/"},
@@ -261,9 +261,9 @@ const GAMES=[
   d:"Overtime, pay types, commission, YTD, reading the stub and an Is It Right? category, with a build-the-stub final round.", url:"/pay-stub-showdown/"},
  {f:"u3", where:"class", isNew:true, name:"Bank Showdown", big:"500", color:"--t16", unit:"Unit 3 - Banking", tags:["Teams","25–30 min"],
   d:"Accounts, interest and CDs, FDIC, overdrafts, debit vs. credit and reading a statement, with a grow-the-CD final round.", url:"/bank-showdown/"},
- {f:"mid", where:"class", name:"Future Millionaire", big:"$1M", color:"--t6", unit:"Midterm - Units 1–4", tags:["Whole class","15 min"],
+ {f:"mid", where:"class", name:"Future Millionaire", big:"$1M", color:"--t6", unit:"Midterm - Units 0–4", tags:["Whole class","15 min"],
   d:"Climb the money ladder with 15 questions, three lifelines and three strikes.", url:"/future-millionaire/"},
- {f:"mid", where:"class", name:"Midterm Showdown", big:"500", color:"--t2", unit:"Midterm - Units 1–4", tags:["Teams","25–30 min"],
+ {f:"mid", where:"class", name:"Midterm Showdown", big:"500", color:"--t2", unit:"Midterm - Units 0–4", tags:["Teams","25–30 min"],
   d:"Team board game covering paychecks, pay stubs, banking and credit, with a wager final round.", url:"/midterm-showdown/"},
  {f:"u4", where:"class", isNew:true, name:"Minimum Payment Trap", big:"74 yrs", color:"--t19", unit:"Unit 4 - Credit", tags:["Whole class","15 min"],
   d:"Predict, then watch Matt and Mark pay off $10,000 one minimum payment at a time. Then try your own card.", url:"/minimum-payment-trap/"},
@@ -281,9 +281,9 @@ const GAMES=[
   d:"Overtime, pay types, commission, YTD and a pay stub to finish. Six locks, one vault code.", url:"/pay-stub-vault/"},
  {f:"u3", where:"partner", isNew:true, name:"Bank Vault", big:"6 locks", color:"--t16", unit:"Unit 3 - Banking", tags:["Partners or teams","15–20 min"],
   d:"Pick accounts, read a statement, survive an overdraft and grow a CD to open the vault.", url:"/bank-vault/"},
- {f:"mid", where:"partner", isNew:true, name:"Midterm Vault", big:"6 locks", color:"--t20", unit:"Midterm - Units 1–4", tags:["Partners or teams","20 min"],
+ {f:"mid", where:"partner", isNew:true, name:"Midterm Vault", big:"6 locks", color:"--t20", unit:"Midterm - Units 0–4", tags:["Partners or teams","20 min"],
   d:"One lock for every unit: paychecks, pay stubs, banking and credit. Escape before the midterm.", url:"/midterm-vault/"},
- {f:"mid", where:"partner", isNew:true, name:"Midterm Duel", big:"1 vs 1", color:"--t6", unit:"Midterm - Units 1–4", tags:["2 players, 1 iPad","5–10 min"],
+ {f:"mid", where:"partner", isNew:true, name:"Midterm Duel", big:"1 vs 1", color:"--t6", unit:"Midterm - Units 0–4", tags:["2 players, 1 iPad","5–10 min"],
   d:"32 questions from all four units. Same question on both sides. First correct tap scores.", url:"/midterm-duel/"},
  {f:"u1", where:"class", isNew:true, name:"Paycheck Corners", big:"4 corners", color:"--t11", unit:"Unit 1 - Payroll Deductions", tags:["Get up and move","10–15 min"],
   d:"Gross or net? Tax or benefit? Walk to your corner before the timer runs out.", url:"/paycheck-corners/"},
@@ -291,7 +291,7 @@ const GAMES=[
   d:"Hourly, salary or commission? Overtime or not? Pay period or pay date? Pick a corner.", url:"/pay-stub-corners/"},
  {f:"u3", where:"class", isNew:true, name:"Bank Corners", big:"4 corners", color:"--t16", unit:"Unit 3 - Banking", tags:["Get up and move","10–15 min"],
   d:"Checking, savings, HYSA or CD? Earn or pay interest? Debit or credit? Move to your answer.", url:"/bank-corners/"},
- {f:"mid", where:"class", isNew:true, name:"Midterm Corners", big:"4 corners", color:"--t20", unit:"Midterm - Units 1–4", tags:["Get up and move","15 min"],
+ {f:"mid", where:"class", isNew:true, name:"Midterm Corners", big:"4 corners", color:"--t20", unit:"Midterm - Units 0–4", tags:["Get up and move","15 min"],
   d:"Twenty rounds, five from each unit. Survivor mode: last one standing wins.", url:"/midterm-corners/"}
 ];
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
