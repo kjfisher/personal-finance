@@ -1,0 +1,158 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Compound Vault</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a vault door. Top bar = team name, timer, code digits earned. Below, six lock cards in a grid; each opens into its puzzle. Final keypad appears when all six are open. */
+:root {
+  --bg:#E9EDF2; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#C6CFDC;
+  --steel:#1F5E33; --steel-ink:#E8EDF5; --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800; --bad:#C23B3B;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0B1220; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --steel:#17482A; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0B1220; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --steel:#17482A; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
+.wrap { max-width:1200px; margin:0 auto; padding-block:18px 28px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+.bar { background:var(--steel); color:var(--steel-ink); border-radius:16px; padding:16px 20px; display:flex; flex-wrap:wrap; gap:14px 24px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3.6vw, 42px); margin:0; line-height:1; }
+.bar .tag { font-size:14px; letter-spacing:.08em; text-transform:uppercase; opacity:.75; margin-top:4px; }
+.stat { display:grid; gap:2px; }
+.stat .k { font-size:12px; letter-spacing:.1em; text-transform:uppercase; opacity:.7; }
+.stat .v { font-family:var(--mono); font-weight:600; font-size:clamp(22px, 2.6vw, 30px); font-variant-numeric:tabular-nums; }
+.digits { display:flex; gap:6px; }
+.digits span { width:34px; height:44px; border-radius:6px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:600; font-size:24px; }
+.digits span.got { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.team input { font:inherit; background:transparent; color:var(--steel-ink); border:none; border-bottom:1px dashed rgba(255,255,255,.4); font-size:18px; font-weight:700; width:170px; padding:2px 0; }
+.intro { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 20px; font-size:clamp(17px, 1.6vw, 20px); line-height:1.45; }
+.locks { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px; }
+.lock { background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:16px; display:grid; gap:10px; align-content:start; min-width:0; }
+.lock.open { border-color:var(--accent); }
+.lock .lh { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.lock .num { font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
+.lock h2 { font-family:var(--display); font-weight:800; font-size:clamp(20px, 2vw, 26px); margin:0; line-height:1.1; }
+.badge { font-family:var(--mono); font-weight:600; font-size:14px; padding:3px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
+.lock.open .badge { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.lock p { margin:0; line-height:1.4; }
+.field { display:grid; gap:4px; }
+.field label { font-weight:700; font-size:15px; }
+input.ans, select.ans { font:inherit; font-family:var(--mono); padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); width:100%; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { font:inherit; padding:6px 12px; border-radius:999px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; font-size:15px; }
+.chip[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:var(--bg); }
+.sortrow { display:grid; grid-template-columns:minmax(0,1fr) 150px; gap:8px; align-items:center; font-size:15px; }
+.mini { width:100%; border-collapse:collapse; font-size:13px; }
+.mini th, .mini td { border:1px solid var(--line); padding:4px 6px; text-align:left; }
+.mini td.m { font-family:var(--mono); }
+.scroll { overflow-x:auto; }
+.acts { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.btn { font:inherit; padding:9px 14px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; font-weight:700; }
+.btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btn:focus-visible, .chip:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.msg { font-weight:700; font-size:15px; }
+.msg.no { color:var(--bad); } .msg.yes { color:var(--accent); }
+.hint { font-size:15px; color:var(--muted); border-left:3px solid var(--gold); padding-left:10px; }
+.shake { animation:shake .35s; }
+@keyframes shake { 25%{transform:translateX(-6px)} 50%{transform:translateX(6px)} 75%{transform:translateX(-4px)} }
+.final { background:var(--steel); color:var(--steel-ink); border-radius:16px; padding:20px; display:grid; gap:12px; justify-items:center; text-align:center; }
+.final h2 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3.4vw, 40px); margin:0; }
+.final input { font-family:var(--mono); font-size:clamp(28px, 4vw, 44px); letter-spacing:.35em; text-align:center; width:min(360px, 100%); padding:10px; border-radius:10px; border:2px solid var(--gold); background:rgba(0,0,0,.25); color:var(--steel-ink); }
+.won { font-size:clamp(18px, 2vw, 24px); line-height:1.5; }
+.won .big { font-family:var(--display); font-weight:800; font-size:clamp(40px, 6vw, 72px); color:var(--gold); }
+@media (prefers-reduced-motion: reduce) { .shake { animation:none; } }
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <div><h1>Compound Vault</h1><div class="tag">Personal Finance - Unit 0 Review</div></div>
+    <div class="stat team"><span class="k">Team</span><input id="teamName" aria-label="Team name" placeholder="Team name"></div>
+    <div class="stat"><span class="k">Time</span><span class="v" id="clock">0:00</span></div>
+    <div class="stat"><span class="k">Vault code</span><div class="digits" id="digits"></div></div>
+  </div>
+  <div class="intro" id="intro"><b>Future you’s retirement fund is locked in the vault.</b> Crack all 6 locks, in any order. Each lock gives you one digit of the vault code. Each hint adds 1 minute to your time. Use a calculator. The fastest team to escape wins.</div>
+  <div class="locks" id="locks"></div>
+  <div id="finalBox"></div>
+</div>
+
+<script>
+const LOCKS=[{"id": "sc", "title": "Simple vs. Compound", "digit": 7, "hint": "Simple: 5,000 × (1 + 0.10 × 2). Compound: 5,000 × 1.10 × 1.10.", "text": "<b>$5,000</b> earns <b>10%</b> a year for <b>2 years</b>.", "fields": [{"id": "a1", "label": "Simple interest balance ($)", "a": 6000, "tol": 0.01}, {"id": "a2", "label": "Compound interest balance ($)", "a": 6050, "tol": 0.01}, {"id": "a3", "label": "Extra from compounding ($)", "a": 50, "tol": 0.01}]}, {"id": "r72", "title": "Rule of 72", "digit": 3, "hint": "Years = 72 ÷ rate. Rate = 72 ÷ years.", "text": "Use the Rule of 72.", "fields": [{"id": "b1", "label": "Years to double at 6%", "a": 12, "tol": 0.01}, {"id": "b2", "label": "Years to double at 9%", "a": 8, "tol": 0.01}, {"id": "b3", "label": "Rate that doubles money in 4 years (%)", "a": 18, "tol": 0.01}]}, {"id": "penny", "title": "The Penny", "digit": 5, "hint": "Day 1 = $0.01. Each day × 2. Day 10 = 0.01 × 2 nine times.", "text": "A penny doubles every day. Day 1 = <b>$0.01</b>.", "fields": [{"id": "c1", "label": "Day 10 ($)", "a": 5.12, "tol": 0.01}, {"id": "c2", "label": "Day 20 ($)", "a": 5242.88, "tol": 0.01}]}, {"id": "debt", "title": "The Debt Doubler", "digit": 9, "hint": "72 ÷ 24. Then count the doublings in 9 years.", "text": "Jordan owes <b>$1,200</b> on a card at <b>24% APR</b> and makes no payments.", "fields": [{"id": "d1", "label": "Years for the debt to double", "a": 3, "tol": 0.01}, {"id": "d2", "label": "Balance after 9 years ($)", "a": 9600, "tol": 0.01}]}, {"id": "infl", "title": "Inflation", "digit": 2, "hint": "72 ÷ 3. When prices double, cash buys half as much.", "text": "Prices rise <b>3%</b> a year. Leo keeps <b>$10,000</b> in cash under his bed.", "fields": [{"id": "e1", "label": "Years for prices to double", "a": 24, "tol": 0.01}, {"id": "e2", "label": "After that, his $10,000 buys what this much buys today ($)", "a": 5000, "tol": 0.01}]}, {"id": "side", "title": "For Me or Against Me?", "digit": 8, "hint": "Growth you earn works for you. Interest you owe and rising prices work against you.", "text": "Does compounding work for you or against you?", "fields": [{"id": "f1", "label": "Investing $100 a month starting at 18", "a": "For me", "options": ["For me", "Against me"]}, {"id": "f2", "label": "Carrying a credit card balance", "a": "Against me", "options": ["For me", "Against me"]}, {"id": "f3", "label": "Keeping savings in cash for 30 years", "a": "Against me", "options": ["For me", "Against me"]}, {"id": "f4", "label": "Reinvesting your investment growth", "a": "For me", "options": ["For me", "Against me"]}]}];
+const WIN="Time is on your side. Start early!";
+const N=s=>String(s).toLowerCase().replace(/[\s$,%]/g,"");
+const $=id=>document.getElementById(id);
+const v=id=>($(id)?.value||"").trim();
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const CODE=LOCKS.map(l=>l.digit).join("");
+function body(l){
+  let h=(l.text?`<p>${l.text}</p>`:"")+(l.html||"");
+  (l.fields||[]).forEach(f=>{ h+= f.options ? `<div class="sortrow"><label for="${f.id}">${f.label}</label><select class="ans" id="${f.id}"><option value="">—</option>${f.options.map(o=>`<option>${esc(o)}</option>`).join("")}</select></div>`
+    : `<div class="field"><label for="${f.id}">${f.label}</label><input class="ans" id="${f.id}" inputmode="decimal" autocomplete="off"></div>`; });
+  if(l.chips) h+=`<div class="chips" id="chips-${l.id}">${l.chips.map(x=>`<button class="chip" aria-pressed="false" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
+  return h; }
+function check(l){
+  const okF=(l.fields||[]).every(f=>{ const val=v(f.id); if(f.options) return val===f.a; const n=parseFloat(N(val)); return !isNaN(n)&&Math.abs(n-f.a)<=(f.tol??0.01); });
+  const okC=!l.chips||[...document.querySelectorAll(`#chips-${l.id} .chip[aria-pressed="true"]`)].map(c=>c.dataset.v).sort().join("|")===l.answer.slice().sort().join("|");
+  return okF&&okC; }
+let G, timer=null;
+function fresh(){ return {start:null, open:{}, hints:{}, tries:0, escaped:null, team:""}; }
+function elapsed(){ if(!G.start) return 0; const end=G.escaped||Date.now(); return Math.floor((end-G.start)/1000)+Object.keys(G.hints).length*60; }
+function fmt(s){ return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function tickClock(){ $("clock").textContent=fmt(elapsed()); }
+function renderDigits(){ $("digits").innerHTML=LOCKS.map(l=>`<span class="${G.open[l.id]?'got':''}">${G.open[l.id]?l.digit:"•"}</span>`).join(""); }
+function renderLocks(){
+  $("locks").innerHTML=LOCKS.map((l,i)=>{ const o=G.open[l.id];
+    return `<section class="lock ${o?'open':''}" id="lock-${l.id}" aria-labelledby="t-${l.id}">
+      <div class="lh"><span class="num">Lock ${i+1}</span><span class="badge">${o?"Open: digit "+l.digit:"Locked"}</span></div>
+      <h2 id="t-${l.id}">${l.title}</h2>
+      ${o?`<p class="msg yes">Unlocked! Your digit for lock ${i+1} is ${l.digit}.</p>`:`${body(l)}
+      ${G.hints[l.id]?`<div class="hint">${l.hint}</div>`:""}
+      <div class="acts"><button class="btn primary" data-try="${l.id}">Try to unlock</button>${G.hints[l.id]?"":`<button class="btn" data-hint="${l.id}">Hint (+1 min)</button>`}<span class="msg no" id="msg-${l.id}" aria-live="polite"></span></div>`}
+    </section>`; }).join("");
+  document.querySelectorAll(".chips .chip").forEach(c=>c.onclick=()=>{ begin(); c.setAttribute("aria-pressed", c.getAttribute("aria-pressed")==="true"?"false":"true"); });
+  document.querySelectorAll("[data-try]").forEach(b=>b.onclick=()=>tryLock(b.dataset.try));
+  document.querySelectorAll("[data-hint]").forEach(b=>b.onclick=()=>{ begin(); G.hints[b.dataset.hint]=true; keepInputs(()=>renderLocks()); tickClock(); });
+  document.querySelectorAll(".lock input, .lock select").forEach(el=>el.addEventListener("focus",begin,{once:true}));
+  renderFinal();
+}
+function keepInputs(fn){ const vals={}, chips={};
+  document.querySelectorAll(".lock .ans").forEach(el=>vals[el.id]=el.value);
+  document.querySelectorAll('.chips').forEach(g=>chips[g.id]=[...g.querySelectorAll('.chip[aria-pressed="true"]')].map(c=>c.dataset.v));
+  fn();
+  Object.entries(vals).forEach(([id,val])=>{ if($(id)) $(id).value=val; });
+  Object.entries(chips).forEach(([gid,list])=>{ const g=$(gid); if(g) g.querySelectorAll('.chip').forEach(c=>{ if(list.includes(c.dataset.v)) c.setAttribute("aria-pressed","true"); }); }); }
+function begin(){ if(!G.start){ G.start=Date.now(); timer=setInterval(tickClock,1000); } }
+function tryLock(id){ begin(); G.tries++; const l=LOCKS.find(x=>x.id===id);
+  if(check(l)){ G.open[id]=true; keepInputs(()=>renderLocks()); renderDigits(); $("lock-"+id)?.scrollIntoView({block:"nearest"}); }
+  else { const m=$("msg-"+id); m.textContent="Still locked. Check your answers."; const box=$("lock-"+id); box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); } }
+function renderFinal(){
+  const all=LOCKS.every(l=>G.open[l.id]), f=$("finalBox");
+  if(G.escaped){ clearInterval(timer);
+    f.innerHTML=`<div class="final"><h2>The vault is open!</h2><div class="won"><div>${G.team?`<b>${esc(G.team)}</b> escaped in`:"You escaped in"}</div><div class="big">${fmt(elapsed())}</div>
+      <div>${Object.keys(G.hints).length} hint${Object.keys(G.hints).length===1?"":"s"} used (included in your time). ${WIN}</div>
+      <div style="opacity:.8;font-size:16px;margin-top:6px">Show this screen to your teacher.</div></div>
+      <button class="btn" id="again">Play again</button></div>`;
+    $("again").onclick=reset; return; }
+  if(!all){ f.innerHTML=""; return; }
+  f.innerHTML=`<div class="final"><h2>Enter the 6-digit vault code</h2><p style="margin:0">Use your digits in lock order: Lock 1 first, Lock 6 last.</p>
+    <input id="codeIn" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Vault code">
+    <div class="acts"><button class="btn primary" id="openVault">Open the vault</button><span class="msg" id="codeMsg" aria-live="polite" style="color:var(--gold)"></span></div></div>`;
+  $("openVault").onclick=()=>{ if(N(v("codeIn"))===CODE){ G.escaped=Date.now(); renderFinal(); tickClock(); } else { $("codeMsg").textContent="Wrong code. Check the order of your digits."; } };
+  $("codeIn").addEventListener("keydown",e=>{ if(e.key==="Enter") $("openVault").click(); });
+}
+function reset(){ clearInterval(timer); timer=null; G=fresh(); $("teamName").value=""; tickClock(); renderDigits(); renderLocks(); window.scrollTo(0,0); }
+$("teamName").oninput=e=>{ G.team=e.target.value; };
+function start(d){ G=(d&&d.G)||fresh(); $("teamName").value=G.team||""; tickClock(); renderDigits(); renderLocks();
+  if(G.start && !G.escaped){ timer=setInterval(tickClock,1000); } }
+window.claude?.hot?.snapshot?.(()=>({G}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>
