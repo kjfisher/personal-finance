@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Debt Doubler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: header bar with score; one card at a time. Each card = a debt story, inputs (or choices), then a "doubling ladder" that shows the balance climbing every doubling. */
+:root {
+  --bg:#F2F4F1; --surface:#FFFFFF; --ink:#14213D; --muted:#5A6478; --line:#D3D9D0;
+  --bar:#2F7D46; --bar-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#F9E1DC;
+  --debt:#C2412D; --grow:#0F8B6C;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0B111D; --surface:#151E33; --ink:#E8EDF5; --muted:#97A3B9; --line:#26334F;
+  --bar:#1F5E33; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3E1F1A;
+  --debt:#FF7A63; --grow:#3CCB9F; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0B111D; --surface:#151E33; --ink:#E8EDF5; --muted:#97A3B9; --line:#26334F;
+  --bar:#1F5E33; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3E1F1A;
+  --debt:#FF7A63; --grow:#3CCB9F; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
+header { background:var(--bar); color:var(--bar-ink); }
+header .inner { max-width:900px; margin:0 auto; padding-block:16px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; justify-content:space-between; }
+header h1 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 4vw, 40px); margin:0; line-height:1; }
+header h1 span { color:var(--gold); }
+header .tag { font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; opacity:.8; margin-top:4px; }
+.stat { font-family:var(--mono); font-size:15px; display:flex; gap:16px; }
+.stat b { color:var(--gold); }
+main { max-width:900px; margin:0 auto; padding-block:20px 48px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:16px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(18px, 3vw, 28px); display:grid; gap:14px; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+h2 { font-family:var(--display); font-weight:800; font-size:clamp(24px, 3.4vw, 34px); margin:0; line-height:1.1; text-wrap:balance; }
+p { margin:0; line-height:1.5; }
+.rule { background:var(--bg); border-radius:12px; padding:12px 16px; font-family:var(--mono); font-size:16px; }
+.prog { height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+.prog i { display:block; height:100%; background:var(--gold); }
+.fields { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+label.f { display:grid; gap:4px; font-weight:700; font-size:15px; }
+.f input { font:inherit; font-family:var(--mono); font-size:18px; padding:10px 12px; border-radius:10px; border:2px solid var(--line); background:var(--bg); color:var(--ink); width:100%; }
+.f input.right { border-color:var(--ok); } .f input.wrong { border-color:var(--bad); } .f input.shown { border-color:var(--gold); }
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+.opt { font:inherit; font-weight:700; text-align:left; padding:14px 16px; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+.opt.right { border-color:var(--ok); background:var(--ok-soft); } .opt.wrong { border-color:var(--bad); background:var(--bad-soft); }
+.opt:disabled { cursor:default; }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:11px 18px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--bar); color:#fff; border-color:var(--bar); }
+.btn:focus-visible, .opt:focus-visible, .f input:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.hint { color:var(--muted); border-left:3px solid var(--gold); padding-left:10px; }
+.fb { border-radius:12px; padding:14px 16px; line-height:1.5; }
+.fb.ok { background:var(--ok-soft); } .fb.no { background:var(--bad-soft); }
+.fb b { font-family:var(--display); }
+.math { font-family:var(--mono); font-size:15px; margin-top:6px; }
+.ladder { display:grid; gap:6px; }
+.step { display:grid; grid-template-columns:64px minmax(0,1fr) 78px; gap:10px; align-items:center; font-family:var(--mono); font-size:14px; }
+.step > div { width:100%; }
+.step .b { height:22px; border-radius:6px; background:var(--debt); min-width:4px; }
+.step.grow .b { background:var(--grow); }
+.step .v { text-align:right; font-weight:600; }
+.end { text-align:center; justify-items:center; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(48px, 9vw, 80px); color:var(--debt); line-height:1; }
+.take { text-align:left; margin:0; padding-left:22px; line-height:1.6; }
+@media (prefers-reduced-motion: no-preference) { .step .b { transition:width .5s ease-out; } }
+</style>
+</head>
+<body>
+<header><div class="inner">
+  <div><h1>Debt <span>Doubler</span></h1><div class="tag">Unit 0 · The Power of Compounding</div></div>
+  <div class="stat" id="stat"></div>
+</div></header>
+<main id="app" aria-live="polite"></main>
+
+<script>
+const CARDS=[
+ {kind:"intro"},
+ {title:"The credit card", story:"Jordan has <b>$1,500</b> on a credit card at <b>24% APR</b>. Jordan stops paying and the interest keeps getting added to the balance.",
+  fields:[{label:"Years for the debt to double", a:3, tol:.05},{label:"Balance after 9 years ($)", a:12000, tol:1}],
+  hint:"72 ÷ 24 = years per doubling. 9 years is how many doublings?",
+  why:"72 ÷ 24 = <b>3 years</b> per doubling. 9 years = 3 doublings: 1,500 → 3,000 → 6,000 → <b>$12,000</b>.",
+  ladder:{start:1500, every:3, times:3}},
+ {title:"The store card", story:"Maya opens a store card for a <b>$800</b> TV. The APR is <b>18%</b>. She ignores the bill.",
+  fields:[{label:"Years for the debt to double", a:4, tol:.05},{label:"Balance after 8 years ($)", a:3200, tol:1}],
+  hint:"72 ÷ 18. Then count the doublings in 8 years.",
+  why:"72 ÷ 18 = <b>4 years</b>. 8 years = 2 doublings: 800 → 1,600 → <b>$3,200</b>. Four times the price of the TV.",
+  ladder:{start:800, every:4, times:2}},
+ {title:"The penalty APR", story:"Theo misses two payments, and his card jumps to a <b>29.99% penalty APR</b>. He owes <b>$2,000</b>. Round the rate to 30%.",
+  fields:[{label:"Years for the debt to double", a:2.4, tol:.05},{label:"Balance after 2 doublings ($)", a:8000, tol:1}],
+  hint:"72 ÷ 30 = 2.4. Each doubling is × 2.",
+  why:"72 ÷ 30 = <b>2.4 years</b>. Two doublings (about 4.8 years): 2,000 → 4,000 → <b>$8,000</b>.",
+  ladder:{start:2000, every:2.4, times:2}},
+ {title:"The fast-cash loan", story:"Kai takes a <b>$600</b> high-cost loan at <b>36% APR</b> and doesn't pay it back.",
+  fields:[{label:"Years for the debt to double", a:2, tol:.05},{label:"Balance after 6 years ($)", a:4800, tol:1}],
+  hint:"72 ÷ 36. 6 years is how many doublings?",
+  why:"72 ÷ 36 = <b>2 years</b>. 6 years = 3 doublings: 600 → 1,200 → 2,400 → <b>$4,800</b>. Eight times what Kai borrowed.",
+  ladder:{start:600, every:2, times:3}},
+ {title:"Work it backward", story:"Ava's unpaid debt doubled in <b>6 years</b>. Use the Rule of 72 to find the APR.",
+  fields:[{label:"APR (%)", a:12, tol:.05}],
+  hint:"Flip it: 72 ÷ years = rate.",
+  why:"72 ÷ 6 = <b>12%</b>. The Rule of 72 works both ways."},
+ {title:"Which rate is worse?", mc:{q:"Same $1,000 debt, no payments. Which one doubles FASTEST?", opts:["A card at 24%","A car loan at 8%","A student loan at 6%","A card at 12%"], right:0},
+  why:"Higher rate = faster doubling. 24% doubles in <b>3 years</b>; 12% in 6; 8% in 9; 6% in 12."},
+ {title:"Same rate, two directions", story:"Nia <b>invests $1,000</b> at <b>8%</b>. Leo <b>owes $1,000</b> on a card at <b>24%</b> and pays nothing. Look <b>9 years</b> ahead.",
+  fields:[{label:"Nia's investment after 9 years ($)", a:2000, tol:1},{label:"Leo's debt after 9 years ($)", a:8000, tol:1}],
+  hint:"Nia doubles every 72 ÷ 8 years. Leo doubles every 72 ÷ 24 years.",
+  why:"Nia: 72 ÷ 8 = 9 years → 1 doubling → <b>$2,000</b>. Leo: 72 ÷ 24 = 3 years → 3 doublings → <b>$8,000</b>. Credit card rates are usually much higher than investment returns, so debt can grow faster than your savings.",
+  ladder:{start:1000, every:3, times:3}, ladder2:{start:1000, every:9, times:1}},
+ {title:"Beat the doubler", mc:{q:"Which move stops a credit card balance from doubling on you?", opts:["Pay the full balance every month","Pay only the minimum","Open a second card to pay the first","Skip a payment when money is tight"], right:0},
+  why:"Pay in full and you pay <b>$0 interest</b>, so there's nothing to double. Minimum payments and missed payments let interest keep piling up."}
+];
+const DEBT_CARDS=CARDS.filter(c=>c.title).length;
+const $=id=>document.getElementById(id);
+const money=n=>"$"+Math.round(n).toLocaleString("en-US");
+const N=s=>parseFloat(String(s).replace(/[$,%\s]/g,""));
+let i=0, score=0, tries=0, answered=false;
+let best=null; try{ best=JSON.parse(localStorage.getItem("debt-doubler-best")||"null"); }catch(e){}
+
+function stat(){ $("stat").innerHTML= i===0||i>=CARDS.length ? (best!=null?`<span>Best <b>${best}/${DEBT_CARDS}</b></span>`:"") : `<span>Card <b>${i}/${DEBT_CARDS}</b></span><span>Score <b>${score}</b></span>`; }
+function ladder(L, cls, label){
+  const max=L.start*Math.pow(2,L.times); let h=`<div class="ladder" aria-label="${label}">`;
+  for(let k=0;k<=L.times;k++){ const v=L.start*Math.pow(2,k), yr=+(L.every*k).toFixed(1);
+    h+=`<div class="step ${cls}"><span>Year ${yr}</span><div><div class="b" style="width:${Math.max(1,v/max*100)}%"></div></div><span class="v">${money(v)}</span></div>`; }
+  return h+"</div>";
+}
+function render(){
+  stat(); answered=false; tries=0;
+  if(i>=CARDS.length) return end();
+  const c=CARDS[i];
+  if(c.kind==="intro"){
+    $("app").innerHTML=`<section class="card"><div class="eyebrow">Solo · About 10 minutes · Calculator OK</div>
+      <h2>Compounding works for savers. It works against borrowers.</h2>
+      <p>The Rule of 72 tells you how fast money doubles. When you <b>owe</b> money and don't pay it off, interest gets added to your balance, and then you pay interest on that interest. Your debt can double, then double again.</p>
+      <div class="rule">Years to double ≈ 72 ÷ interest rate<br>Interest rate ≈ 72 ÷ years to double</div>
+      <p style="color:var(--muted)">These cards assume no payments are made, so interest keeps getting added to the balance. The Rule of 72 is an estimate.</p>
+      <div class="row"><button class="btn go" id="go">Start</button></div></section>`;
+    $("go").onclick=()=>{ i++; render(); }; $("go").focus(); return;
+  }
+  let body="";
+  if(c.fields) body=`<div class="fields">${c.fields.map((f,k)=>`<label class="f" for="f${k}">${f.label}<input id="f${k}" inputmode="decimal" autocomplete="off"></label>`).join("")}</div>
+     <div id="hintBox"></div><div class="row"><button class="btn go" id="check">Check</button>${c.hint?`<button class="btn" id="hint">Hint</button>`:""}</div>`;
+  else body=`<p><b>${c.mc.q}</b></p><div class="opts">${c.mc.opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join("")}</div>`;
+  $("app").innerHTML=`<div class="prog"><i style="width:${(i-1)/DEBT_CARDS*100}%"></i></div>
+    <section class="card"><div class="eyebrow">Card ${i} of ${DEBT_CARDS}</div><h2>${c.title}</h2>${c.story?`<p>${c.story}</p>`:""}${body}<div id="fb"></div></section>`;
+  if(c.fields){
+    $("check").onclick=check;
+    $("app").querySelectorAll(".f input").forEach(el=>el.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); }));
+    $("hint")&&($("hint").onclick=()=>{ $("hintBox").innerHTML=`<p class="hint">${c.hint}</p>`; $("hint").remove(); });
+    $("f0").focus();
+  } else $("app").querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function check(){
+  if(answered) return; const c=CARDS[i]; tries++;
+  let all=true; c.fields.forEach((f,k)=>{ const el=$("f"+k), v=N(el.value), ok=!isNaN(v)&&Math.abs(v-f.a)<=f.tol; el.classList.toggle("right",ok); el.classList.toggle("wrong",!ok); if(!ok) all=false; });
+  if(all||tries>=2) finish(all&&tries===1, all);
+  else $("fb").innerHTML=`<div class="fb no"><b>Not yet.</b> Check the boxes outlined in red and try once more.</div>`;
+}
+function pick(k){
+  if(answered) return; const c=CARDS[i];
+  $("app").querySelectorAll(".opt").forEach((b,j)=>{ b.disabled=true; if(j===c.mc.right) b.classList.add("right"); else if(j===k) b.classList.add("wrong"); });
+  finish(k===c.mc.right, k===c.mc.right);
+}
+function finish(point, ok){
+  answered=true; const c=CARDS[i]; if(point) score++;
+  if(c.fields) c.fields.forEach((f,k)=>{ const el=$("f"+k); el.disabled=true; if(!el.classList.contains("right")){ el.value=(f.a%1?f.a:f.a.toLocaleString("en-US")); el.classList.remove("wrong"); el.classList.add("shown"); } });
+  $("check")&&$("check").remove(); $("hint")&&$("hint").remove();
+  let lad="";
+  if(c.ladder2) lad=`<p><b style="color:var(--grow)">Nia's investment at 8%</b></p>${ladder(c.ladder2,"grow","Investment growth")}<p><b style="color:var(--debt)">Leo's debt at 24%</b></p>${ladder(c.ladder,"","Debt growth")}`;
+  else if(c.ladder) lad=`<p><b>Watch it double</b></p>${ladder(c.ladder,"","Debt growth")}`;
+  $("fb").innerHTML=`<div class="fb ${ok?"ok":"no"}"><b>${point?"Yes! +1":ok?"Got it on the second try.":"Here's how it works."}</b><div class="math">${c.why}</div></div>${lad}
+    <div class="row"><button class="btn go" id="next">${i===CARDS.length-1?"See my score":"Next card"}</button></div>`;
+  stat(); $("next").onclick=()=>{ i++; render(); window.scrollTo(0,0); }; $("next").focus();
+}
+function end(){
+  if(best==null||score>best){ best=score; try{ localStorage.setItem("debt-doubler-best",JSON.stringify(best)); }catch(e){} }
+  stat();
+  $("app").innerHTML=`<section class="card end"><div class="eyebrow">Debt Doubler · Results</div><div class="big">${score}/${DEBT_CARDS}</div>
+    <p>${score===DEBT_CARDS?"Perfect! You can spot a debt doubling before it happens.":score>=5?"Nice work. Review any card you missed and play again.":"Try again. Write the rule in your notes first: 72 ÷ rate."}</p>
+    <ul class="take"><li>Years to double ≈ <b>72 ÷ interest rate</b>.</li><li>At 24%, unpaid debt can double in about <b>3 years</b>.</li><li>Pay credit cards <b>in full</b> every month and there's nothing to double.</li></ul>
+    <div class="row"><button class="btn go" id="again">Play again</button></div></section>`;
+  $("again").onclick=()=>{ i=0; score=0; render(); };
+}
+render();
+</script>
+</body>
+</html>
