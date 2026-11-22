@@ -73,7 +73,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 <div class="wrap">
   <header>
-    <div><h1>Midterm <span>Showdown</span></h1><div class="tag">Personal Finance · Units 1–4 · #FutureMillionaires</div></div>
+    <div><h1>Midterm <span>Showdown</span></h1><div class="tag">Personal Finance · Units 2–5 · #FutureMillionaires</div></div>
     <div class="row">
       <button class="ghost" id="addTeam">+ Team</button>
       <button class="ghost" id="rmTeam">− Team</button>
@@ -89,47 +89,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 <div class="overlay" id="ov" hidden><div class="clue" id="clue"></div></div>
 
 <script>
-const CATS = [
- { name: "Paycheck Deductions", unit: "Unit 1", qs: [
-   ["Your job offer says $52,000 a year. Is that your gross or net income?", "<b>Gross</b> — it's what you earn before taxes and deductions. Net is your take-home pay."],
-   ["Name the two FICA taxes and their percentages.", "<b>Social Security 6.2%</b> and <b>Medicare 1.45%</b> (7.65% total)."],
-   ["You're offered $62,400 per year. What is your gross monthly income?", "$62,400 ÷ 12 = <b>$5,200</b>"],
-   ["You earn $3,600 a month and put 5% in your 401(k). Your employer matches 100% up to 5%. How much goes into your 401(k) in total each month?", "You: $3,600 × 0.05 = $180. Match: $180. Total <b>$360</b> a month."],
-   ["You earn $34,000 a year and pay Social Security (6.2%), Medicare (1.45%), and federal tax (10%). What's your approximate annual net pay?", "17.65% × $34,000 = $6,001 taxes. Net = <b>$27,999</b>."]
- ]},
- { name: "Pay Stub Pro", unit: "Unit 2", qs: [
-   ["What does YTD mean on a pay stub?", "<b>Year-to-date</b>: totals from January 1 through the current pay period."],
-   ["Monthly pay period 10/01 – 10/31, pay date 11/01. How many full months are in the YTD totals?", "<b>10</b> months. Count the pay period, not the pay date."],
-   ["You earn $22 an hour. What is your federal overtime rate?", "$22 × 1.5 = <b>$33 per hour</b>"],
-   ["You earn $15 an hour and work 52 hours this week (1.5× after 40). What is your total gross pay?", "40 × $15 = $600. 12 × $22.50 = $270. Total <b>$870</b>."],
-   ["Gross pay $3,000. Deductions: federal $300, state $148.50, Social Security $186, Medicare $43.50, health $100, 401(k) $90. What is net pay?", "Deductions = $868. $3,000 − $868 = <b>$2,132</b>."]
- ]},
- { name: "Bank On It", unit: "Unit 3", qs: [
-   ["Which account is used for everyday spending, direct deposit, and paying bills?", "A <b>checking account</b>."],
-   ["What is the FDIC, and how much does it insure?", "Government insurance for bank deposits — <b>$250,000 per depositor, per bank</b>, if the bank fails."],
-   ["What's the difference between a debit card and a credit card?", "<b>Debit</b> spends your own checking money. <b>Credit</b> spends borrowed money you must pay back, often with interest."],
-   ["Why can an online bank's high-yield savings account (HYSA) often pay more interest?", "<b>Lower costs</b> — no physical branches to pay for. Many are still FDIC insured."],
-   ["$2,500 in a CD at 4% for 2 years, interest added once per year. What is it worth at maturity?", "Year 1: $2,600. Year 2: $2,600 × 4% = $104 → <b>$2,704</b>. ($2,700 = simple interest.)"]
- ]},
- { name: "Credit Check", unit: "Unit 4", qs: [
-   ["What is the range of a FICO credit score?", "<b>300 to 850</b>"],
-   ["Name all 3 credit bureaus.", "<b>Experian, Equifax, TransUnion</b>"],
-   ["Name 3 of the 4 ways a teen can establish credit.", "<b>Secured card, cosigner, retail store card, authorized user</b> on a parent's card."],
-   ["Credit limit $2,200, balance $660. What is the utilization? Is it OK?", "$660 ÷ $2,200 × 100 = <b>30%</b> — right at the guideline."],
-   ["Rank the 5 FICO categories from biggest to smallest, with percentages.", "<b>Payment history 35% · Amounts owed 30% · Length of history 15% · New credit 10% · Credit mix 10%</b>"]
- ]},
- { name: "Smart or Not?", unit: "CER", qs: [
-   ["\"I'll check my credit report for free at annualcreditreport.com.\" Smart or not? Why?", "<b>Smart.</b> It's free, federally authorized, and checking your own report doesn't hurt your score."],
-   ["\"I keep $0 extra in checking and just swipe my debit card anyway.\" Smart or not? Why?", "<b>Not smart.</b> You'll get overdraft fees (often $25–$35 each time)."],
-   ["\"I'm putting my emergency fund in a 5-year CD.\" Smart or not? Why?", "<b>Not smart.</b> Emergencies can't wait; an early withdrawal penalty eats your money. Use savings or a HYSA."],
-   ["\"I'll put in enough to get my full 401(k) employer match.\" Smart or not? Why?", "<b>Smart.</b> The match is free money, and it grows for retirement."],
-   ["\"I'll cosign my friend's car loan. It's their loan, not mine.\" Smart or not? Why? (Use 2 vocab words.)", "<b>Not smart.</b> A cosigner owes the loan too — missed payments hurt <i>your</i> payment history and credit score."]
- ]}
-];
-const FINAL = { q: "You earn $4,000 a month gross. You put 5% in your 401(k) and your employer matches 100% up to 5%. You also put 10% of your gross into a HYSA. How much goes to savings + retirement each month in total?",
-  a: "401(k): $200 (you) + $200 (match) = $400. HYSA: $400. Total <b>$800 a month</b> — that's $9,600 a year toward Future Millionaire status!" };
+const CATS = [{"name": "Your Paycheck", "unit": "Unit 2", "qs": [["Your job offer says $54,000 a year. Is that gross or net pay?", "<b>Gross</b>: what you earn before taxes and deductions."], ["Name the two FICA taxes and their rates.", "<b>Social Security 6.2%</b> + <b>Medicare 1.45%</b> = 7.65%."], ["$61,200 a year. Gross monthly pay?", "$61,200 ÷ 12 = <b>$5,100</b>"], ["Gross pay is $4,000 a month. How much is Illinois income tax (4.95%)?", "$4,000 × 0.0495 = <b>$198</b>"], ["$3,500 a month. You put 6% in your 401(k) and your employer matches 100% up to 6%. Total going in each month?", "You $210 + match $210 = <b>$420</b>"]]}, {"name": "Pay Stubs & Overtime", "unit": "Unit 2", "qs": [["What does YTD stand for?", "<b>Year to date</b>: January 1 through this pay period."], ["Overtime rate for $26 an hour?", "$26 × 1.5 = <b>$39</b>"], ["$18 an hour, 44 hours. Total pay?", "40 × $18 = $720 + 4 × $27 = $108 → <b>$828</b>"], ["Paid monthly. Period 6/1–6/30, pay date 7/1. Months in YTD?", "<b>6</b>: count by the pay period, not the pay date."], ["Gross pay $2,600. Social Security + Medicare together?", "$161.20 + $37.70 = <b>$198.90</b>"]]}, {"name": "Budgeting", "unit": "Unit 3", "qs": [["Need or want: concert tickets?", "<b>Want.</b>"], ["Fixed or variable: groceries?", "<b>Variable</b>: they change week to week."], ["50/30/20: savings on a $3,500 take-home pay?", "20% of $3,500 = <b>$700</b>"], ["$70 a week on groceries. Monthly cost?", "$70 × 52 = $3,640 ÷ 12 = <b>$303.33</b>"], ["Take-home $2,950, expenses $2,575. Savings ability? How many months to a $2,250 emergency fund?", "$375 a month → <b>6 months</b>"]]}, {"name": "Federal Taxes", "unit": "Unit 4", "qs": [["Which form do you fill out at a new job to set withholding?", "<b>W-4</b>"], ["When are federal taxes usually due?", "<b>April 15</b>"], ["Box 1 is $26,500. Taxable income? (2026 standard deduction $16,100)", "$26,500 − $16,100 = <b>$10,400</b>"], ["Taxable income is $10,400. Federal tax?", "All in the 10% bracket: <b>$1,040</b>"], ["Withheld $1,300. Tax owed $1,040. Refund or owe, and how much?", "<b>Refund of $260</b>"]]}, {"name": "Banking", "unit": "Unit 5", "qs": [["The FDIC insures deposits up to how much?", "<b>$250,000</b> per depositor, per bank."], ["Why can online banks pay more interest on an HYSA?", "<b>No branches</b> = lower costs."], ["What usually happens if you take money out of a CD early?", "You pay a <b>penalty</b>."], ["$5,000 in an HYSA at 4% for one year. Interest earned?", "$5,000 × 0.04 = <b>$200</b>"], ["$1,200 in a CD at 5% for 2 years, compounded annually. Ending amount?", "$1,260 → <b>$1,323</b>"]]}];
+const FINAL = {"q": "Gross pay is $4,500 a month in Illinois. How much comes out for FICA (7.65%) plus Illinois income tax (4.95%) together each month?", "a": "FICA $344.25 + Illinois $222.75 = <b>$567 a month</b>."};
 const VALUES = [100, 200, 300, 400, 500];
-const KEY = "midterm-showdown-v1";
+const KEY = "midterm-showdown-v2";
 const $ = id => document.getElementById(id);
 let S;
 
