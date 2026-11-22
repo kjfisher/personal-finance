@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paycheck to Paycheck</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap"><style>
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--hero:#14213D;--hero-ink:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;
+--good:#1F7A45;--good-bg:#E3F4E8;--bad:#B23A26;--bad-bg:#FBE9E5;--warn:#9A6B00;--warn-bg:#FBF1D9;--accent:var(--money);
+--display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;
+--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.top{background:var(--hero);color:var(--hero-ink)}
+.top .in{max-width:980px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.top h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1;margin:4px 0 0}
+.top nav{display:flex;gap:8px;flex-wrap:wrap}
+.top nav a{color:var(--hero-ink);text-decoration:none;border:1px solid rgba(255,255,255,.3);padding:8px 12px;border-radius:10px;font-weight:700;font-size:15px}
+main{max-width:980px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+.panel h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);line-height:1.15;margin:0}
+.lede{margin:0;color:var(--muted)}
+.label{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 16px var(--body);border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;border-radius:12px;cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--money);color:var(--money-ink);border-color:var(--money)}
+.btn.gold{background:var(--gold);color:#14213D;border-color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.choices{display:grid;gap:10px}
+.choice{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.choice small{grid-column:1/-1;color:var(--muted);font-weight:400}
+.cost{font:600 15px var(--mono)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.stat b{display:block;font:600 22px var(--mono)}
+.stat.neg b{color:var(--bad)} .stat.pos b{color:var(--good)}
+.note{border-radius:12px;padding:10px 14px;font-weight:700}
+.note.ok{background:var(--good-bg);color:var(--good)} .note.no{background:var(--bad-bg);color:var(--bad)} .note.warn{background:var(--warn-bg);color:var(--warn)}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,72px);line-height:1}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:#14213D;font-weight:700;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:all .3s;z-index:50;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)} td.n,th.n{text-align:right;font-family:var(--mono)}
+.tw{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.track{display:grid;grid-template-columns:repeat(30,1fr);gap:2px}
+.track i{height:10px;border-radius:3px;background:var(--line)}
+.track i.done{background:var(--money)} .track i.now{background:var(--gold)} .track i.pay{outline:2px solid var(--money);outline-offset:-2px}
+.ev h3{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);margin:0}
+.ev p{margin:0}
+.happy{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.happy span{display:block;height:100%;background:var(--gold)}
+.stars{font-size:40px;letter-spacing:6px}
+</style></head>
+<body><header class="top"><div class="in"><div><div class="eyebrow">Unit 3 · Budgeting · Solo</div><h1>Paycheck to Paycheck</h1></div>
+<nav><a href="/passport/">My Passport</a><a href="/">Arcade</a></nav></div></header>
+<main>
+<section class="panel" id="intro">
+  <h2>Can you make it to payday… and the next one?</h2>
+  <p class="lede">You're 22 with your first full-time job. For 30 days, bills come out on their own and life throws choices at you. Make it to day 30 without overdrafting or piling up credit card debt. Wants make you happy. Needs keep you afloat. Balance both.</p>
+  <div class="label">Pick your job</div>
+  <div class="choices" id="jobs"></div>
+</section>
+<section id="game" hidden>
+  <div class="stats" id="stats"></div>
+  <div class="panel" style="margin-top:16px">
+    <div class="row" style="justify-content:space-between"><span class="label" id="dayLbl"></span><span class="label" id="jobLbl"></span></div>
+    <div class="track" id="track" aria-hidden="true"></div>
+    <div id="card"></div>
+  </div>
+  <details class="panel" style="margin-top:16px"><summary style="cursor:pointer;font-weight:700">Money log</summary><div class="tw"><table><thead><tr><th>Day</th><th>What</th><th class="n">Amount</th><th class="n">Checking</th></tr></thead><tbody id="log"></tbody></table></div></details>
+</section>
+</main>
+<script>
+const FMP=(()=>{const K="fm-passport";
+ function get(){try{const p=JSON.parse(localStorage.getItem(K));if(p&&p.s&&p.b)return p;}catch(e){}return {s:{},b:{},x:{}};}
+ function save(p){try{localStorage.setItem(K,JSON.stringify(p));}catch(e){}}
+ return {get,
+  stamp(slug,score){const p=get();const s=p.s[slug]||{n:0,best:null};s.n++;if(score!=null&&(s.best==null||score>s.best))s.best=score;s.t=Date.now();p.s[slug]=s;save(p);},
+  badge(id,name){const p=get();if(p.b[id])return false;p.b[id]=Date.now();save(p);if(name)fmToast("🏅 Passport badge earned: "+name);return true;},
+  count(key){const p=get();p.x=p.x||{};p.x[key]=(p.x[key]||0)+1;save(p);return p.x[key];}};})();
+function fmToast(t){let el=document.getElementById("fmToast");if(!el){el=document.createElement("div");el.id="fmToast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}
+ el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3800);}
+
+
+const JOBS=[
+ {id:"retail",name:"Retail associate",pay:900,rent:700,rentNote:"room with 2 roommates",phone:45,util:60,groc:70,trans:{kind:"bus",name:"Monthly bus pass",amt:75,day:2}},
+ {id:"med",name:"Medical assistant",pay:1200,rent:950,rentNote:"studio apartment",phone:55,util:90,groc:75,trans:{kind:"car",name:"Car payment + insurance + gas",amt:500,day:16}},
+ {id:"elec",name:"Electrician apprentice",pay:1400,rent:1050,rentNote:"1-bedroom apartment",phone:65,util:100,groc:80,trans:{kind:"car",name:"Truck payment + insurance + gas",amt:690,day:16}}];
+const START=250, FEE=35;
+const POOL=[
+ {t:"Birthday dinner",p:"Your best friend's birthday dinner is at a steakhouse.",c:[["Go all out",75,8,"Fun, but it's a want. Wants come after needs."],["Go, order something cheap",25,5,"Smart compromise: you still show up."],["Skip it, bake a cake instead",8,2,"Cheapest, and it still shows you care."]]},
+ {t:"Concert drop",p:"Your favorite artist just announced a show. Tickets are on sale now.",c:[["Buy a ticket",150,10,"A big want. Make sure your needs are covered first."],["Pass this time",0,-3,"Saying no now can mean saying yes to bigger goals."]]},
+ {t:"Cracked phone",p:"You dropped your phone. The screen is cracked but it still works.",c:[["Repair it at the store",180,0,"Unexpected expenses are why emergency funds exist."],["Cheap repair kit + case",40,-2,"Fixing it cheaply keeps more money in checking."]]},
+ {t:"Sneaker sale",p:"The shoes you've wanted are 30% off this weekend only.",c:[["Buy them",160,6,"A sale on a want is still spending."],["Pass",0,-1,"“Limited time” is a trick to make you buy fast."]]},
+ {t:"Streaming upgrade",p:"Your streaming app offers a bundle with no ads.",c:[["Upgrade",25,3,"Small monthly costs add up: $25 × 12 = $300 a year."],["Keep the basic plan",0,0,"Subscriptions are easy to forget. Review them."]]},
+ {t:"Feeling sick",p:"You've had a fever for two days. Urgent care copay is $75.",c:[["Go to urgent care",75,0,"Health insurance helps, but you still pay the copay."]]},
+ {t:"Extra shift",p:"A coworker asks you to cover their Saturday shift.",c:[["Take it (+$120 after taxes)",-120,-3,"Extra income is one way to close a gap."],["Say no, rest up",0,2,"Rest matters too."]]},
+ {t:"Road trip",p:"Friends are planning a weekend trip two hours away.",c:[["Go for the weekend",220,10,"Plan big fun ahead and save for it."],["Day trip only",40,5,"Same friends, a fraction of the cost."],["Stay home",0,-3,"Missing out stings, but your budget thanks you."]]},
+ {t:"Grocery temptation",p:"At the store, the snack aisle is calling your name.",c:[["Grab $30 of extras",30,2,"Impulse buys are the easiest place to save."],["Stick to the list",0,0,"Shopping with a list protects your budget."]]},
+ {t:"Family birthday",p:"Your younger brother's birthday is this week.",c:[["Buy a $60 gift",60,4,"Gifts are planned expenses. Put them in your budget."],["Make something + a card",10,3,"Thoughtful beats expensive."]]},
+ {t:"Side gig",p:"A neighbor asks you to dog-sit for the weekend.",c:[["Say yes (+$80)",-80,-1,"Side income can build your savings faster."],["Say no",0,0,"That's OK too."]]},
+ {t:"Parking ticket",p:"You parked in the wrong spot and got a $100 ticket.",c:[["Pay the ticket",100,-3,"Unexpected expenses happen to everyone."]]},
+ {t:"Gym deal",p:"A gym offers a $40/month membership, first month due now.",c:[["Sign up",40,4,"Is it a need or a want? Free options exist."],["Work out free outside",0,1,"Same health benefit, $480 a year saved."]]}];
+const TRANS={bus:{t:"Lost bus pass",p:"You lost your bus pass halfway through the month.",c:[["Buy a new pass",75,-2,"Unexpected expenses come in every size."],["Rideshare all week",90,0,"Convenient, but it costs more."],["Bike for two weeks",0,-5,"Free, but tiring. Your choice."]]},
+             car:{t:"Check engine light",p:"Your check engine light came on. The shop quotes $420.",c:[["Fix it now",420,-2,"Maintenance now beats a breakdown later."],["Ignore it for now",0,0,"Risky: small problems often turn into big ones."]]}};
+const BREAKDOWN={t:"Breakdown!",p:"The problem you ignored got worse. Your car broke down on the highway. Tow + repair: $650.",c:[["Pay the repair",650,-8,"Ignoring the $420 fix cost you $230 more, plus a tow."]]};
+let S, steps, si;
+const $=id=>document.getElementById(id);
+const money=v=>(v<0?"−":"")+"$"+Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:2});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+$("jobs").innerHTML=JOBS.map((j,i)=>`<button class="btn choice" data-j="${i}"><span>${j.name}</span><span class="cost">${money(j.pay*2)}/mo take-home</span><small>Rent ${money(j.rent)} (${j.rentNote}) · ${j.trans.name} ${money(j.trans.amt)} · Groceries ${money(j.groc)}/week</small></button>`).join("");
+document.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>start(JOBS[+b.dataset.j]));
+function start(job){
+  S={job,checking:START,savings:0,card:0,happy:60,od:0,saved:0,ignored:false,log:[]};
+  const ev=shuffle(POOL.slice()).slice(0,10);
+  const evDays=[4,6,8,11,17,19,21,24,26,29];
+  steps=[{d:1,k:"pay"},{d:1,k:"bill",n:"Rent",a:job.rent,noCard:true},{d:2,k:"bill",n:"Groceries",a:job.groc},{d:3,k:"bill",n:"Phone + utilities",a:job.phone+job.util}];
+  steps.push({d:job.trans.day,k:"bill",n:job.trans.name,a:job.trans.amt});
+  evDays.forEach((d,i)=>steps.push({d,k:"ev",e:ev[i]}));
+  steps.push({d:9,k:"bill",n:"Groceries",a:job.groc},{d:13,k:"ev",e:TRANS[job.trans.kind],trans:true},{d:15,k:"pay"},{d:16,k:"bill",n:"Groceries",a:job.groc},{d:23,k:"bill",n:"Groceries",a:job.groc},{d:28,k:"break"},{d:30,k:"cardbill"},{d:30,k:"end"});
+  steps.sort((a,b)=>a.d-b.d||(a.k==="pay"?-1:0)-(b.k==="pay"?-1:0));
+  si=0; $("intro").hidden=true; $("game").hidden=false; $("jobLbl").textContent=job.name; S.log.push([0,"Starting balance",START,START]); next(true);
+}
+function stats(){
+  $("stats").innerHTML=`<div class="stat ${S.checking<0?"neg":""}"><span class="label">Checking</span><b>${money(S.checking)}</b></div>
+   <div class="stat pos"><span class="label">Savings</span><b>${money(S.savings)}</b></div>
+   <div class="stat ${S.card>0?"neg":""}"><span class="label">Credit card</span><b>${money(S.card)}</b></div>
+   <div class="stat"><span class="label">Happiness ${S.happy}/100</span><div class="happy" style="margin-top:8px"><span style="width:${Math.max(0,Math.min(100,S.happy))}%"></span></div></div>`;
+  const d=steps[Math.min(si,steps.length-1)].d;
+  $("dayLbl").textContent=`Day ${d} of 30`;
+  const pays=[1,15]; $("track").innerHTML=Array.from({length:30},(_,i)=>`<i class="${i+1<d?"done":i+1===d?"now":""} ${pays.includes(i+1)?"pay":""}"></i>`).join("");
+  $("log").innerHTML=S.log.map(([d,w,a,b])=>`<tr><td>${d||"—"}</td><td>${esc(w)}</td><td class="n">${a>0?"+":""}${money(a)}</td><td class="n">${money(b)}</td></tr>`).join("");
+}
+function add(d,what,amt){S.checking=Math.round((S.checking+amt)*100)/100;S.log.push([d,what,amt,S.checking]);}
+function next(first){ if(!first) si++; if(si>=steps.length) return; const st=steps[si];
+  if(st.k==="break" && !(S.ignored)) return next();
+  stats(); render(st); }
+function card(html){$("card").innerHTML=`<div class="ev" style="display:grid;gap:12px">${html}</div>`;}
+function render(st){
+  if(st.k==="pay"){ add(st.d,"Paycheck (take-home)",S.job.pay); stats();
+    card(`<div class="label">Payday</div><h3>+${money(S.job.pay)} hit your checking account</h3><p>Pay yourself first? Move money to savings before you spend.</p>
+      <div class="row">${[0,50,100,150].map(v=>`<button class="btn ${v?"":""}" data-sv="${v}">${v?"Save "+money(v):"Save nothing"}</button>`).join("")}</div>`);
+    document.querySelectorAll("[data-sv]").forEach(b=>b.onclick=()=>{const v=+b.dataset.sv; if(v>S.checking){fmToast("Not enough in checking for that.");return;} if(v){add(st.d,"Moved to savings",-v);S.savings+=v;S.saved+=v;} next();});
+  } else if(st.k==="bill"){
+    card(`<div class="label">Bill · paid automatically</div><h3>${esc(st.n)}: ${money(st.a)}</h3><p>${st.n==="Rent"?"Rent is due on the 1st. This is a fixed need.":st.n==="Groceries"?"Weekly groceries: a variable need.":"A fixed monthly bill. It comes out whether you think about it or not."}</p><div class="row"><button class="btn primary" id="go">OK</button></div>`);
+    $("go").onclick=()=>pay(st.d,st.n,st.a,st.noCard,()=>next());
+  } else if(st.k==="ev"||st.k==="break"){ const e=st.k==="break"?BREAKDOWN:st.e;
+    card(`<div class="label">Day ${st.d} · Life happens</div><h3>${esc(e.t)}</h3><p>${esc(e.p)}</p><div class="choices">${e.c.map((c,i)=>`<button class="btn choice" data-c="${i}"><span>${esc(c[0])}</span><span class="cost">${c[1]<0?"+"+money(-c[1]):c[1]?money(c[1]):"$0"}</span></button>`).join("")}</div>`);
+    document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const c=e.c[+b.dataset.c]; if(st.trans&&S.job.trans.kind==="car") S.ignored=(+b.dataset.c===1);
+      S.happy=Math.max(0,Math.min(100,S.happy+c[2]));
+      const after=()=>{stats();card(`<div class="label">Day ${st.d}</div><h3>${esc(c[0])}</h3><div class="note ${c[1]>0&&c[2]>4?"warn":"ok"}">${esc(c[3])}</div><div class="row"><button class="btn primary" id="go">Next</button></div>`);$("go").onclick=()=>next();};
+      if(c[1]<0){add(st.d,e.t+" (income)",-c[1]);after();} else if(c[1]>0) pay(st.d,e.t,c[1],false,after); else after();});
+  } else if(st.k==="cardbill"){
+    if(S.card<=0){ return next(); }
+    const min=Math.min(S.card,Math.max(35,Math.round(S.card*0.03)));
+    card(`<div class="label">Day 30 · Credit card statement</div><h3>You owe ${money(S.card)} at 24% APR</h3><p>Pay it in full and you pay no interest. Pay the minimum and the rest grows at 24% a year.</p>
+      <div class="choices"><button class="btn choice" id="full"><span>Pay in full</span><span class="cost">${money(S.card)}</span></button><button class="btn choice" id="min"><span>Pay the minimum</span><span class="cost">${money(min)}</span></button></div>`);
+    $("full").onclick=()=>pay(30,"Credit card payment",S.card,true,()=>{S.card=0;next();});
+    $("min").onclick=()=>pay(30,"Credit card minimum",min,true,()=>{S.card=Math.round((S.card-min)*100)/100;next();});
+  } else if(st.k==="end"){ finish(); }
+}
+function pay(d,what,amt,noCard,done){
+  if(S.checking>=amt){add(d,what,-amt);stats();return done();}
+  const short=Math.round((amt-Math.max(0,S.checking))*100)/100;
+  stats();
+  card(`<div class="label">Uh oh: not enough in checking</div><h3>${esc(what)}: ${money(amt)}</h3><p>You only have ${money(S.checking)} in checking. You're ${money(short)} short. What do you do?</p>
+   <div class="choices">${S.savings>=short?`<button class="btn choice" id="sv"><span>Move ${money(short)} from savings</span><span class="cost">emergency fund</span><small>This is exactly what savings is for.</small></button>`:""}
+   ${noCard?"":`<button class="btn choice" id="cc"><span>Put it on the credit card</span><span class="cost">24% APR</span><small>Borrowed money. Pay it off fast or it grows.</small></button>`}
+   <button class="btn choice" id="od"><span>Let it overdraft</span><span class="cost">+${money(FEE)} fee</span><small>The bank pays it and charges you a fee.</small></button></div>`);
+  const sv=$("sv"); if(sv) sv.onclick=()=>{S.savings-=short;add(d,"From savings",short);add(d,what,-amt);done();};
+  const cc=$("cc"); if(cc) cc.onclick=()=>{S.card=Math.round((S.card+amt)*100)/100;S.log.push([d,what+" (credit card)",0,S.checking]);done();};
+  $("od").onclick=()=>{add(d,what,-amt);add(d,"Overdraft fee",-FEE);S.od++;done();};
+}
+function finish(){
+  stats(); si=steps.length-1;
+  const survived=S.checking>=0&&S.od===0, stars=[S.od===0&&S.checking>=0,S.card===0,S.savings>=100,S.happy>=50];
+  const n=stars.filter(Boolean).length;
+  FMP.stamp("paycheck-to-paycheck",n);
+  if(survived&&S.card===0) FMP.badge("survivor","Survivor (made it to day 30, no debt, no overdrafts)");
+  if(S.saved>=200) setTimeout(()=>FMP.badge("pay-yourself-first","Pay Yourself First"),1200);
+  if(n===4) setTimeout(()=>FMP.badge("month-master","Month Master (4 stars)"),2400);
+  card(`<div class="label">Day 30 · Month complete</div><h3>${survived?"You made it!":"You made it… barely."}</h3>
+   <div class="stars" aria-label="${n} of 4 stars">${"★".repeat(n)}${"☆".repeat(4-n)}</div>
+   <table><tbody>
+    <tr><td>${stars[0]?"✅":"❌"} No overdrafts, checking at $0 or more</td><td class="n">${S.od} overdraft${S.od===1?"":"s"} · ${money(S.checking)}</td></tr>
+    <tr><td>${stars[1]?"✅":"❌"} No credit card debt left</td><td class="n">${money(S.card)}</td></tr>
+    <tr><td>${stars[2]?"✅":"❌"} Started an emergency fund ($100+)</td><td class="n">${money(S.savings)}</td></tr>
+    <tr><td>${stars[3]?"✅":"❌"} Still enjoyed life (happiness 50+)</td><td class="n">${S.happy}/100</td></tr></tbody></table>
+   <div class="note ${n>=3?"ok":"warn"}">${S.card>0?`Your ${money(S.card)} card balance will grow about ${money(Math.round(S.card*0.02*100)/100)} next month in interest. `:""}${S.od?`Overdraft fees cost you ${money(S.od*FEE)} for nothing. `:""}${n>=3?"Strong month! You balanced needs, wants and savings.":"Next time: pay yourself first, plan for unexpected costs, and pick one want at a time."}</div>
+   <div class="row"><button class="btn primary" id="again">Play again</button><button class="btn" id="other">Try a different job</button></div>`);
+  $("again").onclick=()=>start(S.job); $("other").onclick=()=>{$("game").hidden=true;$("intro").hidden=false;};
+}
+</script></body></html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Market Time Machine</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap"><style>
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--hero:#14213D;--hero-ink:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;
+--good:#1F7A45;--good-bg:#E3F4E8;--bad:#B23A26;--bad-bg:#FBE9E5;--warn:#9A6B00;--warn-bg:#FBF1D9;--accent:var(--money);
+--display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;
+--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.top{background:var(--hero);color:var(--hero-ink)}
+.top .in{max-width:980px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.top h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1;margin:4px 0 0}
+.top nav{display:flex;gap:8px;flex-wrap:wrap}
+.top nav a{color:var(--hero-ink);text-decoration:none;border:1px solid rgba(255,255,255,.3);padding:8px 12px;border-radius:10px;font-weight:700;font-size:15px}
+main{max-width:980px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+.panel h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);line-height:1.15;margin:0}
+.lede{margin:0;color:var(--muted)}
+.label{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 16px var(--body);border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;border-radius:12px;cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--money);color:var(--money-ink);border-color:var(--money)}
+.btn.gold{background:var(--gold);color:#14213D;border-color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.choices{display:grid;gap:10px}
+.choice{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.choice small{grid-column:1/-1;color:var(--muted);font-weight:400}
+.cost{font:600 15px var(--mono)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.stat b{display:block;font:600 22px var(--mono)}
+.stat.neg b{color:var(--bad)} .stat.pos b{color:var(--good)}
+.note{border-radius:12px;padding:10px 14px;font-weight:700}
+.note.ok{background:var(--good-bg);color:var(--good)} .note.no{background:var(--bad-bg);color:var(--bad)} .note.warn{background:var(--warn-bg);color:var(--warn)}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,72px);line-height:1}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:#14213D;font-weight:700;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:all .3s;z-index:50;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)} td.n,th.n{text-align:right;font-family:var(--mono)}
+.tw{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+#chart{width:100%;height:auto}
+#chart text{font:600 11px var(--mono);fill:var(--muted)}
+.key{display:inline-flex;align-items:center;gap:6px;margin-right:12px}.key i{width:14px;height:4px;border-radius:2px;display:inline-block}
+</style></head>
+<body><header class="top"><div class="in"><div><div class="eyebrow">Unit 9 · Investing · Solo</div><h1>Market Time Machine</h1></div>
+<nav><a href="/passport/">My Passport</a><a href="/">Arcade</a></nav></div></header>
+<main>
+<section class="panel" id="pick">
+  <h2>You're 22 with $10,000. Where do you put it?</h2>
+  <p class="lede">Hop in the time machine and fast-forward 30 years, to age 52. This market is made up, but it follows real patterns: good years, bad years and a few scary crashes. You add nothing after today.</p>
+  <div class="choices" id="opts"></div>
+</section>
+<section id="run" hidden style="display:grid;gap:16px">
+  <div class="stats"><div class="stat"><span class="label">Age</span><b id="age">22</b></div><div class="stat pos"><span class="label">Your money</span><b id="val">$10,000</b></div><div class="stat"><span class="label">This year</span><b id="yr">—</b></div></div>
+  <div class="panel"><svg id="chart" viewBox="0 0 640 300" role="img" aria-label="Growth of your money over 30 years"></svg><div class="row" id="legend" style="font-size:14px"></div></div>
+  <div class="panel" id="msg" hidden></div>
+</section>
+<section class="panel" id="end" hidden></section>
+</main>
+<script>
+const FMP=(()=>{const K="fm-passport";
+ function get(){try{const p=JSON.parse(localStorage.getItem(K));if(p&&p.s&&p.b)return p;}catch(e){}return {s:{},b:{},x:{}};}
+ function save(p){try{localStorage.setItem(K,JSON.stringify(p));}catch(e){}}
+ return {get,
+  stamp(slug,score){const p=get();const s=p.s[slug]||{n:0,best:null};s.n++;if(score!=null&&(s.best==null||score>s.best))s.best=score;s.t=Date.now();p.s[slug]=s;save(p);},
+  badge(id,name){const p=get();if(p.b[id])return false;p.b[id]=Date.now();save(p);if(name)fmToast("🏅 Passport badge earned: "+name);return true;},
+  count(key){const p=get();p.x=p.x||{};p.x[key]=(p.x[key]||0)+1;save(p);return p.x[key];}};})();
+function fmToast(t){let el=document.getElementById("fmToast");if(!el){el=document.createElement("div");el.id="fmToast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}
+ el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3800);}
+
+
+const $=id=>document.getElementById(id), money=v=>"$"+Math.round(v).toLocaleString("en-US"), pct=v=>(v>=0?"+":"")+(v*100).toFixed(0)+"%";
+const STOCKS=["Zippi Scooters","NovaGame Studios","GreenGrid Energy"];
+const OPTS=[{id:"index",name:"S&P 500 index fund",d:"Owns ~500 big companies. Fee: 0.05% a year.",c:"#0F8B6C"},
+ {id:"active",name:"Actively managed fund",d:"A manager picks stocks for you. Fee: 1% a year.",c:"#2F5FB8"},
+ {id:"stock",name:"One hot stock",d:"Pick one company and go all in.",c:"#B23A26"},
+ {id:"save",name:"High-yield savings",d:"Safe and steady: about 2.5% a year.",c:"#9A6B00"}];
+function randn(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+let M, choice, stockI, path, me, y, sold, soldAt, everSold, timerT;
+$("opts").innerHTML=OPTS.map(o=>o.id==="stock"?`<div class="panel" style="padding:12px 14px"><div><b>${o.name}</b> <span class="lede">· ${o.d}</span></div><div class="row">${STOCKS.map((s,i)=>`<button class="btn" data-o="stock" data-s="${i}">${s}</button>`).join("")}</div></div>`:`<button class="btn choice" data-o="${o.id}"><span>${o.name}</span><small>${o.d}</small></button>`).join("");
+document.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>go(b.dataset.o,+(b.dataset.s||0)));
+function market(){let m;do{m=market1();}while(series(m.idx,.0005)[30]<60000||series(m.idx,.0005)[30]>170000);return m;}
+function market1(){const idx=[];for(let i=0;i<30;i++)idx.push(Math.max(-.3,Math.min(.35,.10+.12*randn())));
+  const c1=3+Math.floor(Math.random()*8), c2=15+Math.floor(Math.random()*10); idx[c1]=-.27; idx[c1+1]=.22; idx[c2]=-.19; idx[c2+1]=.16;
+  const bust=Math.floor(Math.random()*3), win=(bust+1+Math.floor(Math.random()*2))%3, bustYr=7+Math.floor(Math.random()*12);
+  const st=[0,1,2].map(k=>{let dead=false;return idx.map((r,i)=>{if(k===bust&&i===bustYr){dead=true;return -.9;} if(dead)return 0; return Math.max(-.7,Math.min(1.2,1.2*r+(k===win?.03:-.01)+.3*randn()));});});
+  return {idx,act:idx.map(r=>r-.01-.004*randn()-.0),st,save:Array(30).fill(.025),bust,win,bustYr};}
+function series(rets,fee){const v=[10000];rets.forEach(r=>v.push(v[v.length-1]*(1+r-(fee||0))));return v;}
+function go(o,s){choice=o;stockI=s;M=market();y=0;sold=false;everSold=false;soldAt=null;me=[10000];
+  path={index:series(M.idx,.0005),active:series(M.act),stock:series(M.st[s]),save:series(M.save)};
+  $("pick").hidden=true;$("run").hidden=false;$("end").hidden=true;$("msg").hidden=true;draw();tick();}
+function myRet(i){ if(sold) return .025; return choice==="index"?M.idx[i]-.0005:choice==="active"?M.act[i]:choice==="stock"?M.st[stockI][i]:.025;}
+function tick(){ if(y>=30) return finish();
+  const r=myRet(y); me.push(me[me.length-1]*(1+r)); y++;
+  $("age").textContent=22+y; $("val").textContent=money(me[y]); $("yr").textContent=(sold?"(in savings) ":"")+pct(r);
+  draw();
+  if(!sold&&choice!=="save"&&M.idx[y-1]<=-.15){ return crash(M.idx[y-1]); }
+  if(sold&&y-soldAt===3){ return backIn(); }
+  if(choice==="stock"&&stockI===M.bust&&y-1===M.bustYr){ return note(`💥 ${STOCKS[stockI]} went bankrupt. The stock lost 90% and never came back. This is the risk of putting everything in one company.`); }
+  timerT=setTimeout(tick,matchMedia("(prefers-reduced-motion: reduce)").matches?60:420);}
+function note(t){$("msg").hidden=false;$("msg").innerHTML=`<div class="note warn">${t}</div><div class="row"><button class="btn primary" id="cont">Keep going</button></div>`;$("cont").onclick=()=>{$("msg").hidden=true;tick();};}
+function crash(r){$("msg").hidden=false;$("msg").innerHTML=`<h2>📉 Market crash! The market fell ${pct(r)} this year.</h2><p class="lede">Your account dropped to ${money(me[y])}. News headlines are scary. What do you do?</p>
+  <div class="row"><button class="btn" id="sell">Sell everything, move to savings</button><button class="btn primary" id="stay">Stay the course</button></div>`;
+  $("sell").onclick=()=>{sold=true;everSold=true;soldAt=y;$("msg").hidden=true;tick();};$("stay").onclick=()=>{$("msg").hidden=true;tick();};}
+function backIn(){$("msg").hidden=false;$("msg").innerHTML=`<h2>It's been 3 years since you sold.</h2><p class="lede">The market has bounced back while your money sat in savings. Get back in?</p><div class="row"><button class="btn primary" id="yes">Yes, invest again</button><button class="btn" id="no">No, stay in savings</button></div>`;
+  $("yes").onclick=()=>{sold=false;$("msg").hidden=true;tick();};$("no").onclick=()=>{$("msg").hidden=true;tick();};}
+function draw(){const W=640,H=300,L=56,B=26,T=12; const all=[...Object.values(path).flat(),...me];const max=Math.max(20000,...all.slice(0));
+  const X=i=>L+(W-L-10)*i/30, Y=v=>H-B-(H-B-T)*v/max;
+  let s=""; for(let k=0;k<=4;k++){const v=max*k/4;s+=`<line x1="${L}" x2="${W-10}" y1="${Y(v)}" y2="${Y(v)}" stroke="currentColor" opacity=".12"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v>=1e6?"$"+(v/1e6).toFixed(1)+"M":"$"+Math.round(v/1000)+"k"}</text>`;}
+  [0,10,20,30].forEach(i=>s+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle">age ${22+i}</text>`);
+  const line=(v,c,w,dash)=>`<polyline fill="none" stroke="${c}" stroke-width="${w}" ${dash?'stroke-dasharray="5 5"':""} stroke-linejoin="round" points="${v.slice(0,y+1).map((x,i)=>X(i).toFixed(1)+","+Y(x).toFixed(1)).join(" ")}"/>`;
+  OPTS.forEach(o=>{if(o.id!==choice) s+=line(path[o.id],o.c,2,true);}); s+=line(me,"currentColor",4,false);
+  $("chart").innerHTML=s; $("chart").style.color="var(--ink)";
+  $("legend").innerHTML=`<span class="key"><i style="background:var(--ink);height:5px"></i>You</span>`+OPTS.filter(o=>o.id!==choice).map(o=>`<span class="key"><i style="background:${o.c}"></i>${o.id==="stock"?STOCKS[stockI]:o.name}</span>`).join("");}
+function finish(){ y=30; draw(); const stay=choice==="save"?path.save[30]:choice==="index"?path.index[30]:choice==="active"?path.active[30]:path.stock[30];
+  FMP.stamp("market-time-machine",Math.round(me[30]));
+  if(choice!=="save"&&!everSold) FMP.badge("stay-course","Stay the Course (held through a crash)");
+  if(choice==="index") setTimeout(()=>FMP.badge("diversified","Diversified (picked the index fund)"),1200);
+  const rows=OPTS.map(o=>[o.id==="stock"?`One stock: ${STOCKS[stockI]}`:o.name,path[o.id][30]]);
+  const allStocks=STOCKS.map((n,i)=>[n,series(M.st[i])[30]]);
+  $("msg").hidden=true;$("end").hidden=false;
+  $("end").innerHTML=`<h2>You're 52. Your $10,000 is now ${money(me[30])}.</h2>
+   <div class="tw"><table><thead><tr><th>If you had picked…</th><th class="n">At age 52</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${money(r[1])}</td></tr>`).join("")}</tbody></table></div>
+   ${everSold&&stay>me[30]?`<div class="note warn">You sold during a crash. If you had stayed the course, you'd have ${money(stay)} instead of ${money(me[30])}. Selling locks in the loss.</div>`:""}
+   <div class="tw"><table><thead><tr><th>The three stocks</th><th class="n">At age 52</th></tr></thead><tbody>${allStocks.map(r=>`<tr><td>${r[0]}${STOCKS.indexOf(r[0])===M.bust?" (went bankrupt)":""}</td><td class="n">${money(r[1])}</td></tr>`).join("")}</tbody></table></div>
+   <div class="note ok">The index fund owned all the companies, so one bankruptcy barely mattered. The 1% fee on the managed fund cost about ${money(path.index[30]-path.active[30])} over 30 years. And savings is safe, but it grows slowly.</div>
+   <div class="row"><button class="btn primary" id="again">Travel again (new market)</button></div>`;
+  $("again").onclick=()=>{$("end").hidden=true;$("pick").hidden=false;};}
+</script></body></html>

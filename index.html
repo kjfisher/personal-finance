@@ -37,6 +37,8 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 .agenda-btn:hover { filter:brightness(1.05); }
 .agenda-btn:focus-visible { outline:3px solid var(--hero-ink); outline-offset:3px; }
 @media (max-width:480px){ .agenda-btn { grid-template-columns:1fr; } }
+.hero-links{display:flex;flex-wrap:wrap;gap:8px}.hero-links a{color:var(--hero-ink);text-decoration:none;border:1px solid rgba(255,255,255,.3);padding:8px 14px;border-radius:10px;font-weight:700}
+.played{font-size:13px;font-weight:700;color:var(--money)}
 .hero p { margin:0; max-width:60ch; font-size:clamp(17px, 1.8vw, 21px); line-height:1.45; opacity:.9; }
 .ticker { margin-top:10px; border-top:1px solid rgba(255,255,255,.15); padding-top:12px; display:flex; flex-wrap:wrap; gap:8px 22px; font-family:var(--mono); font-size:14px; }
 .ticker span b { color:var(--gold); font-weight:600; }
@@ -82,8 +84,9 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
 <header class="hero"><div class="inner">
   <div class="eyebrow">Personal Finance - Review Games</div>
   <h1>Future Millionaires <span class="tag">Arcade</span></h1>
-  <p>Practice the money skills from class, from compounding and paychecks to cars, housing, investing, taxes and insurance. Pick a game on your iPad, challenge a partner, and walk into the quiz ready.</p>
+  <p>Practice the money skills from class, from compounding and paychecks to budgets, taxes, banking, credit, cars, housing, insurance and investing. Pick a game on your iPad, challenge a partner, and walk into the quiz ready.</p>
   <a class="agenda-btn" href="/daily-agenda/" target="_blank" rel="noopener"><span class="lbl">Today in class</span><b>Daily Agenda</b><span class="go">Learning target, plan &amp; today's games ↗</span></a>
+  <div class="hero-links"><a href="/passport/">🛂 My Millionaire Passport</a><a href="/exit-tickets/">Exit tickets</a><a href="/warm-ups/">Warm-ups</a></div>
   <div class="ticker" aria-label="Numbers to know">
     <span>FICA <b>7.65%</b></span><span>FICO range <b>300–850</b></span><span>Payment history <b>35%</b></span><span>Utilization goal <b>≤ 30%</b></span><span>FDIC insured <b>$250,000</b></span><span>Free reports <b>annualcreditreport.com</b></span>
   </div>
@@ -93,20 +96,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
   <div class="filters" role="group" aria-label="Filter games">
     <span class="lbl">Show:</span>
     <button class="chip" data-f="all" aria-pressed="true">All games</button>
-    <button class="chip" data-f="u0" aria-pressed="false">Unit 0: The Power of Compounding</button><button class="chip" data-f="u1" aria-pressed="false">Unit 1: Payroll Deductions</button>
-    <button class="chip" data-f="u2" aria-pressed="false">Unit 2: Pay Stubs</button>
-    <button class="chip" data-f="u3" aria-pressed="false">Unit 3: Banking</button>
-    <button class="chip" data-f="u4" aria-pressed="false">Unit 4: Credit</button>
-    <button class="chip" data-f="mid" aria-pressed="false">Midterm (Units 0–4)</button>
-    <button class="chip" data-f="u5" aria-pressed="false">Unit 5: Cars &amp; Lending</button>
-    <button class="chip" data-f="u6" aria-pressed="false">Unit 6: Real Estate</button>
-    <button class="chip" data-f="u7" aria-pressed="false">Unit 7: Investing</button>
-    <button class="chip" data-f="u8" aria-pressed="false">Unit 8: Federal Taxes</button>
-    <button class="chip" data-f="u9" aria-pressed="false">Unit 9: Insurance, Budgeting, and Estate Planning</button>
-    <button class="chip" data-f="u10" aria-pressed="false">Unit 10: Final Project</button>
-    <button class="chip" data-f="fin" aria-pressed="false">Final Exam</button>
-    
-    <button class="chip" data-f="cs" aria-pressed="false">Case Studies</button>
+    <button class="chip" data-f="u1" aria-pressed="false">Unit 1: Compounding</button><button class="chip" data-f="u2" aria-pressed="false">Unit 2: Your Paycheck</button><button class="chip" data-f="u3" aria-pressed="false">Unit 3: Budgeting</button><button class="chip" data-f="u4" aria-pressed="false">Unit 4: Taxes</button><button class="chip" data-f="u5" aria-pressed="false">Unit 5: Banking</button><button class="chip" data-f="mid" aria-pressed="false">Midterm</button><button class="chip" data-f="u6" aria-pressed="false">Unit 6: Credit</button><button class="chip" data-f="u7" aria-pressed="false">Unit 7: Big Purchases</button><button class="chip" data-f="u8" aria-pressed="false">Unit 8: Insurance</button><button class="chip" data-f="u9" aria-pressed="false">Unit 9: Investing & Estate</button><button class="chip" data-f="u10" aria-pressed="false">Unit 10: Final Project</button><button class="chip" data-f="fin" aria-pressed="false">Final Exam</button><button class="chip" data-f="cs" aria-pressed="false">Case Studies</button>
   </div>
 
   <section class="shelf" aria-labelledby="solo-h">
@@ -133,11 +123,21 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
     </div>
   </section>
 
-  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span>New: Unit 0, Final Exam, Target Match &amp; Case Files</span></span></div>
+  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span>New: Paycheck to Paycheck, Swipe It, Insurance Roulette, Market Time Machine, Money Would You Rather</span></span></div>
 </div></main>
 <footer>Personal Finance - Future Millionaires Arcade</footer>
 
 <script>
+const FMP=(()=>{const K="fm-passport";
+ function get(){try{const p=JSON.parse(localStorage.getItem(K));if(p&&p.s&&p.b)return p;}catch(e){}return {s:{},b:{},x:{}};}
+ function save(p){try{localStorage.setItem(K,JSON.stringify(p));}catch(e){}}
+ return {get,
+  stamp(slug,score){const p=get();const s=p.s[slug]||{n:0,best:null};s.n++;if(score!=null&&(s.best==null||score>s.best))s.best=score;s.t=Date.now();p.s[slug]=s;save(p);},
+  badge(id,name){const p=get();if(p.b[id])return false;p.b[id]=Date.now();save(p);if(name)fmToast("🏅 Passport badge earned: "+name);return true;},
+  count(key){const p=get();p.x=p.x||{};p.x[key]=(p.x[key]||0)+1;save(p);return p.x[key];}};})();
+function fmToast(t){let el=document.getElementById("fmToast");if(!el){el=document.createElement("div");el.id="fmToast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}
+ el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3800);}
+
 const GAMES=[
  {f:"cs", where:"solo", isNew:true, name:"Case Files", big:"CER", color:"--cs", unit:"Case Studies", tags:["Claim · Evidence · Reasoning", "Units 0–9"],
   d:"Read a real money decision, decide if it's smart, then pick the strongest evidence and reasoning. Shows a model CER after each case.", url:"/case-files/"},
@@ -297,14 +297,22 @@ const GAMES=[
   d:"Checking, savings, HYSA or CD? Earn or pay interest? Debit or credit? Move to your answer.", url:"/bank-corners/"},
  {f:"mid", where:"class", isNew:true, name:"Midterm Corners", big:"4 corners", color:"--t20", unit:"Midterm - Units 0–4", tags:["Get up and move","15 min"],
   d:"Twenty rounds, five from each unit. Survivor mode: last one standing wins.", url:"/midterm-corners/"}
-];
+,
+ {"f": "u3", "where": "solo", "isNew": true, "_n": true, "name": "Paycheck to Paycheck", "big": "Day 30", "color": "--u7", "unit": "Unit 3 - Budgeting", "tags": ["Solo", "Life sim", "10–15 min"], "d": "Survive a month on your first paycheck. Bills come out on their own, life throws choices at you, and you try to reach day 30 with no overdrafts or card debt.", "url": "/paycheck-to-paycheck/"},
+ {"f": "u3", "where": "solo", "isNew": true, "_n": true, "name": "Swipe It", "big": "← →", "color": "--t13", "unit": "Unit 3 - Budgeting", "tags": ["Solo", "60 seconds", "4 decks"], "d": "Swipe fast: need or want, fixed or variable, helps or hurts your credit, stock or bond. Build a streak.", "url": "/swipe-it/"},
+ {"f": "u8", "where": "solo", "isNew": true, "_n": true, "name": "Insurance Roulette", "big": "Spin!", "color": "--t7", "unit": "Unit 8 - Insurance", "tags": ["Solo or class", "Wheel", "10 min"], "d": "Pick health, auto and renters coverage, then spin your year: ER visits, hail, break-ins, crashes. See what insurance really saved you.", "url": "/insurance-roulette/"},
+ {"f": "u9", "where": "solo", "isNew": true, "_n": true, "name": "Market Time Machine", "big": "30 yrs", "color": "--t15", "unit": "Unit 9 - Investing, Retirement & Estate Planning", "tags": ["Solo", "Chart", "10 min"], "d": "Invest $10,000 at 22 and fast-forward to 52. Index fund, one hot stock, a managed fund or savings? Survive the crashes without panic-selling.", "url": "/market-time-machine/"},
+ {"f": "cs", "where": "class", "isNew": true, "_n": true, "name": "Money Would You Rather", "big": "A or B?", "color": "--t18", "unit": "Case Studies", "tags": ["Whole class", "Projector", "Any unit"], "d": "Two money choices, the class votes, then the math reveal. A penny that doubles or $1 million? New car or used car + investing?", "url": "/would-you-rather/"}];
+const NEWU={"u1": "Unit 1 - The Power of Compounding", "u2": "Unit 2 - Your Paycheck", "u3": "Unit 3 - Budgeting", "u4": "Unit 4 - Federal Taxes", "u5": "Unit 5 - Banking", "mid": "Midterm - Units 2–5", "u6": "Unit 6 - Credit", "u7": "Unit 7 - Big Purchases: Housing & Cars", "u8": "Unit 8 - Insurance", "u9": "Unit 9 - Investing, Retirement & Estate Planning", "u10": "Unit 10 - Final Project & Posters", "fin": "Final Exam - Units 1–9", "cs": "Case Studies"}, OLDF={"u0": "u1", "u1": "u2", "u2": "u2", "u3": "u5", "u4": "u6", "mid": "mid", "u5": "u7", "u6": "u7", "u7": "u9", "u8": "u4", "u10": "u10", "fin": "fin", "cs": "cs"}, BYNAME={"Budget Builder": "u3", "Life Duel": "u3", "Cover Me": "u8", "Life Corners": "u8", "Life Vault": "u9", "Life Showdown": "u9"};
+GAMES.forEach(g=>{ if(!g._n){ g.f=BYNAME[g.name]||OLDF[g.f]||g.f; g.unit=NEWU[g.f]||g.unit; g.tags=g.tags.map(t=>t.replace('Units 0–9','Units 1–9')); } });
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function played(g){const s=FMP.get().s, k=g.url.replace(/\//g,"");return !!(s[k]||Object.keys(s).some(x=>x.startsWith(k+"-")));}
 function card(g){ return `<article class="card">
   <div class="cart" style="background:var(${g.color})"><span class="unit">${esc(g.unit)}</span><span class="big">${esc(g.big)}</span>${g.isNew?`<span class="new">NEW</span>`:""}</div>
   <div class="body"><h3>${esc(g.name)}</h3><div class="meta">${g.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div><p>${esc(g.d)}</p>
   ${g.blooket?`<div class="blooket"><span class="code">Your teacher will give you the game code.</span><a class="play alt" href="${g.url}" target="_blank" rel="noopener">Join on Blooket</a></div>`
-    :`<a class="play" href="${g.url}" target="_blank" rel="noopener">Play ${esc(g.name)}</a>`}</div></article>`; }
-const UO={u0:0,u1:1,u2:2,u3:3,u4:4,mid:5,u5:6,u6:7,u7:8,u8:9,u9:10,u10:11,fin:12,cs:13};
+    :`<a class="play" href="${g.url}" target="_blank" rel="noopener" data-slug="${g.url.replace(/\//g,'')}">Play ${esc(g.name)}</a>${played(g)?`<span class="played">✓ In your passport</span>`:""}`}</div></article>`; }
+const UO={u1:1,u2:2,u3:3,u4:4,u5:5,mid:6,u6:7,u7:8,u8:9,u9:10,u10:11,fin:12,cs:13};
 let filter="all";
 try{ const s=localStorage.getItem("arcade-filter"); if(s&&document.querySelector(`.chip[data-f="${s}"]`)) filter=s; }catch(e){}
 function render(){
@@ -312,6 +320,7 @@ function render(){
   ["solo","partner","class"].forEach(w=>{ const list=GAMES.filter(g=>g.where===w && (filter==="all"||g.f===filter)).sort((a,b)=>UO[a.f]-UO[b.f]);
     document.getElementById(w).innerHTML = list.length ? list.map(card).join("") : `<p class="empty">No games here for this filter.</p>`; });
 }
+document.addEventListener("click",e=>{const a=e.target.closest("a.play[data-slug]");if(!a)return;FMP.stamp(a.dataset.slug);if(Object.keys(FMP.get().s).length===1)FMP.badge("first-stamp","First Stamp");setTimeout(render,300);});
 document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{ filter=c.dataset.f; try{ localStorage.setItem("arcade-filter",filter); }catch(e){} render(); });
 render();
 </script>

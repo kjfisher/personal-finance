@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Insurance Roulette</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap"><style>
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--hero:#14213D;--hero-ink:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;
+--good:#1F7A45;--good-bg:#E3F4E8;--bad:#B23A26;--bad-bg:#FBE9E5;--warn:#9A6B00;--warn-bg:#FBF1D9;--accent:var(--money);
+--display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;
+--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.top{background:var(--hero);color:var(--hero-ink)}
+.top .in{max-width:980px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.top h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1;margin:4px 0 0}
+.top nav{display:flex;gap:8px;flex-wrap:wrap}
+.top nav a{color:var(--hero-ink);text-decoration:none;border:1px solid rgba(255,255,255,.3);padding:8px 12px;border-radius:10px;font-weight:700;font-size:15px}
+main{max-width:980px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+.panel h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);line-height:1.15;margin:0}
+.lede{margin:0;color:var(--muted)}
+.label{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 16px var(--body);border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;border-radius:12px;cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--money);color:var(--money-ink);border-color:var(--money)}
+.btn.gold{background:var(--gold);color:#14213D;border-color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.choices{display:grid;gap:10px}
+.choice{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.choice small{grid-column:1/-1;color:var(--muted);font-weight:400}
+.cost{font:600 15px var(--mono)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.stat b{display:block;font:600 22px var(--mono)}
+.stat.neg b{color:var(--bad)} .stat.pos b{color:var(--good)}
+.note{border-radius:12px;padding:10px 14px;font-weight:700}
+.note.ok{background:var(--good-bg);color:var(--good)} .note.no{background:var(--bad-bg);color:var(--bad)} .note.warn{background:var(--warn-bg);color:var(--warn)}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,72px);line-height:1}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:#14213D;font-weight:700;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:all .3s;z-index:50;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)} td.n,th.n{text-align:right;font-family:var(--mono)}
+.tw{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.wheelwrap{position:relative;max-width:340px;width:100%;margin:6px auto}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-size:28px;color:var(--gold);z-index:2;text-shadow:0 2px 4px rgba(0,0,0,.3)}
+#wheel{pointer-events:none;width:100%;height:auto;transition:transform 2.6s cubic-bezier(.17,.67,.2,1)}
+#wheel text{font:700 8.5px var(--body);fill:#fff}
+.opt{display:grid;gap:8px}
+.opt .row .btn[aria-pressed="true"]{border-color:var(--money);background:color-mix(in srgb,var(--money) 14%,var(--surface))}
+.opt .btn{flex:1 1 220px}
+.opt .btn small{display:block;color:var(--muted);font-weight:400}
+</style></head>
+<body><header class="top"><div class="in"><div><div class="eyebrow">Unit 8 · Insurance · Solo or class</div><h1>Insurance Roulette</h1></div>
+<nav><a href="/passport/">My Passport</a><a href="/">Arcade</a></nav></div></header>
+<main>
+<section class="panel" id="setup">
+  <h2>Pick your coverage, then spin your year</h2>
+  <p class="lede">You're 23, renting an apartment and driving a paid-off used car. Choose your insurance, then spin the wheel 4 times, once for each season. At the end, see what you paid with your coverage versus with no extra coverage at all.</p>
+  <div id="opts" style="display:grid;gap:14px"></div>
+  <div class="row"><span class="label" id="prem"></span></div>
+  <div class="row"><button class="btn primary" id="lock">Lock in my coverage</button></div>
+</section>
+<section id="play" hidden style="display:grid;gap:16px">
+  <div class="panel">
+    <div class="row" style="justify-content:space-between"><span class="label" id="season"></span><span class="label" id="myplan"></span></div>
+    <div class="wheelwrap"><div class="pointer" aria-hidden="true">▼</div><svg id="wheel" viewBox="-110 -110 220 220" role="img" aria-label="Life event wheel"></svg></div>
+    <div class="row" style="justify-content:center"><button class="btn gold" id="spin">Spin the wheel</button></div>
+    <div id="result"></div>
+  </div>
+  <div class="panel"><div class="label">Your year so far · *Bare minimum = liability only, no health or renters insurance</div><div class="tw"><table><thead><tr><th>Season</th><th>Event</th><th class="n">You paid</th><th class="n">Bare min.*</th></tr></thead><tbody id="tbl"></tbody></table></div></div>
+</section>
+<section class="panel" id="end" hidden></section>
+</main>
+<script>
+const FMP=(()=>{const K="fm-passport";
+ function get(){try{const p=JSON.parse(localStorage.getItem(K));if(p&&p.s&&p.b)return p;}catch(e){}return {s:{},b:{},x:{}};}
+ function save(p){try{localStorage.setItem(K,JSON.stringify(p));}catch(e){}}
+ return {get,
+  stamp(slug,score){const p=get();const s=p.s[slug]||{n:0,best:null};s.n++;if(score!=null&&(s.best==null||score>s.best))s.best=score;s.t=Date.now();p.s[slug]=s;save(p);},
+  badge(id,name){const p=get();if(p.b[id])return false;p.b[id]=Date.now();save(p);if(name)fmToast("🏅 Passport badge earned: "+name);return true;},
+  count(key){const p=get();p.x=p.x||{};p.x[key]=(p.x[key]||0)+1;save(p);return p.x[key];}};})();
+function fmToast(t){let el=document.getElementById("fmToast");if(!el){el=document.createElement("div");el.id="fmToast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}
+ el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3800);}
+
+
+const PLANS={
+ health:{name:"Health insurance",opts:[
+   {id:"none",label:"No health insurance",prem:0,ded:null,co:1,oop:Infinity,desc:"You pay every medical bill in full."},
+   {id:"hdhp",label:"Low premium plan",prem:120,ded:4000,co:.2,oop:7000,desc:"$120/mo · $4,000 deductible · then 20% · $7,000 out-of-pocket max"},
+   {id:"ppo",label:"High premium plan",prem:260,ded:1000,co:.2,oop:3500,desc:"$260/mo · $1,000 deductible · then 20% · $3,500 out-of-pocket max"}]},
+ auto:{name:"Auto insurance",opts:[
+   {id:"liab",label:"Liability only (required)",prem:70,full:false,desc:"$70/mo · pays for damage you cause to OTHERS. Your own car isn't covered."},
+   {id:"full",label:"Full coverage",prem:130,full:true,ded:500,desc:"$130/mo · liability + collision + comprehensive · $500 deductible on your car"}]},
+ renters:{name:"Renters insurance",opts:[
+   {id:"none",label:"No renters insurance",prem:0,on:false,desc:"Your landlord's policy covers the building, not your stuff."},
+   {id:"yes",label:"Renters insurance",prem:15,on:true,ded:500,desc:"$15/mo · covers your belongings · $500 deductible"}]}};
+const EVENTS=[
+ {id:"quiet",s:"Quiet",t:"A quiet season",d:"Nothing happened. Insurance is for the seasons that aren't quiet.",type:"none",amt:0,c:"#2E6B5E"},
+ {id:"er",s:"ER visit",t:"ER visit",d:"Bad stomach pain at 2 a.m. The ER bill is $3,200.",type:"health",amt:3200,c:"#B23A26"},
+ {id:"arm",s:"Broken arm",t:"Broken arm",d:"You fell playing pickup basketball. Surgery and a cast: $9,500.",type:"health",amt:9500,c:"#9C3420"},
+ {id:"flu",s:"Urgent care",t:"Urgent care",d:"Flu and a sinus infection. Urgent care + medicine: $250.",type:"health",amt:250,c:"#B07A12"},
+ {id:"crash",s:"Crash",t:"Fender bender (your fault)",d:"You rear-ended someone. Their car: $3,500. Your car: $2,800.",type:"crash",amt:2800,other:3500,c:"#1D4E89"},
+ {id:"hail",s:"Hail",t:"Hailstorm",d:"Hail dented your hood and cracked the windshield: $2,200.",type:"comp",amt:2200,c:"#5B3FA6"},
+ {id:"deer",s:"Deer",t:"Deer on the road",d:"A deer jumped out on a back road. Repair: $1,900.",type:"comp",amt:1900,c:"#7A4A1A"},
+ {id:"theft",s:"Break-in",t:"Apartment break-in",d:"Someone took your laptop, TV and game console: $2,400.",type:"stuff",amt:2400,c:"#3F2E73"},
+ {id:"fire",s:"Fire",t:"Kitchen fire",d:"A neighbor's fire spread smoke and water damage. Your belongings: $6,000.",type:"stuff",amt:6000,c:"#8C3B5E"}];
+const W=["quiet","er","crash","flu","theft","quiet","hail","arm","deer","quiet","fire","flu"]; // wheel slices (repeats = more likely)
+let pick={health:"hdhp",auto:"liab",renters:"none"}, season=0, rows=[], healthPaid=0, healthPaidNone=0, rot=0;
+const $=id=>document.getElementById(id), money=v=>"$"+Math.round(v).toLocaleString("en-US");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function opt(cat){return PLANS[cat].opts.find(o=>o.id===pick[cat]);}
+function renderOpts(){
+  $("opts").innerHTML=Object.entries(PLANS).map(([k,c])=>`<div class="opt"><div class="label">${c.name}</div><div class="row">${c.opts.map(o=>`<button class="btn" data-cat="${k}" data-id="${o.id}" aria-pressed="${pick[k]===o.id}">${esc(o.label)}<small>${esc(o.desc)}</small></button>`).join("")}</div></div>`).join("");
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{pick[b.dataset.cat]=b.dataset.id;renderOpts();});
+  const m=opt("health").prem+opt("auto").prem+opt("renters").prem;
+  $("prem").textContent=`Premiums: ${money(m)} a month = ${money(m*12)} a year`;
+}
+renderOpts();
+function drawWheel(){const n=W.length,a=2*Math.PI/n;let s="";
+  W.forEach((id,i)=>{const e=EVENTS.find(x=>x.id===id),a0=i*a-Math.PI/2,a1=a0+a,x0=100*Math.cos(a0),y0=100*Math.sin(a0),x1=100*Math.cos(a1),y1=100*Math.sin(a1),m=a0+a/2;
+    s+=`<path d="M0 0L${x0.toFixed(2)} ${y0.toFixed(2)}A100 100 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z" fill="${e.c}" stroke="#fff" stroke-width="1"/>`;
+    const lab=e.s; s+=`<text x="${(62*Math.cos(m)).toFixed(1)}" y="${(62*Math.sin(m)).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(m*180/Math.PI).toFixed(1)} ${(62*Math.cos(m)).toFixed(1)} ${(62*Math.sin(m)).toFixed(1)})">${esc(lab)}</text>`;});
+  s+=`<circle r="12" fill="#14213D" stroke="#E0A800" stroke-width="3"/>`; $("wheel").innerHTML=s;}
+drawWheel();
+$("lock").onclick=()=>{$("setup").hidden=true;$("play").hidden=false;season=0;rows=[];healthPaid=0;healthPaidNone=0;
+  $("myplan").textContent=`${opt("health").label} · ${opt("auto").label.replace(" (required)","")} · ${opt("renters").label}`;nextSeason();};
+const SEAS=["Winter","Spring","Summer","Fall"];
+function nextSeason(){ $("season").textContent=`Spin ${season+1} of 4 · ${SEAS[season]}`; $("result").innerHTML=""; $("spin").disabled=false; $("spin").textContent="Spin the wheel"; }
+function healthCost(bill,plan,paidSoFar){ // returns what you pay for this bill
+  if(plan.id==="none") return bill;
+  const dedLeft=Math.max(0,plan.ded-Math.min(paidSoFar,plan.ded)); // assumes paidSoFar first fills the deductible
+  let pay=Math.min(bill,dedLeft)+plan.co*Math.max(0,bill-dedLeft);
+  return Math.min(pay,Math.max(0,plan.oop-paidSoFar));}
+function cost(e){ // [you pay, no-coverage pays, explanation]
+  const h=opt("health"),a=opt("auto"),r=opt("renters");
+  if(e.type==="none") return [0,0,"No bills this season."];
+  if(e.type==="health"){const y=healthCost(e.amt,h,healthPaid); healthPaid+=y; healthPaidNone+=e.amt;
+    return [y,e.amt,h.id==="none"?`No health insurance: you pay the full ${money(e.amt)}.`:`Your plan: deductible first, then 20%, capped by your out-of-pocket max. You pay ${money(y)} of ${money(e.amt)}.`];}
+  if(e.type==="crash"){const mine=a.full?Math.min(a.ded,e.amt):e.amt;
+    return [mine,e.amt,`Liability (required by law) paid the other driver's ${money(e.other)}. ${a.full?`Collision fixed your car after your ${money(a.ded)} deductible.`:`Without collision, you pay your own ${money(e.amt)} repair.`}`];}
+  if(e.type==="comp"){const y=a.full?Math.min(a.ded,e.amt):e.amt; return [y,e.amt,a.full?`Comprehensive covers weather and animals. You pay the ${money(a.ded)} deductible.`:`Liability doesn't cover your own car. You pay ${money(e.amt)}.`];}
+  if(e.type==="stuff"){const y=r.on?Math.min(r.ded,e.amt):e.amt; return [y,e.amt,r.on?`Renters insurance replaced your things after the ${money(r.ded)} deductible.`:`The landlord's insurance covers the building, not your stuff. You pay ${money(e.amt)}.`];}
+}
+$("spin").onclick=()=>{ $("spin").disabled=true; const n=W.length, i=Math.floor(Math.random()*n), slice=360/n;
+  const target=360-(i*slice+slice/2); rot+=360*4+((target-rot%360)+360)%360; $("wheel").style.transform=`rotate(${rot}deg)`;
+  setTimeout(()=>{const e=EVENTS.find(x=>x.id===W[i]); const [y,none,why]=cost(e); rows.push([SEAS[season],e.t,y,none]);
+    $("tbl").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${esc(r[1])}</td><td class="n">${money(r[2])}</td><td class="n">${money(r[3])}</td></tr>`).join("");
+    $("result").innerHTML=`<div style="display:grid;gap:8px;margin-top:8px"><h2>${esc(e.t)}</h2><p class="lede">${esc(e.d)}</p><div class="note ${y<none?"ok":y===0?"ok":"warn"}">${esc(why)}</div></div>`;
+    season++; if(season<4){$("spin").disabled=false;$("spin").textContent="Spin again";$("season").textContent=`Spin ${season+1} of 4 · ${SEAS[season]}`;} else {$("spin").textContent="See my year";$("spin").disabled=false;$("spin").onclick=finish;}
+  },matchMedia("(prefers-reduced-motion: reduce)").matches?50:2700);};
+function finish(){
+  const prem=(opt("health").prem+opt("auto").prem+opt("renters").prem)*12, oop=rows.reduce((s,r)=>s+r[2],0), none=rows.reduce((s,r)=>s+r[3],0);
+  const total=prem+oop, minPrem=70*12; // liability is required by law, so "bare minimum" still pays it
+  const bare=minPrem+none;
+  FMP.stamp("insurance-roulette",bare-total); const plays=FMP.count("ir-plays");
+  if(total<bare) FMP.badge("covered","Covered (insurance saved you money)");
+  if(plays>=3) setTimeout(()=>FMP.badge("risk-manager","Risk Manager (played 3 years)"),1200);
+  $("play").hidden=true; $("end").hidden=false;
+  $("end").innerHTML=`<h2>Your year is over</h2>
+   <div class="tw"><table><thead><tr><th></th><th class="n">Your coverage</th><th class="n">Bare minimum*</th></tr></thead><tbody>
+    <tr><td>Premiums for the year</td><td class="n">${money(prem)}</td><td class="n">${money(minPrem)}</td></tr>
+    <tr><td>Out of pocket after events</td><td class="n">${money(oop)}</td><td class="n">${money(bare-minPrem)}</td></tr>
+    <tr><th>Total cost of the year</th><th class="n">${money(total)}</th><th class="n">${money(bare)}</th></tr></tbody></table></div>
+   <p class="lede">*Bare minimum = liability only (required by law to drive), no health insurance, no renters insurance.</p>
+   <div class="note ${total<=bare?"ok":"warn"}">${total<bare?`Your coverage saved you ${money(bare-total)} this year.`:total===bare?"Same cost either way this year.":`This year you paid ${money(total-bare)} more for coverage you didn't need… this time. Insurance is protection from the big, rare bills, like a $9,500 broken arm.`}</div>
+   <p>Big idea: you pay a small, certain cost (premium) to avoid a big, uncertain one. A higher deductible lowers your premium, so it works best when you have an emergency fund.</p>
+   <div class="row"><button class="btn primary" id="again">Play another year</button></div>`;
+  $("again").onclick=()=>location.reload();
+}
+</script></body></html>
