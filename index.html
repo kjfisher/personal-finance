@@ -38,6 +38,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 .agenda-btn:focus-visible { outline:3px solid var(--hero-ink); outline-offset:3px; }
 @media (max-width:480px){ .agenda-btn { grid-template-columns:1fr; } }
 .hero-links{display:flex;flex-wrap:wrap;gap:8px}.hero-links a{color:var(--hero-ink);text-decoration:none;border:1px solid rgba(255,255,255,.3);padding:8px 14px;border-radius:10px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:#14213D;font-weight:700;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:all .3s;z-index:50;max-width:calc(100% - 32px);text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .played{font-size:13px;font-weight:700;color:var(--money)}
 .hero p { margin:0; max-width:60ch; font-size:clamp(17px, 1.8vw, 21px); line-height:1.45; opacity:.9; }
 .ticker { margin-top:10px; border-top:1px solid rgba(255,255,255,.15); padding-top:12px; display:flex; flex-wrap:wrap; gap:8px 22px; font-family:var(--mono); font-size:14px; }
