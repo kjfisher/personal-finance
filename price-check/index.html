@@ -85,37 +85,41 @@ const ITEMS=[
  {q:"A full year of Netflix Standard (no ads, $19.99 a month)",a:239.88,cents:true,unit:"Unit 3 · Budgeting",why:"Small monthly charges add up. Subscriptions are the easiest wants to cut.",src:"Netflix U.S. plan prices, 2026"},
  {q:"How much more per year Netflix Premium ($26.99) costs than Standard with ads ($8.99)",a:216,unit:"Unit 3 · Needs vs. wants",why:"($26.99 − $8.99) × 12 = $216 a year for the upgrade.",src:"Netflix U.S. plan prices, 2026"},
  {q:"Average car insurance in Illinois for one YEAR (about $201 a month)",a:2412,unit:"Unit 8 · Insurance",why:"$201 × 12 = $2,412. Teen and new drivers usually pay more.",src:"Illinois average rates, 2026"},
+ {q:"One credit hour at Harper College for an in-district student (tuition + fees, 2026-27)",a:167.75,cents:true,unit:"Unit 9 · Paying for your future",why:"$145.75 tuition + $22 in fees per credit hour. A typical class is 3 credit hours: about $503.",src:"Harper College, 2026-27 rates"},
+ {q:"A full-time year at Harper: 30 credit hours plus a $50 activity fee each semester",a:5132.50,cents:true,unit:"Unit 3 · Budgeting",why:"30 × $167.75 = $5,032.50 + $100 = $5,132.50, before books. Two years at Harper, then transfer, is a big money saver.",src:"Calculated from Harper College 2026-27 rates"},
+ {q:"One year of in-state tuition + fees at the University of Illinois Urbana-Champaign (lowest-cost majors, 2026-27)",a:18530,unit:"Unit 9 · Paying for your future",why:"Tuition and fees run $18,530 to $24,018 depending on major. That's about 3.6 times a year at Harper.",src:"University of Illinois Undergraduate Admissions, 2026-27 estimates"},
+ {q:"The full in-state cost of one year at U of I: tuition, fees, food, housing, books and other costs (lowest-cost majors)",a:38088,unit:"Unit 3 · Budgeting",why:"$18,530 + $15,858 food & housing + $1,200 books + $2,500 other = $38,088 before financial aid. Always check the net price calculator: aid can cut this a lot.",src:"University of Illinois Undergraduate Admissions, 2026-27 estimates"},
  {q:"The raise a typical renter would need to comfortably afford buying a home",a:14408,unit:"Unit 7 · Rent or buy",why:"High prices and mortgage rates keep many 20-somethings renting longer.",src:"Zillow Rent Report, October 2026"}
 ];
 const store={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
 let G;
 function shuffleKeepPairs(){ // keep each derived question right after its source fact
-  const groups=[[0,1],[2],[3,4],[5],[6,7],[8,9],[10],[11]];
+  const groups=[[0,1],[2],[3,4],[5],[6,7],[8,9],[10],[11,12],[13,14],[15]];
   for(let i=groups.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[groups[i],groups[j]]=[groups[j],groups[i]];}
   return groups.flat(); }
 function pts(guess,ans){ const off=Math.abs(guess-ans)/ans; return off<=.10?3:off<=.25?2:off<=.50?1:0; }
 function render(){
   const a=$("app");
   if(!G){ const best=store.get("price-check-best");
-    a.innerHTML=`<section class="panel"><div class="label">12 prices · about 10 minutes · calculator OK</div><h2>What does life really cost?</h2>
-      <p class="lede">Guess real prices from the news and from class math. Within 10% = 3 points, within 25% = 2, within 50% = 1. Max 36.</p>
+    a.innerHTML=`<section class="panel"><div class="label">${ITEMS.length} prices · about 12 minutes · calculator OK</div><h2>What does life really cost?</h2>
+      <p class="lede">Guess real prices from the news and from class math. Within 10% = 3 points, within 25% = 2, within 50% = 1. Max ${ITEMS.length*3}.</p>
       <p><b>Class mode:</b> project it, teams write guesses on whiteboards, then your teacher types one team's guess and reveals.</p>
-      ${best?`<p class="lede">Best on this iPad: ${best} / 36</p>`:""}
+      ${best?`<p class="lede">Best on this iPad: ${best} / ${ITEMS.length*3}</p>`:""}
       <div class="row"><button class="btn primary" id="go">Start</button></div>
       <p class="lede" style="font-size:14px">Prices checked November 2026.</p></section>`;
     $("go").onclick=()=>{G={order:shuffleKeepPairs(),i:0,score:0,res:[],shown:false};render();}; return; }
   if(G.i>=ITEMS.length){
     const best=Math.max(G.score,+(store.get("price-check-best")||0)); store.set("price-check-best",best);
-    if(!G.stamped){G.stamped=true;FMP.stamp("price-check",G.score);if(G.score>=27)FMP.badge("price-pro","Price Pro (27+ on Price Check)");}
-    a.innerHTML=`<section class="panel"><div class="label">Price Check · Results</div><div class="big">${G.score} / 36</div>
-      <p class="lede">${G.score>=27?"Price Pro! You know what life costs.":G.score>=18?"Solid. A few prices surprised you.":"Real life costs more than most people guess. That's why we budget."}</p>
+    if(!G.stamped){G.stamped=true;FMP.stamp("price-check",G.score);if(G.score>=Math.round(ITEMS.length*3*.75))FMP.badge("price-pro","Price Pro (75%+ on Price Check)");}
+    a.innerHTML=`<section class="panel"><div class="label">Price Check · Results</div><div class="big">${G.score} / ${ITEMS.length*3}</div>
+      <p class="lede">${G.score>=ITEMS.length*3*.75?"Price Pro! You know what life costs.":G.score>=ITEMS.length*1.5?"Solid. A few prices surprised you.":"Real life costs more than most people guess. That's why we budget."}</p>
       <div class="tw"><table><thead><tr><th>Price</th><th class="n">You</th><th class="n">Real</th><th class="n">Pts</th></tr></thead><tbody>
       ${G.res.map(r=>`<tr><td>${esc(r.q)}</td><td class="n">${r.g}</td><td class="n">${r.a}</td><td class="n">${r.p}</td></tr>`).join("")}</tbody></table></div>
       <div class="row"><button class="btn primary" id="again">Play again</button></div></section>`;
     $("again").onclick=()=>{G=null;render();}; return; }
   const it=ITEMS[G.order[G.i]];
-  a.innerHTML=`<div class="track" style="grid-template-columns:repeat(12,1fr)">${ITEMS.map((_,k)=>`<i class="${k<G.i?'done':k===G.i?'now':''}"></i>`).join("")}</div>
-    <section class="panel"><div class="row" style="justify-content:space-between"><span class="label">Price ${G.i+1} of 12 · ${esc(it.unit)}</span><span class="label">Score ${G.score}</span></div>
+  a.innerHTML=`<div class="track" style="grid-template-columns:repeat(${ITEMS.length},1fr)">${ITEMS.map((_,k)=>`<i class="${k<G.i?'done':k===G.i?'now':''}"></i>`).join("")}</div>
+    <section class="panel"><div class="row" style="justify-content:space-between"><span class="label">Price ${G.i+1} of ${ITEMS.length} · ${esc(it.unit)}</span><span class="label">Score ${G.score}</span></div>
     <h2>${esc(it.q)}</h2>
     <form id="f" class="row" autocomplete="off"><label for="g" class="label" style="width:100%">Your guess ($)</label>
       <input id="g" inputmode="decimal" style="font:600 24px var(--mono);padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:min(260px,100%)" ${G.shown?"disabled":""}>
