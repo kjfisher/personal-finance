@@ -161,7 +161,7 @@ function render(){
   if(now<toDate("Jan 6")&&cur===0) when="Semester 2 starts Wed, Jan 6";
   const b=document.getElementById("board");
   b.innerHTML=`<div class="head"><div class="meta"><span>Day ${r.day} of 45</span><span>·</span><span>${fmt(dt)}</span><span>·</span><span class="unit">${esc(r.unitName)}</span></div>
-    <h1>${esc(r.lesson)}</h1><div class="note">${when}${r.day===1?" · Shortened day: all blocks meet":""}</div>${r.plan_url?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"><a class="reslink" style="margin:0" href="${r.plan_url}">📋 Lesson plan + slides</a>${r.unit_url?`<a class="reslink" style="margin:0" href="${r.unit_url}">Unit page</a>`:""}</div>`:""}</div>
+    <h1>${esc(r.lesson)}</h1><div class="note">${when}${r.day===1?" · Shortened day: all blocks meet":""}</div>${r.plan_url?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"><a class="reslink" style="margin:0" href="${r.plan_url}">📋 Today's slides + notes</a>${r.unit_url?`<a class="reslink" style="margin:0" href="${r.unit_url}">Unit page</a>`:""}</div>`:""}</div>
     <div class="lt" style="margin-top:18px"><div class="label">Learning target</div><p class="tgt">${esc(r.target)}</p>
       <div class="label" style="margin-top:4px">Success criteria</div><ul>${r.criteria.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
       <span class="rule">18 by 18 · ${esc(r.rule)}</span></div>
