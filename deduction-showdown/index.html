@@ -106,8 +106,8 @@ const CATS = [
   ["Which is NOT taken out of your paycheck: federal income tax, state income tax or sales tax?","<b>Sales tax</b>. You pay it when you buy things."],
   ["What form tells your employer how much federal income tax to withhold?","Your <b>W-4</b> (along with your income)"],
   ["Name THREE things federal income tax pays for.","Any three: <b>national defense</b>, <b>health care</b>, <b>education</b>, <b>veterans benefits</b>, <b>science</b>, <b>justice and law</b>, <b>agriculture</b>, <b>natural disaster relief</b>, <b>jobs and family security</b>"],
-  ["Use 5% for state and local tax. How much comes out of $4,300 gross monthly pay?","4,300 × 0.05 = <b>$215</b>"],
-  ["Gross monthly pay is $4,500. Federal rate is 9%, state is 5%, plus FICA (7.65%). What are the TOTAL taxes?","Federal $405 + State $225 + FICA $344.25 = <b>$974.25</b>"]]},
+  ["Illinois income tax is 4.95%. How much comes out of $4,300 gross monthly pay?","4,300 × 0.0495 = <b>$212.85</b>"],
+  ["Gross monthly pay is $4,500. Federal rate is 9%, Illinois is 4.95%, plus FICA (7.65%). What are the TOTAL taxes?","Federal $405 + Illinois $222.75 + FICA $344.25 = <b>$972</b>"]]},
  { name:"Benefits", q:[
   ["Employee benefits are ______ compensation in addition to your wages.","<b>Non-cash</b> compensation"],
   ["What is the difference between health insurance and life insurance?","<b>Health</b> lowers your medical costs. <b>Life</b> pays a beneficiary if you die."],
@@ -128,7 +128,7 @@ const CATS = [
   ["Give TWO advantages of direct deposit for workers, and ONE reason employers like it.","Workers: <b>faster</b>, <b>safe</b>, <b>no trip to the bank</b>, no lost checks. Employers: <b>cheaper and easier</b> than printing checks."]]}
 ];
 const VALUES=[100,200,300,400,500];
-const FINAL={cat:"Final Round: Build the Paycheck", q:"Kai earns $70,800 a year. Federal rate 10%, state 5%, plus FICA. Kai puts 3% in a 401(k), pays $120 for health and $10 for life insurance. What is Kai's NET monthly pay?", a:"Gross monthly $5,900. Taxes: SS $365.80 + Medicare $85.55 + Federal $590 + State $295 = $1,336.35. 401(k) $177. Insurance $130.<br>5,900 − 1,336.35 − 177 − 130 = <b>$4,256.65</b>"};
+const FINAL={cat:"Final Round: Build the Paycheck", q:"Kai earns $70,800 a year. Federal rate 10%, Illinois 4.95%, plus FICA. Kai puts 3% in a 401(k), pays $120 for health and $10 for life insurance. What is Kai's NET monthly pay?", a:"Gross monthly $5,900. Taxes: SS $365.80 + Medicare $85.55 + Federal $590 + Illinois $292.05 = $1,333.40. 401(k) $177. Insurance $130.<br>5,900 − 1,333.40 − 177 − 130 = <b>$4,259.60</b>"};
 const KEY="deduction-showdown-v1";
 let S;
 function fresh(n){ const dd=[Math.floor(Math.random()*6), 2+Math.floor(Math.random()*3)];

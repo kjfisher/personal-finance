@@ -136,7 +136,7 @@ const pct=x=>(+x).toLocaleString("en-US",{maximumFractionDigits:2})+"%";
 function build(c){
   const hourly=c.hr!=null;
   const annual=hourly?r2(c.hr*40*52):c.yr, m=r2(annual/12), f=c.fed/100;
-  const ss=r2(m*.062), med=r2(m*.0145), fed=r2(m*f), st=r2(m*.05), tax=r2(ss+med+fed+st);
+  const ss=r2(m*.062), med=r2(m*.0145), fed=r2(m*f), st=r2(m*.0495), tax=r2(ss+med+fed+st);
   const k=r2(m*.03), both=r2(k*2), net=r2(m-tax-k-HEALTH-LIFE), annNet=r2(net*12), bw=r2(annNet/26);
   const V={annual,m,ss,med,fed,st,tax,k,match:k,both,net,annNet,bw};
   const S=[];
@@ -155,9 +155,9 @@ function build(c){
   S.push({key:"fed", sec:"Taxes (page 2)", label:"Federal income tax", rate:pct(c.fed), prompt:`The tax calculator says your federal rate is ${pct(c.fed)}. How much federal income tax comes out each month?`,
     formula:`Gross monthly × ${(f).toFixed(4).replace(/0+$/,"")}`, steps:`${fmt(m)} × ${pct(c.fed)} = ${fmt(fed)}`,
     miss:[[m*f*10,"Decimal slip. Move the decimal two places: "+pct(c.fed)+" = "+(f).toFixed(4).replace(/0+$/,"")+"."],[m*c.fed,"Change the percent to a decimal before you multiply."],[annual*f,"Use your MONTHLY gross pay, not annual."]]});
-  S.push({key:"st", sec:"Taxes (page 2)", label:"State income tax", rate:"5%", prompt:`Use 5% for state and local income tax. How much comes out each month?`,
-    formula:`Gross monthly × 0.05`, steps:`${fmt(m)} × 0.05 = ${fmt(st)}`,
-    miss:[[m*.5,"Decimal slip: 5% is 0.05, not 0.5."],[m*5,"Change 5% to 0.05 before you multiply."],[annual*.05,"Use your MONTHLY gross pay, not annual."]]});
+  S.push({key:"st", sec:"Taxes (page 2)", label:"Illinois income tax", rate:"4.95%", prompt:`Illinois income tax is 4.95%. How much comes out each month?`,
+    formula:`Gross monthly × 0.0495`, steps:`${fmt(m)} × 0.0495 = ${fmt(st)}`,
+    miss:[[m*.495,"Decimal slip: 4.95% is 0.0495, not 0.495."],[m*4.95,"Change 4.95% to 0.0495 before you multiply."],[m*.05,"Close! Illinois is 4.95%, not 5%."],[annual*.0495,"Use your MONTHLY gross pay, not annual."]]});
   S.push({key:"tax", sec:"Taxes (page 2)", label:"Total taxes", tol:.03, prompt:`Add up all four taxes. What are your total taxes each month?`,
     formula:`Social Security + Medicare + Federal + State`, steps:`${fmt(ss)} + ${fmt(med)} + ${fmt(fed)} + ${fmt(st)} = ${fmt(tax)}`,
     miss:[[tax-st,"You left out state tax."],[tax-fed,"You left out federal tax."],[tax-ss,"You left out Social Security."],[tax-med,"You left out Medicare."],[ss+med,"That's only FICA. Add federal and state tax too."]]});
@@ -238,7 +238,7 @@ function stub(){
       ${has("annual")?stubRow("annual","Gross annual"):`<tr class="done"><td>Gross annual</td><td>${fmt(S.V.annual)}</td></tr>`}
       ${stubRow("m","Gross monthly")}
       <tr><th colspan="2">Taxes</th></tr>
-      ${stubRow("ss","Social Security","6.2%")}${stubRow("med","Medicare","1.45%")}${stubRow("fed","Federal income tax",pct(c.fed))}${stubRow("st","State income tax","5%")}
+      ${stubRow("ss","Social Security","6.2%")}${stubRow("med","Medicare","1.45%")}${stubRow("fed","Federal income tax",pct(c.fed))}${stubRow("st","Illinois income tax","4.95%")}
       ${stubRow("tax","Total taxes").replace("<tr class=\"","<tr class=\"total ")}
       <tr><th colspan="2">Benefits</th></tr>
       ${stubRow("k","401(k) contribution","3%")}

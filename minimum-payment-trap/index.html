@@ -92,7 +92,7 @@ const SCENES=[
  {t:"vote", key:"m1", eyebrow:"Month 1 · Matt (10% APR)", q:"Matt's first minimum payment is $200 (2% of $10,000). How much of that $200 goes to INTEREST?", opts:["$83.33","$200.00","$16.67","$1,000.00"], right:0,
    why:`<div class="math">Interest = $10,000 × 10% ÷ 12 = <b>$83.33</b><br>Paying down the balance: $200 − $83.33 = <b>$116.67</b></div>Almost half of his first payment just pays the bank for borrowing.`},
  {t:"vote", key:"m2", eyebrow:"Predict · Matt (10% APR)", q:"Paying only the minimum, how long will it take Matt to pay off $10,000?", opts:["About 2 years","About 5 years","About 10 years","About 24 years"], right:3,
-   why:`About <b>${yrs(MATT.months)} years</b> (${MATT.months} payments) and <b>${fmt(MATT.interest)}</b> in interest. Your slides say 24 years and $6,831.35. That's the same story.`},
+   why:`About <b>${yrs(MATT.months)} years</b> (${MATT.months} payments) and <b>${fmt(MATT.interest)}</b> in interest. Online calculators show about the same: roughly 24 years.`},
  {t:"chart", show:["matt"], eyebrow:"Watch it · Matt", q:"Matt's balance, month by month"},
  {t:"vote", key:"m3", eyebrow:"Month 1 · Mark (20% APR)", q:"Mark has the same $200 first payment, but a 20% rate. How much of it actually pays down his balance?", opts:["$33.33","$166.67","$116.67","$200.00"], right:0,
    why:`<div class="math">Interest = $10,000 × 20% ÷ 12 = $166.67<br>Paying down the balance: $200 − $166.67 = <b>$33.33</b></div>Only $33.33 of $200 makes a dent.`},
@@ -138,7 +138,7 @@ function draw(){
   $("dots").innerHTML=SCENES.map((_,i)=>`<i class="${i<S.i?"done":i===S.i?"on":""}"></i>`).join("");
   $("back").disabled=S.i===0; $("fwd").textContent=S.i===SCENES.length-1?"Start over":"Next →";
   let h="";
-  if(sc.t==="story") h=`<div class="eyebrow">From your Unit 4 slides</div><h2>Same couch. Same car repair. Same $10,000.</h2>
+  if(sc.t==="story") h=`<div class="eyebrow">Unit 6 · A tale of two cards</div><h2>Same couch. Same car repair. Same $10,000.</h2>
     <p class="lead">Matt and Mark both furnished a first apartment and then had a transmission fail. Each now owes $10,000 on a credit card. Each will pay only the minimum: 2% of the balance each month.</p>
     <div class="duo"><div class="person" style="--c:var(--matt)"><b>Matt</b><span>Good credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>10%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div>
     <div class="person" style="--c:var(--mark)"><b>Mark</b><span>Bad credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>20%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div></div>`;
