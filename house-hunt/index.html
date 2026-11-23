@@ -155,12 +155,12 @@ function makeRound(){ return [mkReady(), mkDown(), mkPITI(), mkRule(), ...shuffl
 let G=null, best=null;
 try{ best=+localStorage.getItem("house-hunt-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 6: Real Estate</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 7: Real Estate</span>`; return; }
   el.innerHTML=`<span>Home <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 6 · Buying a home</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Buying a home</div>
     <h2>Can you afford the house, or just the down payment?</h2>
     <p>Six homes: are you ready to buy?, down payments and PMI, closing costs, the full monthly payment (PITI), the 28% rule, 15 vs. 30 years, and when renting beats buying.</p>
     <ol class="steps"><li><b>Loan</b> = price − down payment. Under 20% down usually means PMI.</li><li><b>PITI</b> = principal & interest + property tax ÷ 12 + insurance ÷ 12.</li><li><b>28% rule:</b> PITI ≤ 28% of gross monthly income.</li></ol>

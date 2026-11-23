@@ -152,12 +152,12 @@ function makeRound(){ return [mkHealth(), mkTypes(), mkTrust(), ...shuffle([mkPr
 let G=null, best=null;
 try{ best=+localStorage.getItem("cover-me-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 9: Insurance, Budgeting & Estate</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Units 8 &amp; 9: Insurance &amp; Estate Planning</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 9 · Insurance & estate planning</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Units 8 &amp; 9 · Insurance &amp; estate planning</div>
     <h2>Protect your money, your health and the people you love.</h2>
     <p>Six cards: what you really pay on a medical bill, premiums vs. deductibles, types of insurance, life insurance, and wills, beneficiaries and powers of attorney.</p>
     <ol class="steps"><li><b>Medical bill:</b> you pay the deductible, then coinsurance, up to the out-of-pocket max.</li><li><b>Higher deductible</b> usually means a lower premium.</li><li><b>Term life</b> is the low-cost way to protect people who depend on you.</li></ol>

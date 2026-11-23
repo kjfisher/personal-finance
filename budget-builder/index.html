@@ -140,12 +140,12 @@ function makeRound(){ return [mkGoal(), mk503020(), mkSort(), mkEF(), ...shuffle
 let G=null, best=null;
 try{ best=+localStorage.getItem("budget-builder-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 9: Insurance, Budgeting & Estate</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 3: Budgeting</span>`; return; }
   el.innerHTML=`<span>Budget <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 9 · Budgeting</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 3 · Budgeting</div>
     <h2>Tell your money where to go.</h2>
     <p>Six cards: the 50/30/20 rule, sorting needs, wants and savings, sizing an emergency fund, and balancing a real monthly budget.</p>
     <ol class="steps"><li><b>50/30/20</b> of take-home pay: needs / wants / savings.</li><li><b>Emergency fund</b>: 3 to 6 months of essential expenses.</li><li>Income − expenses should never be negative.</li></ol>

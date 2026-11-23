@@ -206,12 +206,12 @@ function promptFor(R){
   return R.q.q;
 }
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 1: Checks & Direct Deposit</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 2: Checks & Direct Deposit</span>`; return; }
   el.innerHTML=`<span>Round <b>${Math.min(G.i+1,G.rounds.length)}</b> of ${G.rounds.length}</span><span>Score <b>${G.score}</b></span>`; }
 function intro(){
   G=null; stats();
   $("root").innerHTML=`<div class="panel">
-    <div class="eyebrow">Unit 1 · Payroll Deductions packet, pages 6 and 7</div>
+    <div class="eyebrow">Unit 2 · Your Paycheck: checks &amp; direct deposit</div>
     <h2>Read it. Write it. Check it.</h2>
     <p>Twelve quick rounds about checks and direct deposit. You'll tap parts of a real-looking check, pick the right way to write an amount in words, find the mistake on a check, and fill in a direct deposit form.</p>
     <ul class="how"><li>One try per round. Read the explanation when you miss one.</li><li>Every check is new each time you play.</li></ul>
@@ -260,7 +260,7 @@ function end(){
     <div class="eyebrow">Results</div>
     <h2>${G.score} of ${n} correct${G.score===n?". Perfect!":G.score>=n*.8?". Nice work.":"."}</h2>
     <div class="skills">${rows}</div>
-    <p>Missed some? Look at page 7 of your packet: the check-writing tips list what goes on each line.</p>
+    <p>Missed some? Look at your class notes: the check-writing tips list what goes on each line.</p>
     <div class="row"><button class="btn go" id="again">Play again (new checks)</button></div></div>`;
   $("again").onclick=newGame;
 }

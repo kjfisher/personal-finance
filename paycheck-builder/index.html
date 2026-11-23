@@ -187,7 +187,7 @@ try{ best=JSON.parse(localStorage.getItem("paycheck-builder-best")||"{}")||{}; }
 
 function stats(){
   const el=$("stats");
-  if(!S||S.phase==="pick"){ el.innerHTML=`<span>Unit 1: Payroll Deductions</span>`; return; }
+  if(!S||S.phase==="pick"){ el.innerHTML=`<span>Unit 2: Your Paycheck</span>`; return; }
   el.innerHTML=`<span>${esc(S.c.n)}</span><span>Score <b>${S.score}</b></span>${S.phase==="play"?`<button class="btn" id="quit">Change career</button>`:""}`;
   $("quit")&&($("quit").onclick=pick);
 }
@@ -202,7 +202,7 @@ function pick(){
       ${CAREERS.map((c,i)=>`<button class="pick" data-i="${i}"><b>${esc(c.n)}</b><span>${careerLine(c)}${best[c.n]!=null?` · best ${best[c.n]}`:""}</span></button>`).join("")}
     </div>
     <form class="own" id="ownForm" novalidate>
-      <label for="ownName">My career (from the packet)<input id="ownName" maxlength="40" placeholder="Career title"></label>
+      <label for="ownName">My career (from your career research)<input id="ownName" maxlength="40" placeholder="Career title"></label>
       <label for="ownSal">Gross annual salary<input id="ownSal" inputmode="decimal" placeholder="e.g. 61,500"></label>
       <label for="ownFed">Federal rate % (tinyurl.com/fakeTax)<input id="ownFed" inputmode="decimal" placeholder="e.g. 8"></label>
       <button class="btn gold" type="submit">Use my career</button>

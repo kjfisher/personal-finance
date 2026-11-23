@@ -154,12 +154,12 @@ function makeRound(){ return [mkPenny(), mkSimple(), mk72(), mkThree(), ...shuff
 let G=null, best=null;
 try{ best=+localStorage.getItem("growth-on-growth-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 0: The Power of Compounding</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 1: The Power of Compounding</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 0 · 18 by 18 #1 · The Power of Compounding</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 1 · 18 by 18 #1 · The Power of Compounding</div>
     <h2>Start early. Time does the heavy lifting.</h2>
     <p>Six cards: the doubling penny, simple vs. compound growth, the Rule of 72 for investing, debt and inflation, three investors who start at 18, 28 and 38, and when compounding works for you or against you.</p>
     <ol class="steps"><li><b>Compound</b> = growth on the CURRENT balance. <b>Simple</b> = growth on the original amount only.</li><li><b>Rule of 72:</b> 72 ÷ rate ≈ years to double.</li><li>Returns are assumptions, not guarantees.</li></ol>

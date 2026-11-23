@@ -162,13 +162,13 @@ function makeRound(){ return [mkPoints(), ...shuffle([mkCash(), mkTravel(), mkSt
 let G=null, best=null;
 try{ best=+localStorage.getItem("fine-print-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 4: Credit</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 6: Credit</span>`; return; }
   el.innerHTML=`<span>Offer <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
   $("root").innerHTML=`<div class="panel">
-    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 4 · Credit Card Offer Analysis (worksheet page 4)</div>
+    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 6 · Credit Card Offer Analysis (worksheet page 4)</div>
     <h2>Every card sounds great. Read the fine print.</h2>
     <p>Six credit card offers: points, cash back, travel, student, secured, and a terms decoder. Work out the rewards, the real cost of carrying a balance, and who each card is built for.</p>
     <ol class="steps"><li><b>APR</b> = yearly interest rate. One month of interest ≈ balance × APR ÷ 12.</li><li><b>Grace period</b>: pay the full balance by the due date and you pay $0 interest.</li><li>Credit cards are a tool to build credit, not a way to borrow money.</li></ol>

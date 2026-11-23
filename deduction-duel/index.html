@@ -84,7 +84,7 @@ const BANK=[
  ["Social Security on $5,000 gross per month:",["$310","$72.50","$382.50","$31"],"5,000 × 0.062 = $310."],
  ["Medicare on $4,000 gross per month:",["$58","$248","$5.80","$580"],"4,000 × 0.0145 = $58."],
  ["Federal tax withholding is based on your...",["W-4 and income","Credit score","Bank balance","Age"],"Your W-4 and your income set how much federal tax is withheld."],
- ["In our packet, state and local income tax is...",["5%","6.2%","1.45%","0%"],"Use 5% for state and local tax in this activity."],
+ ["In this game, state and local income tax is...",["5%","6.2%","1.45%","0%"],"Use 5% for state and local tax in this activity."],
  ["Which is NOT a payroll tax?",["Sales tax","FICA","Federal income tax","State income tax"],"Sales tax is paid when you buy things, not taken from your paycheck."],
  ["Health insurance helps you...",["Lower medical costs","Pay a beneficiary","Retire at 62","Pay for college"],"Health insurance reduces the cost of doctor visits, hospital stays and prescriptions."],
  ["Life insurance pays money to your ___ if you die.",["Beneficiary","Employer","Bank","Landlord"],"Life insurance pays the beneficiary you choose."],
@@ -115,7 +115,7 @@ try{ const s=JSON.parse(localStorage.getItem("deduction-duel-names")||"null"); i
 function setup(){
   G=null; clearTimeout(timerId);
   $("root").innerHTML=`<div class="setup"><div class="card">
-    <div class="unit">Unit 1 · Payroll Deductions</div>
+    <div class="unit">Unit 2 · Your Paycheck</div>
     <h1>Deduction Duel</h1>
     <p>Two players, one iPad. Lay it flat on the desk between you. The top half flips so your partner can read it.</p>
     <ol><li>Both of you see the same question.</li><li>Tap the right answer first to score.</li><li>Tap a wrong answer and you're locked out for that question.</li></ol>

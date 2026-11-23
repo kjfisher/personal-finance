@@ -150,12 +150,12 @@ function makeRound(){ return [mkComp(), mk72(), mkEarly(), ...shuffle([mkMatch()
 let G=null, best=null;
 try{ best=+localStorage.getItem("grow-it-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 7: Investing</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 9: Investing</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Retirement planning</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 9 · Retirement planning</div>
     <h2>Time is your biggest investment.</h2>
     <p>Six cards: compound growth year by year, the Rule of 72, starting at 22 vs. 32, the 401(k) match, and traditional vs. Roth accounts.</p>
     <ol class="steps"><li><b>Compound growth:</b> balance × rate, then add it. Repeat every year.</li><li><b>Rule of 72:</b> years to double ≈ 72 ÷ rate.</li><li>Returns here are practice numbers. Real markets go up and down.</li></ol>

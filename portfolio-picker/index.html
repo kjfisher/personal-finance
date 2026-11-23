@@ -133,7 +133,7 @@ function mkRisk(){ const O=["Lowest","Middle","Highest"];
       {k:"r3", type:"risk", choices:["CD","Index fund","Single stock"], q:"Best for retirement money you won't touch for 40 years", a:"Index fund", why:"Diversified and built for long-term growth."},
       {k:"r4", type:"risk", choices:["High-yield savings","Index fund"], q:"Best for an emergency fund", a:"High-yield savings", why:"Emergency money must be safe and reachable, not in the market."}]}; }
 function mkDiversify(){ const amt=pick([1000,2000,5000]);
-  return {kind:"Diversification", title:"Don't put all your eggs in one basket", html:tbl([["Portfolio A",`All ${fmt0(amt)} in one coffee company`],["Portfolio B",`${fmt0(amt)} in an S&P 500 index fund (500 companies)`]])+`<div class="rule">Think back to your list of 10 favorite businesses from Unit 1.</div>`,
+  return {kind:"Diversification", title:"Don't put all your eggs in one basket", html:tbl([["Portfolio A",`All ${fmt0(amt)} in one coffee company`],["Portfolio B",`${fmt0(amt)} in an S&P 500 index fund (500 companies)`]])+`<div class="rule">Think back to your list of 10 favorite businesses from earlier this semester.</div>`,
    F:[{k:"d1", type:"div", choices:["Portfolio A","Portfolio B"], q:"The coffee company goes bankrupt. Which portfolio is hurt more?", a:"Portfolio A", why:"A loses almost everything. In B it's 1 of 500 companies."},
       {k:"d2", type:"div", choices:["Owning many different investments","Owning one stock","Keeping cash under the bed","Day trading"], q:"Diversification means...", a:"Owning many different investments", why:"Spreading money out lowers the risk of any one loss."},
       {k:"d3", type:"div", q:`Portfolio B split evenly across 500 companies: about how much per company?`, a:r2(amt/500), miss:[]}]}; }
@@ -154,12 +154,12 @@ function makeRound(){ return [mkFunds(), mkStock(), mkRisk(), mkDiversify(), ...
 let G=null, best=null;
 try{ best=+localStorage.getItem("portfolio-picker-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 7: Investing</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 9: Investing</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Investing</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 9 · Investing</div>
     <h2>Risk, return and not putting all your eggs in one basket.</h2>
     <p>Six cards: stock gains and losses, dividends, ranking risk, diversification and the hidden cost of fees. All companies are made up.</p>
     <ol class="steps"><li><b>Gain or loss</b> = value now − cost. <b>Percent</b> = gain ÷ cost × 100.</li><li>Higher possible return usually means higher risk.</li><li><b>Expense ratio</b> = yearly fee = balance × percent.</li></ol>

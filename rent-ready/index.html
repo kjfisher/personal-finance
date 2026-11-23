@@ -147,12 +147,12 @@ function makeRound(){ return [mkSteps(), mk30(), mkMove(), mkMonth(), ...shuffle
 let G=null, best=null;
 try{ best=+localStorage.getItem("rent-ready-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 6: Real Estate</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 7: Real Estate</span>`; return; }
   el.innerHTML=`<span>Listing <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 6 · Renting</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Renting</div>
     <h2>Find a place you can actually afford.</h2>
     <p>Six apartment listings: what a 2/1 means, the rental application, lease and move-in checklist, the 30% rule, first + last + deposit move-in cash, splitting costs with roommates, and what your lease really says.</p>
     <ol class="steps"><li><b>30% rule:</b> rent ≤ 30% of gross monthly pay.</li><li><b>Move-in cash</b> = first month + security deposit + fees.</li><li>Split shared bills evenly. Your renters insurance is just yours.</li></ol>

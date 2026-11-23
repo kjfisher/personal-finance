@@ -145,12 +145,12 @@ function makeRound(){ return [mkPayroll(), mkWhere(), mkGig(), ...shuffle([mkSma
 let G=null, best=null;
 try{ best=+localStorage.getItem("tax-trail-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 8: Federal Taxes</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 4: Federal Taxes</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 8 · Taxes in real life</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 4 · Taxes in real life</div>
     <h2>Where does your tax money come from, and where does it go?</h2>
     <p>Six cards: FICA on a paycheck, every tax on a monthly paycheck, side-gig taxes, where tax dollars go, and filing smart (and spotting IRS scams).</p>
     <ol class="steps"><li><b>FICA</b> = Social Security 6.2% + Medicare 1.45%.</li><li>Side-gig contractors pay <b>self-employment tax</b>: 15.3% on 92.35% of earnings.</li><li>The IRS never demands gift cards.</li></ol>

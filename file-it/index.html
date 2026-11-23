@@ -160,12 +160,12 @@ function makeRound(){ return [mkTI(), mkBr(), mkRef(), mkItem(), ...shuffle([mkR
 let G=null, best=null;
 try{ best=+localStorage.getItem("file-it-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 8: Federal Taxes</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 4: Federal Taxes</span>`; return; }
   el.innerHTML=`<span>Form <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 8 · Federal income tax (2026 rules)</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 4 · Federal income tax (2026 rules)</div>
     <h2>Do your own taxes, one bracket at a time.</h2>
     <p>Seven cards: taxable income, tax by bracket, refund or owe, marginal vs. effective rate, tax forms, and credits vs. deductions. Uses 2026 single-filer numbers.</p>
     <ol class="steps"><li><b>Taxable income</b> = wages − pre-tax 401(k) − $16,100 standard deduction.</li><li>Each rate only applies to the dollars <b>inside</b> its bracket.</li><li><b>Refund</b> if withheld &gt; tax owed. Otherwise you owe the difference.</li></ol>

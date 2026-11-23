@@ -175,13 +175,13 @@ function makeGame(){ return [caseRead(), ...shuffle([caseOD(), caseATM(), caseOD
 let G=null, best=null;
 try{ best=+localStorage.getItem("statement-sleuth-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 3: Banking</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 5: Banking</span>`; return; }
   el.innerHTML=`<span>Statement <b>${Math.min(G.ci+1,G.cases.length)}</b>/${G.cases.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
   $("root").innerHTML=`<div class="panel">
-    <div class="eyebrow">Unit 3 · Reading a bank statement</div>
+    <div class="eyebrow">Unit 5 · Reading a bank statement</div>
     <h2>Follow the money. Find the overdraft.</h2>
     <p>Five checking-account statements, each one new. Fill in missing balances, read the deposits, find what caused an overdraft, add up the fees, and choose the smart move.</p>
     <div class="codes"><span><b>Withdrawals</b> make the balance go down</span><span><b>Deposits</b> make the balance go up</span><span><b>POS DEB</b> = debit card purchase at a store</span><span><b>Overdraft</b> = spending more than you have; the bank charges a fee</span></div>

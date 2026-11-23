@@ -145,12 +145,12 @@ function makeRound(){ return [mkCompare(), ...shuffle([mkCompare(), mkCompare(),
 let G=null, best=null;
 try{ best=+localStorage.getItem("road-test-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 5: Cars & Lending</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 7: Cars & Lending</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 5 · Cars & Lending</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Cars & Lending</div>
     <h2>The cheapest payment isn't always the cheapest car.</h2>
     <p>Compare what cars really cost each month: payment, insurance, gas and repairs. Then sort out insurance, depreciation, and whether to buy new, buy used or lease.</p>
     <ol class="steps"><li><b>Gas per month</b> = miles ÷ mpg × price per gallon.</li><li><b>Cost of owning</b> = payment + insurance + gas + maintenance.</li></ol>

@@ -174,13 +174,13 @@ function makeRound(){ return [mkCompound(), ...shuffle([mkSimple(), mkVs(), mkPe
 let G=null, best=null;
 try{ best=+localStorage.getItem("savings-lab-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 3: Banking</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 5: Banking</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
   $("root").innerHTML=`<div class="panel">
-    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 3 · Worksheet pages 2, 5 and 6</div>
+    <div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 5 · Banking: savings &amp; interest</div>
     <h2>Make your money work. Then pick where it lives.</h2>
     <p>Eight cards: CD growth, early-withdrawal penalties, minimum-balance fees, HYSA vs. savings, choosing the right account, and comparing banks. Every CD card tells you which kind of interest to use:</p>
     <ol class="steps"><li><b>Simple interest:</b> A = P(1 + rt). Interest only on the starting amount.</li><li><b>Compounded annually:</b> find each year's interest on the NEW balance, then add it. Round to the cent each year.</li></ol>
