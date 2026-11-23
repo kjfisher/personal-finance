@@ -8,17 +8,17 @@
 /* Layout: a vault door. Top bar = team name, timer, code digits earned. Below, six lock cards in a grid; each opens into its puzzle. Final keypad appears when all six are open. */
 :root {
   --bg:#E9EDF2; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#C6CFDC;
-  --steel:#1F5E33; --steel-ink:#E8EDF5; --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800; --bad:#C23B3B;
+  --steel:#1E2B45; --steel-ink:#E8EDF5; --accent:#0F8B6C; --accent-ink:#FFFFFF; --gold:#E0A800; --bad:#C23B3B;
   --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
   --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg:#0B1220; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
-  --steel:#17482A; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
+  --steel:#22345C; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark } }
 :root[data-theme="dark"] {
   --bg:#0B1220; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
-  --steel:#17482A; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
+  --steel:#22345C; --steel-ink:#E8EDF5; --accent:#3CCB9F; --accent-ink:#06261D; --gold:#F5C542; --bad:#F07070; color-scheme:dark }
 * { box-sizing:border-box; }
 [hidden] { display:none !important; }
 body { background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; }
@@ -49,7 +49,7 @@ input.ans, select.ans { font:inherit; font-family:var(--mono); padding:8px 10px;
 .chips { display:flex; flex-wrap:wrap; gap:6px; }
 .chip { font:inherit; padding:6px 12px; border-radius:999px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; font-size:15px; }
 .chip[aria-pressed="true"] { border-color:var(--ink); background:var(--ink); color:var(--bg); }
-.sortrow { display:grid; grid-template-columns:minmax(0,1fr) 150px; gap:8px; align-items:center; font-size:15px; }
+.sortrow { display:grid; grid-template-columns:minmax(0,1fr) 130px; gap:8px; align-items:center; font-size:15px; }
 .mini { width:100%; border-collapse:collapse; font-size:13px; }
 .mini th, .mini td { border:1px solid var(--line); padding:4px 6px; text-align:left; }
 .mini td.m { font-family:var(--mono); }
@@ -73,34 +73,51 @@ input.ans, select.ans { font:inherit; font-family:var(--mono); padding:8px 10px;
 
 <div class="wrap">
   <div class="bar">
-    <div><h1>Compound Vault</h1><div class="tag">Personal Finance - Unit 0 Review</div></div>
+    <div><h1>Compound Vault</h1><div class="tag">Personal Finance - Unit 1 Review</div></div>
     <div class="stat team"><span class="k">Team</span><input id="teamName" aria-label="Team name" placeholder="Team name"></div>
     <div class="stat"><span class="k">Time</span><span class="v" id="clock">0:00</span></div>
     <div class="stat"><span class="k">Vault code</span><div class="digits" id="digits"></div></div>
   </div>
-  <div class="intro" id="intro"><b>Future you’s retirement fund is locked in the vault.</b> Crack all 6 locks, in any order. Each lock gives you one digit of the vault code. Each hint adds 1 minute to your time. Use a calculator. The fastest team to escape wins.</div>
+  <div class="intro" id="intro"><b>Your future millionaire fortune is locked in the Compound Vault.</b> Crack all 6 locks, in any order. Each lock gives you one digit of the vault code. Each hint adds 1 minute to your time. The fastest team to escape wins.</div>
   <div class="locks" id="locks"></div>
   <div id="finalBox"></div>
 </div>
 
 <script>
-const LOCKS=[{"id": "sc", "title": "Simple vs. Compound", "digit": 7, "hint": "Simple: 5,000 × (1 + 0.10 × 2). Compound: 5,000 × 1.10 × 1.10.", "text": "<b>$5,000</b> earns <b>10%</b> a year for <b>2 years</b>.", "fields": [{"id": "a1", "label": "Simple interest balance ($)", "a": 6000, "tol": 0.01}, {"id": "a2", "label": "Compound interest balance ($)", "a": 6050, "tol": 0.01}, {"id": "a3", "label": "Extra from compounding ($)", "a": 50, "tol": 0.01}]}, {"id": "r72", "title": "Rule of 72", "digit": 3, "hint": "Years = 72 ÷ rate. Rate = 72 ÷ years.", "text": "Use the Rule of 72.", "fields": [{"id": "b1", "label": "Years to double at 6%", "a": 12, "tol": 0.01}, {"id": "b2", "label": "Years to double at 9%", "a": 8, "tol": 0.01}, {"id": "b3", "label": "Rate that doubles money in 4 years (%)", "a": 18, "tol": 0.01}]}, {"id": "penny", "title": "The Penny", "digit": 5, "hint": "Day 1 = $0.01. Each day × 2. Day 10 = 0.01 × 2 nine times.", "text": "A penny doubles every day. Day 1 = <b>$0.01</b>.", "fields": [{"id": "c1", "label": "Day 10 ($)", "a": 5.12, "tol": 0.01}, {"id": "c2", "label": "Day 20 ($)", "a": 5242.88, "tol": 0.01}]}, {"id": "debt", "title": "The Debt Doubler", "digit": 9, "hint": "72 ÷ 24. Then count the doublings in 9 years.", "text": "Jordan owes <b>$1,200</b> on a card at <b>24% APR</b> and makes no payments.", "fields": [{"id": "d1", "label": "Years for the debt to double", "a": 3, "tol": 0.01}, {"id": "d2", "label": "Balance after 9 years ($)", "a": 9600, "tol": 0.01}]}, {"id": "infl", "title": "Inflation", "digit": 2, "hint": "72 ÷ 3. When prices double, cash buys half as much.", "text": "Prices rise <b>3%</b> a year. Leo keeps <b>$10,000</b> in cash under his bed.", "fields": [{"id": "e1", "label": "Years for prices to double", "a": 24, "tol": 0.01}, {"id": "e2", "label": "After that, his $10,000 buys what this much buys today ($)", "a": 5000, "tol": 0.01}]}, {"id": "side", "title": "For Me or Against Me?", "digit": 8, "hint": "Growth you earn works for you. Interest you owe and rising prices work against you.", "text": "Does compounding work for you or against you?", "fields": [{"id": "f1", "label": "Investing $100 a month starting at 18", "a": "For me", "options": ["For me", "Against me"]}, {"id": "f2", "label": "Carrying a credit card balance", "a": "Against me", "options": ["For me", "Against me"]}, {"id": "f3", "label": "Keeping savings in cash for 30 years", "a": "Against me", "options": ["For me", "Against me"]}, {"id": "f4", "label": "Reinvesting your investment growth", "a": "For me", "options": ["For me", "Against me"]}]}];
-const WIN="Time is on your side. Start early!";
 const N=s=>String(s).toLowerCase().replace(/[\s$,%]/g,"");
+const LOCKS=[
+ {id:"sc", title:"Simple vs. Compound", digit:3, hint:"Simple: interest on $5,000 only, every year. Compound: year 2 earns interest on year 1's interest too.",
+  body:`<p>Ava puts <b>$5,000</b> away at <b>6%</b> for <b>2 years</b>.</p>
+    <div class="field"><label for="sc-a">Total with SIMPLE interest ($)</label><input class="ans" id="sc-a" inputmode="decimal" autocomplete="off"></div>
+    <div class="field"><label for="sc-b">Total with COMPOUND interest, once a year ($)</label><input class="ans" id="sc-b" inputmode="decimal" autocomplete="off"></div>`,
+  check:()=>["5600","5600.00"].includes(N(v("sc-a")))&&["5618","5618.00"].includes(N(v("sc-b")))},
+ {id:"r72", title:"The Rule of 72", digit:8, hint:"Years to double = 72 ÷ rate. Rate = 72 ÷ years.",
+  body:`<div class="field"><label for="r72-a">At 2%, about how many years to double?</label><input class="ans" id="r72-a" inputmode="numeric" autocomplete="off"></div>
+    <div class="field"><label for="r72-b">Money doubles every 4 years. What rate (%)?</label><input class="ans" id="r72-b" inputmode="numeric" autocomplete="off"></div>`,
+  check:()=>N(v("r72-a"))==="36"&&N(v("r72-b"))==="18"},
+ {id:"penny", title:"The Doubling Penny", digit:5, hint:"Day 1 = $0.01. Day 2 = $0.02. Day 3 = $0.04. Keep doubling.",
+  body:`<p>Start with <b>1 penny</b> on Day 1. It doubles every day.</p>
+    <div class="field"><label for="pen-a">Value on Day 11 ($)</label><input class="ans" id="pen-a" inputmode="decimal" autocomplete="off"></div>
+    <div class="field"><label for="pen-b">Value on Day 21 ($)</label><input class="ans" id="pen-b" inputmode="decimal" autocomplete="off"></div>`,
+  check:()=>N(v("pen-a"))==="10.24"&&N(v("pen-b"))==="10485.76"},
+ {id:"debt", title:"Debt That Doubles", digit:1, hint:"72 ÷ 24 = 3 years per double. 9 years = 3 doubles.",
+  body:`<p>Eli owes <b>$2,000</b> on a card at <b>24%</b> and pays nothing. Use the Rule of 72.</p>
+    <div class="field"><label for="debt-a">Years for the debt to double</label><input class="ans" id="debt-a" inputmode="numeric" autocomplete="off"></div>
+    <div class="field"><label for="debt-b">What he owes after 9 years ($)</label><input class="ans" id="debt-b" inputmode="decimal" autocomplete="off"></div>`,
+  check:()=>N(v("debt-a"))==="3"&&["16000","16000.00"].includes(N(v("debt-b")))},
+ {id:"infl", title:"Inflation", digit:9, hint:"Inflation doubles prices with the Rule of 72 too: 72 ÷ 3.",
+  body:`<p>A week of groceries costs <b>$50</b> today. Prices rise <b>3%</b> a year.</p>
+    <div class="field"><label for="inf-a">About how many years until prices double?</label><input class="ans" id="inf-a" inputmode="numeric" autocomplete="off"></div>
+    <div class="field"><label for="inf-b">What will those groceries cost then ($)?</label><input class="ans" id="inf-b" inputmode="decimal" autocomplete="off"></div>
+    <div class="field"><label for="inf-c">Cash under your mattress for those years...</label><select class="ans" id="inf-c"><option value="">—</option><option>Buys more</option><option>Buys less</option><option>Buys the same</option></select></div>`,
+  check:()=>N(v("inf-a"))==="24"&&["100","100.00"].includes(N(v("inf-b")))&&v("inf-c")==="Buys less"},
+ {id:"sort", title:"For Me or Against Me?", digit:4, hint:"Interest you EARN works for you. Interest you OWE (and rising prices) work against you.",
+  body:`<p>Is compounding working <b>for</b> you or <b>against</b> you?</p>${[["s1","A high-yield savings account"],["s2","A credit card balance you don't pay off"],["s3","Reinvesting dividends in an index fund"],["s4","A payday loan"],["s5","Cash sitting in a drawer while prices rise"],["s6","A 401(k) with an employer match"]].map(([id,l])=>`<div class="sortrow"><label for="${id}">${l}</label><select class="ans" id="${id}"><option value="">—</option><option>For me</option><option>Against me</option></select></div>`).join("")}`,
+  check:()=>v("s1")==="For me"&&v("s2")==="Against me"&&v("s3")==="For me"&&v("s4")==="Against me"&&v("s5")==="Against me"&&v("s6")==="For me"}
+];
+const CODE=LOCKS.map(l=>l.digit).join("");
 const $=id=>document.getElementById(id);
 const v=id=>($(id)?.value||"").trim();
-const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
-const CODE=LOCKS.map(l=>l.digit).join("");
-function body(l){
-  let h=(l.text?`<p>${l.text}</p>`:"")+(l.html||"");
-  (l.fields||[]).forEach(f=>{ h+= f.options ? `<div class="sortrow"><label for="${f.id}">${f.label}</label><select class="ans" id="${f.id}"><option value="">—</option>${f.options.map(o=>`<option>${esc(o)}</option>`).join("")}</select></div>`
-    : `<div class="field"><label for="${f.id}">${f.label}</label><input class="ans" id="${f.id}" inputmode="decimal" autocomplete="off"></div>`; });
-  if(l.chips) h+=`<div class="chips" id="chips-${l.id}">${l.chips.map(x=>`<button class="chip" aria-pressed="false" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
-  return h; }
-function check(l){
-  const okF=(l.fields||[]).every(f=>{ const val=v(f.id); if(f.options) return val===f.a; const n=parseFloat(N(val)); return !isNaN(n)&&Math.abs(n-f.a)<=(f.tol??0.01); });
-  const okC=!l.chips||[...document.querySelectorAll(`#chips-${l.id} .chip[aria-pressed="true"]`)].map(c=>c.dataset.v).sort().join("|")===l.answer.slice().sort().join("|");
-  return okF&&okC; }
 let G, timer=null;
 function fresh(){ return {start:null, open:{}, hints:{}, tries:0, escaped:null, team:""}; }
 function elapsed(){ if(!G.start) return 0; const end=G.escaped||Date.now(); return Math.floor((end-G.start)/1000)+Object.keys(G.hints).length*60; }
@@ -112,31 +129,29 @@ function renderLocks(){
     return `<section class="lock ${o?'open':''}" id="lock-${l.id}" aria-labelledby="t-${l.id}">
       <div class="lh"><span class="num">Lock ${i+1}</span><span class="badge">${o?"Open: digit "+l.digit:"Locked"}</span></div>
       <h2 id="t-${l.id}">${l.title}</h2>
-      ${o?`<p class="msg yes">Unlocked! Your digit for lock ${i+1} is ${l.digit}.</p>`:`${body(l)}
+      ${o?`<p class="msg yes">Unlocked! Your digit for lock ${i+1} is ${l.digit}.</p>`:`${l.body}
       ${G.hints[l.id]?`<div class="hint">${l.hint}</div>`:""}
       <div class="acts"><button class="btn primary" data-try="${l.id}">Try to unlock</button>${G.hints[l.id]?"":`<button class="btn" data-hint="${l.id}">Hint (+1 min)</button>`}<span class="msg no" id="msg-${l.id}" aria-live="polite"></span></div>`}
     </section>`; }).join("");
-  document.querySelectorAll(".chips .chip").forEach(c=>c.onclick=()=>{ begin(); c.setAttribute("aria-pressed", c.getAttribute("aria-pressed")==="true"?"false":"true"); });
+  document.querySelectorAll("#bureau-chips .chip").forEach(c=>c.onclick=()=>c.setAttribute("aria-pressed", c.getAttribute("aria-pressed")==="true"?"false":"true"));
   document.querySelectorAll("[data-try]").forEach(b=>b.onclick=()=>tryLock(b.dataset.try));
   document.querySelectorAll("[data-hint]").forEach(b=>b.onclick=()=>{ begin(); G.hints[b.dataset.hint]=true; keepInputs(()=>renderLocks()); tickClock(); });
-  document.querySelectorAll(".lock input, .lock select").forEach(el=>el.addEventListener("focus",begin,{once:true}));
+  document.querySelectorAll(".lock input, .lock select, .lock .chip").forEach(el=>el.addEventListener("focus",begin,{once:true}));
   renderFinal();
 }
-function keepInputs(fn){ const vals={}, chips={};
-  document.querySelectorAll(".lock .ans").forEach(el=>vals[el.id]=el.value);
-  document.querySelectorAll('.chips').forEach(g=>chips[g.id]=[...g.querySelectorAll('.chip[aria-pressed="true"]')].map(c=>c.dataset.v));
-  fn();
+function keepInputs(fn){ const vals={}, chips=[...document.querySelectorAll('#bureau-chips .chip[aria-pressed="true"]')].map(c=>c.dataset.v);
+  document.querySelectorAll(".lock .ans").forEach(el=>vals[el.id]=el.value); fn();
   Object.entries(vals).forEach(([id,val])=>{ if($(id)) $(id).value=val; });
-  Object.entries(chips).forEach(([gid,list])=>{ const g=$(gid); if(g) g.querySelectorAll('.chip').forEach(c=>{ if(list.includes(c.dataset.v)) c.setAttribute("aria-pressed","true"); }); }); }
+  document.querySelectorAll('#bureau-chips .chip').forEach(c=>{ if(chips.includes(c.dataset.v)) c.setAttribute("aria-pressed","true"); }); }
 function begin(){ if(!G.start){ G.start=Date.now(); timer=setInterval(tickClock,1000); } }
 function tryLock(id){ begin(); G.tries++; const l=LOCKS.find(x=>x.id===id);
-  if(check(l)){ G.open[id]=true; keepInputs(()=>renderLocks()); renderDigits(); $("lock-"+id)?.scrollIntoView({block:"nearest"}); }
+  if(l.check()){ G.open[id]=true; keepInputs(()=>renderLocks()); renderDigits(); $("lock-"+id)?.scrollIntoView({block:"nearest"}); }
   else { const m=$("msg-"+id); m.textContent="Still locked. Check your answers."; const box=$("lock-"+id); box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); } }
 function renderFinal(){
   const all=LOCKS.every(l=>G.open[l.id]), f=$("finalBox");
   if(G.escaped){ clearInterval(timer);
-    f.innerHTML=`<div class="final"><h2>The vault is open!</h2><div class="won"><div>${G.team?`<b>${esc(G.team)}</b> escaped in`:"You escaped in"}</div><div class="big">${fmt(elapsed())}</div>
-      <div>${Object.keys(G.hints).length} hint${Object.keys(G.hints).length===1?"":"s"} used (included in your time). ${WIN}</div>
+    f.innerHTML=`<div class="final"><h2>The vault is open!</h2><div class="won"><div>${G.team?`<b>${G.team.replace(/</g,"&lt;")}</b> escaped in`:"You escaped in"}</div><div class="big">${fmt(elapsed())}</div>
+      <div>${Object.keys(G.hints).length} hint${Object.keys(G.hints).length===1?"":"s"} used (included in your time). Your fortune is free, and it keeps growing!</div>
       <div style="opacity:.8;font-size:16px;margin-top:6px">Show this screen to your teacher.</div></div>
       <button class="btn" id="again">Play again</button></div>`;
     $("again").onclick=reset; return; }
