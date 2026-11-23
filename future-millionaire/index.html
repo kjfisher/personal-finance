@@ -98,7 +98,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
 <div class="wrap">
   <header>
-    <div class="brand"><h1>Future <span>Millionaire</span></h1><span class="tag">Personal Finance · Midterm Review · Units 1–4</span></div>
+    <div class="brand"><h1>Future <span>Millionaire</span></h1><span class="tag">Personal Finance · Midterm Review · Units 2–5</span></div>
     <div class="hud">
       <span class="pill" id="bank">Banked: $0</span>
       <span class="pill strikes">Strikes: <b id="strikes">○○○</b></span>
@@ -109,7 +109,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
   <div class="stage">
     <section class="qcard" aria-live="polite">
-      <div class="qmeta"><span>Question <b id="qnum">1</b> of 15 · for <b id="qval">$100</b></span><span class="unit" id="unit">Unit 1</span></div>
+      <div class="qmeta"><span>Question <b id="qnum">1</b> of 15 · for <b id="qval">$100</b></span><span class="unit" id="unit">Unit 2</span></div>
       <p class="qtext" id="qtext"></p>
       <div class="answers" id="answers"></div>
       <div class="controls">
@@ -156,47 +156,49 @@ const money = n => "$" + n.toLocaleString("en-US");
 // [unit, question, answers (first = correct), hint, explanation]
 const BANK = {
 easy: [
- [1, "Your job offer lists your <b>gross</b> income. Gross income is the money you earn…", ["Before taxes and deductions", "After taxes and deductions", "From overtime only", "From your employer's 401(k) match"], "Gross is the bigger number on the job offer.", "Gross income is everything you earn before anything is taken out. Net income is what's left after deductions."],
- [1, "<b>Net</b> income is also called your…", ["Take-home pay", "Job offer salary", "Year-to-date pay", "Commission"], "It's what actually lands in your bank account.", "Net income = gross income minus taxes and deductions. It's your take-home pay."],
- [1, "A 401(k) is a type of…", ["Retirement account", "Checking account", "Health insurance plan", "Credit card"], "You won't touch this money until you're much older.", "A 401(k) is a retirement account offered through your employer, often with a match."],
- [1, "Which is government health insurance, mainly for people age 65 and older?", ["Medicare", "Social Security", "Life insurance", "Federal income tax"], "It's one of the two FICA taxes.", "Medicare (1.45%) helps pay for health care at 65+. Social Security (6.2%) provides retirement and disability income."],
+ [2, "Your job offer lists your <b>gross</b> income. Gross income is the money you earn…", ["Before taxes and deductions", "After taxes and deductions", "From overtime only", "From your employer's 401(k) match"], "Gross is the bigger number on the job offer.", "Gross income is everything you earn before anything is taken out. Net is what's left."],
+ [2, "<b>Net</b> income is also called your…", ["Take-home pay", "Job offer salary", "Year-to-date pay", "Commission"], "It's what actually lands in your bank account.", "Net income = gross income minus taxes and deductions. It's your take-home pay."],
  [2, "On a pay stub, what does <b>YTD</b> stand for?", ["Year-to-date", "Yearly tax deduction", "Your total deposit", "Yesterday's take-home dollars"], "It's a running total since January 1.", "YTD = year-to-date: totals from January 1 through the current pay period."],
- [2, "You earn a set amount for every hour you work. You are paid…", ["Hourly", "Salary", "Commission", "Year-to-date"], "Hourly rate × hours worked.", "Hourly workers earn rate × hours, and may qualify for overtime at 1.5× after 40 hours in a week."],
- [3, "Which account is best for everyday spending, direct deposit, and paying bills?", ["Checking account", "CD (certificate of deposit)", "Savings account", "401(k)"], "It links to your debit card.", "Checking accounts are for daily money: direct deposit, bills, debit card purchases."],
- [3, "You spend more than you have in checking and the bank charges you. That's called a(n)…", ["Overdraft fee", "ATM fee", "Interest payment", "Commission"], "You went 'over' your balance.", "An overdraft happens when you spend more than your balance. Banks often charge around $25–$35 each time."],
- [4, "A FICO credit score ranges from…", ["300 to 850", "0 to 100", "100 to 1,000", "1 to 10"], "The lowest score is not zero.", "FICO scores run from 300 to 850. 800+ is Exceptional."],
- [4, "The only federally authorized website for free credit reports is…", ["annualcreditreport.com", "creditkarma.com", "freecreditscore.com", "bankrate.com"], "The name says how often you could check it originally.", "annualcreditreport.com is the free site authorized by federal law, with reports from all 3 bureaus."],
- [4, "Which category is the <b>largest</b> part of your FICO score?", ["Payment history", "Amounts owed", "New credit", "Credit mix"], "It's 35%.", "Payment history is 35% of your FICO score. Paying on time, every time, matters most."],
- [3, "The FDIC protects your bank deposits up to…", ["$250,000 per depositor, per bank", "$25,000 per account", "$1,000,000 per family", "Nothing; it only protects banks"], "It's a quarter of a million.", "The FDIC insures deposits up to $250,000 per depositor, per bank, if the bank fails."]
+ [2, "Which is government health insurance, mainly for people age 65 and older?", ["Medicare", "Social Security", "A 401(k)", "Federal income tax"], "It's one of the two FICA taxes.", "Medicare (1.45%) helps pay for health care at 65+. Social Security (6.2%) provides retirement and disability income."],
+ [3, "In a <b>zero-based budget</b>…", ["Every dollar gets a job", "You save nothing", "You spend nothing", "You stop using a bank"], "Income − expenses − savings = $0.", "Zero-based means you plan every dollar (bills, fun AND savings) until $0 is left unassigned."],
+ [3, "Which is a <b>fixed</b> expense?", ["Rent", "Groceries", "Gas", "Eating out"], "Fixed = the same amount every month.", "Rent stays the same each month. Groceries, gas and eating out are variable."],
+ [3, "In the <b>50/30/20</b> budget, the 30% is for…", ["Wants", "Needs", "Savings + debt payments", "Taxes"], "50 needs · 30 ? · 20 savings.", "50% needs, 30% wants, 20% savings and extra debt payments."],
+ [4, "Which form do you fill out at a new job to set how much federal tax is withheld?", ["W-4", "W-2", "1040", "I-9"], "\"4\" as in for-holding.", "The W-4 tells your employer how much to withhold. The W-2 shows what was actually withheld."],
+ [4, "Federal income taxes are usually due on…", ["April 15", "January 1", "July 4", "December 31"], "Tax Day is in the spring.", "Returns for last year are due April 15 (the next business day if it's a weekend)."],
+ [4, "Your employer must send your <b>W-2</b> by…", ["January 31", "April 15", "June 30", "December 1"], "Right after the year ends.", "W-2s arrive by January 31 so you have time to file by April 15."],
+ [5, "Which account is best for everyday spending, direct deposit, and paying bills?", ["Checking account", "CD (certificate of deposit)", "Savings account", "401(k)"], "It links to your debit card.", "Checking accounts are for daily money: direct deposit, bills, debit card purchases."],
+ [5, "You spend more than you have in checking and the bank charges you. That's called a(n)…", ["Overdraft fee", "ATM fee", "Interest payment", "Commission"], "You went 'over' your balance.", "An overdraft happens when you spend more than your balance. Banks often charge around $25–$35 each time."],
+ [5, "The FDIC protects your bank deposits up to…", ["$250,000 per depositor, per bank", "$25,000 per account", "$1,000,000 per family", "Nothing; it only protects banks"], "It's a quarter of a million.", "The FDIC insures deposits up to $250,000 per depositor, per bank, if the bank fails."]
 ],
 medium: [
- [1, "You're offered <b>$57,600 per year</b>. What is your gross <b>monthly</b> income?", ["$4,800", "$5,760", "$1,107.69", "$691,200"], "Annual ÷ 12 months.", "$57,600 ÷ 12 = $4,800 per month. ($1,107.69 is weekly: ÷ 52.)"],
- [1, "Your gross monthly pay is <b>$4,800</b>. You put <b>3%</b> in your 401(k). How much per month?", ["$144", "$1,440", "$14.40", "$48"], "3% = 0.03.", "$4,800 × 0.03 = $144 per month."],
- [1, "Which pays a lump sum to a beneficiary if the insured person dies?", ["Life insurance", "Health insurance", "Medicare", "Social Security"], "The payout goes to someone else.", "Life insurance pays a beneficiary (like family) if the insured person dies."],
+ [2, "You're offered <b>$62,400 per year</b>. What is your gross <b>monthly</b> income?", ["$5,200", "$6,240", "$1,200", "$748,800"], "Annual ÷ 12 months.", "$62,400 ÷ 12 = $5,200 per month. ($1,200 is weekly: ÷ 52.)"],
+ [2, "You earn <b>$22 per hour</b>. Under federal law, what is your overtime hourly rate?", ["$33", "$44", "$22", "$23.50"], "Time-and-a-half = rate × 1.5.", "$22 × 1.5 = $33 per overtime hour, for hours over 40 in a week."],
  [2, "Which two deductions make up <b>FICA</b>?", ["Social Security and Medicare", "Federal and state income tax", "Health insurance and 401(k)", "State tax and Medicare"], "6.2% + 1.45%.", "FICA = Social Security (6.2%) + Medicare (1.45%) = 7.65%."],
- [2, "You earn <b>$18 per hour</b>. Under federal law, what is your overtime hourly rate?", ["$27", "$36", "$18", "$19.50"], "Time-and-a-half = rate × 1.5.", "$18 × 1.5 = $27 per overtime hour, for hours over 40 in a week."],
- [2, "Your monthly pay period is <b>03/01 – 03/31</b> and the pay date is <b>04/01</b>. How many full months are in the YTD totals?", ["3", "4", "1", "12"], "Count the pay period, not the pay date.", "Jan, Feb, Mar = 3 months. The 04/01 pay date pays for March work."],
- [2, "A salesperson earns a <b>4% commission</b> on a <b>$25,000</b> car. How much do they earn?", ["$1,000", "$100", "$10,000", "$250"], "4% = 0.04.", "$25,000 × 0.04 = $1,000 commission."],
- [3, "A debit card takes money from…", ["Your own checking account", "A loan from the bank", "Your credit limit", "Your 401(k)"], "It's your money, not borrowed.", "Debit cards spend money you already have in checking. Credit cards spend borrowed money."],
- [3, "What happens if you take money out of a CD before the maturity date?", ["You pay an early withdrawal penalty", "You earn bonus interest", "Nothing happens", "Your credit score goes up"], "A CD locks your money for a set time.", "CDs pay a fixed rate for a set term. Taking money out early costs a penalty."],
- [3, "Why do online banks often pay higher interest on savings (HYSAs)?", ["They have lower costs without physical branches", "They aren't FDIC insured", "They charge more overdraft fees", "They only work with businesses"], "Think about what they don't have to pay for.", "No branches = lower overhead, so online banks can pay higher rates. Many are still FDIC insured."],
- [4, "Which is <b>NOT</b> one of the 3 credit bureaus?", ["Credit Karma", "Experian", "Equifax", "TransUnion"], "The bureaus are Experian, Equifax, and…", "The 3 bureaus are Experian, Equifax, and TransUnion. Credit Karma is a free app, not a bureau."],
- [4, "A car loan or a mortgage is an example of…", ["An installment loan", "A revolving line of credit", "A debit account", "A certificate of deposit"], "Borrow once, pay it off in set payments.", "Installment loans: borrow once, pay back over time. Credit cards are revolving: borrow, repay, borrow again."],
- [4, "Your credit limit is <b>$1,500</b> and your balance is <b>$450</b>. What is your utilization?", ["30%", "45%", "3%", "70%"], "Balance ÷ limit × 100.", "$450 ÷ $1,500 × 100 = 30%. Experts say stay at or below 30%."]
+ [2, "A salesperson earns a <b>3% commission</b> on a <b>$31,000</b> car. How much do they earn?", ["$930", "$93", "$9,300", "$310"], "3% = 0.03.", "$31,000 × 0.03 = $930 commission."],
+ [3, "Groceries cost about <b>$78 a week</b>. What is the <b>monthly</b> cost for your budget?", ["$338", "$312", "$4,056", "$78"], "Weekly × 52 ÷ 12.", "$78 × 52 = $4,056 a year ÷ 12 = $338. (× 4 = $312 misses the extra days.)"],
+ [3, "Take-home pay is <b>$3,075</b> and expenses are <b>$2,745</b>. What is your monthly <b>savings ability</b>?", ["$330", "$5,820", "$2,745", "$307.50"], "What's left after expenses.", "$3,075 − $2,745 = $330 a month you can save."],
+ [3, "Saving for a used car you'll buy in <b>3 years</b> is a…", ["Mid-term goal (1–5 years)", "Short-term goal (under 1 year)", "Long-term goal (5+ years)", "Fixed expense"], "Count the years.", "1–5 years = mid-term. Under 1 year = short-term. 5+ years = long-term."],
+ [4, "Which saves you more: a <b>$1,000 tax credit</b> or a <b>$1,000 deduction</b>?", ["The credit", "The deduction", "They save the same", "Neither saves money"], "One cuts the tax, one cuts the income.", "A credit cuts your tax bill dollar for dollar. A deduction only lowers taxable income (worth $100–$120 in the 10–12% brackets)."],
+ [4, "Box 1 of your W-2 shows <b>$40,300</b>. With the <b>$16,100</b> standard deduction, what is your taxable income?", ["$24,200", "$56,400", "$40,300", "$16,100"], "Box 1 − standard deduction.", "$40,300 − $16,100 = $24,200 taxable income."],
+ [4, "Getting a <b>giant refund</b> every year means…", ["You overpaid all year, like a 0% loan to the IRS", "The IRS gave you bonus money", "You paid too little tax", "You'll get audited"], "Where did that money come from?", "A refund is your own money coming back. Adjusting your W-4 puts it in each paycheck instead."],
+ [5, "A debit card takes money from…", ["Your own checking account", "A loan from the bank", "Your credit limit", "Your 401(k)"], "It's your money, not borrowed.", "Debit cards spend money you already have in checking. Credit cards spend borrowed money."],
+ [5, "What happens if you take money out of a CD before the maturity date?", ["You pay an early withdrawal penalty", "You earn bonus interest", "Nothing happens", "Your credit score goes up"], "A CD locks your money for a set time.", "CDs pay a fixed rate for a set term. Taking money out early costs a penalty."],
+ [5, "Why do online banks often pay higher interest on savings (HYSAs)?", ["They have lower costs without physical branches", "They aren't FDIC insured", "They charge more overdraft fees", "They only work with businesses"], "Think about what they don't have to pay for.", "No branches = lower overhead, so online banks can pay higher rates. Most are still FDIC insured."]
 ],
 hard: [
- [1, "Ava earns <b>$50,000 per year</b>. She pays Social Security (6.2%), Medicare (1.45%), and federal income tax (10%). What is her approximate annual <b>net</b> pay?", ["$41,175", "$8,825", "$46,175", "$45,000"], "Add the 3 rates, find the taxes, then subtract from gross.", "6.2% + 1.45% + 10% = 17.65%. $50,000 × 0.1765 = $8,825 in taxes. $50,000 − $8,825 = $41,175. ($8,825 is the taxes, not net pay.)"],
- [2, "Gross pay is <b>$2,900</b>. Find the net pay.<span class='data'>Federal $290.00 · State (IL) $143.55 · Social Security $179.80 · Medicare $42.05 · Health $90.00 · 401(k) $87.00</span>", ["$2,067.60", "$3,732.40", "$2,157.60", "$832.40"], "Add every deduction first, then subtract from gross.", "Deductions total $832.40. $2,900 − $832.40 = $2,067.60."],
- [2, "You earn <b>$17/hour</b> and work <b>47 hours</b> this week (federal overtime: 1.5× after 40). Total gross pay?", ["$858.50", "$799.00", "$1,198.50", "$918.00"], "40 regular hours + 7 overtime hours at $25.50.", "40 × $17 = $680. Overtime rate $17 × 1.5 = $25.50. 7 × $25.50 = $178.50. Total $858.50. ($799 forgets overtime; $1,198.50 pays every hour at overtime.)"],
- [2, "Monthly gross: Jan $2,640 · Feb $3,115 · Mar $2,980 · Apr $3,365 · May $2,900. What is YTD gross through May?", ["$15,000", "$12,100", "$11,885", "$2,900"], "Add all 5 months. Count them twice.", "$2,640 + $3,115 + $2,980 + $3,365 + $2,900 = $15,000. ($12,100 leaves out May.)"],
- [3, "You put <b>$3,000</b> in a CD at <b>3%</b> for <b>2 years</b>, interest added once per year. What is it worth at maturity?", ["$3,182.70", "$3,180.00", "$3,090.00", "$182.70"], "Find year 1, then use that new balance for year 2.", "Year 1: $3,000 × 3% = $90 → $3,090. Year 2: $3,090 × 3% = $92.70 → $3,182.70. ($3,180 is simple interest.)"],
- [3, "Why is a 5-year CD a bad place to keep your <b>emergency fund</b>?", ["You'd pay a penalty to take it out early", "CDs aren't FDIC insured", "CDs never earn interest", "Only businesses can open CDs"], "Emergencies don't wait for maturity dates.", "Emergency money needs to be available right away. A CD locks it up and charges an early withdrawal penalty. Use savings or a HYSA."],
- [4, "Your credit limit is <b>$3,500</b>. To stay at <b>30%</b> utilization, what's the most you should owe?", ["$1,050", "$2,450", "$350", "$1,500"], "Limit × 0.30.", "$3,500 × 0.30 = $1,050. ($2,450 is 70%.)"],
- [4, "Which pair is correct?", ["Length of credit history = 15%", "Payment history = 30%", "Amounts owed = 35%", "New credit = 20%"], "The pie is 35, 30, 15, 10, 10.", "Payment history 35% · Amounts owed 30% · Length of history 15% · New credit 10% · Credit mix 10%."],
- [4, "Which action will most likely <b>hurt</b> your credit score?", ["Closing your oldest credit card", "Checking your own credit score", "Paying your bill on time", "Keeping utilization under 30%"], "Think about length of credit history.", "Closing your oldest card shortens your credit history (15%) and can raise your utilization. Checking your own score has no effect."],
- [1, "You earn <b>$4,000/month</b> and put <b>4%</b> in your 401(k). Your employer matches 100% up to 4%. How much goes into your 401(k) each month in total?", ["$320", "$160", "$4,160", "$16"], "Your part + your employer's matching part.", "You: $4,000 × 4% = $160. Employer match: $160. Total = $320 a month. The match is free money."],
- [4, "If you only pay the <b>minimum</b> on a credit card each month, you will most likely…", ["Pay much more in interest and take years to pay it off", "Pay no interest at all", "Raise your score the fastest", "Have your card closed"], "Remember the minimum payment calculator.", "Minimum payments mostly cover interest, so the balance shrinks slowly. It can take years and cost more than you borrowed."],
- [1, "A friend says: \"My job matches my 401(k), but I'm skipping it.\" Which is the strongest <b>evidence</b> this is a bad idea?", ["They're turning down free money from the employer", "Retirement is a long way off", "401(k)s are a kind of checking account", "Their friends skipped it too"], "Strong evidence uses a course concept.", "An employer match is free money added to your retirement savings. Skipping it means leaving part of your pay on the table."]
+ [2, "Ava earns <b>$44,000 per year</b>. She pays Social Security (6.2%), Medicare (1.45%), and federal income tax (10%). What is her approximate annual <b>net</b> pay?", ["$36,234", "$7,766", "$40,634", "$39,600"], "Add the 3 rates, find the taxes, then subtract from gross.", "6.2% + 1.45% + 10% = 17.65%. $44,000 × 0.1765 = $7,766 in taxes. $44,000 − $7,766 = $36,234."],
+ [2, "Gross pay is <b>$3,300</b>. Find the net pay.<span class='data'>Federal $330.00 · State (IL) $163.35 · Social Security $204.60 · Medicare $47.85 · Health $85.00 · 401(k) $99.00</span>", ["$2,370.20", "$4,229.80", "$2,455.20", "$929.80"], "Add every deduction first, then subtract from gross.", "Deductions total $929.80. $3,300 − $929.80 = $2,370.20. ($2,455.20 skips health insurance.)"],
+ [2, "You earn <b>$19/hour</b> and work <b>46 hours</b> this week (federal overtime: 1.5× after 40). Total gross pay?", ["$931.00", "$874.00", "$1,311.00", "$988.00"], "40 regular hours + 6 overtime hours at $28.50.", "40 × $19 = $760. Overtime rate $19 × 1.5 = $28.50. 6 × $28.50 = $171. Total $931. ($874 forgets overtime; $988 uses double time.)"],
+ [2, "You earn <b>$3,900/month</b> and put <b>5%</b> in your 401(k). Your employer matches 100% up to 5%. How much goes into your 401(k) each month in total?", ["$390", "$195", "$4,095", "$19.50"], "Your part + your employer's matching part.", "You: $3,900 × 5% = $195. Match: $195. Total = $390 a month. The match is free money."],
+ [3, "Take-home pay is <b>$3,700</b>. Needs cost <b>$2,350</b>. How much <b>over</b> the 50% guideline are needs?", ["$500", "$1,850", "$1,350", "$850"], "Find 50% of take-home first.", "50% of $3,700 = $1,850. $2,350 − $1,850 = $500 over. Cutting needs frees money for savings."],
+ [3, "Expenses are <b>$2,250</b> a month. You want a <b>3-month</b> emergency fund and can save <b>$250</b> a month. How many months will it take?", ["27 months", "9 months", "3 months", "270 months"], "Goal first, then ÷ monthly savings.", "Goal: 3 × $2,250 = $6,750. $6,750 ÷ $250 = 27 months."],
+ [4, "Taxable income is <b>$27,400</b>. 2026 brackets: 10% on the first $12,400, 12% on the rest up to $50,400. Federal tax owed?", ["$3,040", "$3,288", "$1,800", "$2,740"], "$1,240 + 12% of the amount over $12,400.", "10% × $12,400 = $1,240. $27,400 − $12,400 = $15,000 × 12% = $1,800. Total $3,040. ($3,288 taxes every dollar at 12%.)"],
+ [4, "You owe <b>$2,660</b> in federal tax. Box 2 shows <b>$2,410</b> withheld. What happens?", ["You owe $250", "You get a $250 refund", "You get a $2,410 refund", "You owe $2,660"], "Withheld − tax owed.", "$2,410 − $2,660 = −$250. Less was withheld than owed, so you owe $250."],
+ [4, "You're in the <b>22%</b> bracket. The 22% rate applies to…", ["Only the dollars in that bracket", "Every dollar you earn", "Only your refund", "Only overtime pay"], "Progressive tax works in layers.", "Each bracket's rate only applies to the dollars inside it. A raise never lowers your take-home pay."],
+ [5, "You put <b>$2,800</b> in a CD at <b>4%</b> for <b>2 years</b>, interest added once per year. What is it worth at maturity?", ["$3,028.48", "$3,024.00", "$2,912.00", "$228.48"], "Find year 1, then use that new balance for year 2.", "Year 1: $2,800 × 4% = $112 → $2,912. Year 2: $2,912 × 4% = $116.48 → $3,028.48. ($3,024 is simple interest.)"],
+ [5, "<b>$5,500</b> for one year: an HYSA at <b>4%</b> vs. savings at <b>0.01%</b>. How much <b>more</b> does the HYSA earn?", ["$219.45", "$220.00", "$22.00", "$0.55"], "Find both, then subtract.", "HYSA: $5,500 × 0.04 = $220. Savings: $5,500 × 0.0001 = $0.55. Difference: $219.45."],
+ [5, "Balance <b>$47</b>. You spend <b>$85</b> and get a <b>$35</b> overdraft fee. New balance?", ["–$73", "–$38", "–$3", "$73"], "Subtract the purchase, then the fee.", "$47 − $85 = −$38. −$38 − $35 = −$73."],
+ [5, "Why is a 5-year CD a bad place to keep your <b>emergency fund</b>?", ["You'd pay a penalty to take it out early", "CDs aren't FDIC insured", "CDs never earn interest", "Only businesses can open CDs"], "Emergencies don't wait for maturity dates.", "Emergency money needs to be available right away. A CD locks it up and charges a penalty to take it out early. Use an HYSA."]
 ]};
 
 const tierOf = i => i < 5 ? "easy" : i < 10 ? "medium" : "hard";
@@ -208,7 +210,7 @@ function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { co
 function newGame() {
   const pools = { easy: shuffle(BANK.easy), medium: shuffle(BANK.medium), hard: shuffle(BANK.hard) };
   S = { level: 0, strikes: 0, banked: 0, pools, used: { easy: 0, medium: 0, hard: 0 }, sel: null, locked: false,
-        lifelines: { l50: true, lhint: true, lhuddle: true }, byUnit: { 1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0] }, q: null, timer: null };
+        lifelines: { l50: true, lhint: true, lhuddle: true }, byUnit: { 2: [0, 0], 3: [0, 0], 4: [0, 0], 5: [0, 0] }, q: null, timer: null };
   ["l50", "lhint", "lhuddle"].forEach(id => $(id).disabled = false);
   $("endScreen").hidden = true;
   drawLadder(); nextQuestion();
@@ -227,7 +229,7 @@ function nextQuestion() {
   S.q = { unit, text, hint, explain, opts: order.map(i => answers[i]), correct: order.indexOf(0) };
   S.sel = null; S.locked = false;
   $("qnum").textContent = S.level + 1; $("qval").textContent = money(LADDER[S.level]);
-  $("unit").textContent = unit === 1 ? "Unit 1 · Payroll Deductions" : unit === 2 ? "Unit 2 · Pay Stubs" : unit === 3 ? "Unit 3 · Banking" : "Unit 4 · Credit";
+  $("unit").textContent = "Unit " + unit + " · " + ({ 2: "Your Paycheck", 3: "Budgeting", 4: "Federal Taxes", 5: "Banking" })[unit];
   $("qtext").innerHTML = text;
   $("answers").innerHTML = S.q.opts.map((o, i) => `<button class="ans" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span>${o}</span></button>`).join("");
   $("answers").querySelectorAll(".ans").forEach(b => b.onclick = () => select(+b.dataset.i));
@@ -291,21 +293,23 @@ function drawLadder() {
 }
 
 function finish(won) {
-  const units = ["Payroll Deductions", "Pay Stubs", "Banking", "Credit"];
+  const units = { 2: "Your Paycheck", 3: "Budgeting", 4: "Federal Taxes", 5: "Banking" };
   let worst = null, worstPct = 2;
-  const cards = [1, 2, 3, 4].map(u => {
+  const cards = [2, 3, 4, 5].map(u => {
     const [c, t] = S.byUnit[u]; const pct = t ? c / t : null;
     if (t && pct < worstPct) { worstPct = pct; worst = u; }
     const label = t === 0 ? "Not asked" : pct >= .8 ? "Got it" : pct >= .6 ? "Almost" : "Study this";
-    return `<div class="u"><div class="l">Unit ${u} · ${units[u - 1]}</div><div class="s">${c}/${t}</div><div class="r">${label}</div></div>`;
+    return `<div class="u"><div class="l">Unit ${u} · ${units[u]}</div><div class="s">${c}/${t}</div><div class="r">${label}</div></div>`;
   }).join("");
   const prize = won ? 1000000 : S.banked;
+  try { const K = "fm-passport"; let p = JSON.parse(localStorage.getItem(K)); if (!p || !p.s || !p.b) p = { s: {}, b: {}, x: {} };
+    const s = p.s["future-millionaire"] || { n: 0, best: null }; s.n++; if (s.best == null || prize > s.best) s.best = prize; s.t = Date.now(); p.s["future-millionaire"] = s; localStorage.setItem(K, JSON.stringify(p)); } catch (e) {}
   $("endBody").innerHTML = `<h2>${won ? "Future Millionaire! 🎉" : "Game over"}</h2>
     <p>${won ? "You answered all 15 questions." : `You reached question ${S.level + 1} with 3 strikes.`} You walk away with:</p>
     <div class="big">${money(prize)}</div>
     <p><b>Results by unit</b> (this is how your midterm is scored too):</p>
     <div class="units">${cards}</div>
-    <p>${worst && worstPct < 1 ? `Study focus: <b>Unit ${worst} · ${units[worst - 1]}</b>. Use that part of your study guide tonight.` : "Perfect run. You're ready for the midterm."}</p>
+    <p>${worst && worstPct < 1 ? `Study focus: <b>Unit ${worst} · ${units[worst]}</b>. Use that part of your study guide tonight.` : "Perfect run. You're ready for the midterm."}</p>
     <div class="controls"><button class="primary" id="againBtn">Play again</button></div>`;
   $("endScreen").hidden = false;
   $("againBtn").onclick = newGame; $("againBtn").focus();
@@ -347,4 +351,5 @@ document.addEventListener("keydown", e => {
 newGame();
 </script>
 
+<script src="/fm-home.js" defer></script>
 </body></html>

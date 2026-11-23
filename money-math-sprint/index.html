@@ -86,21 +86,21 @@ td.n { text-align: right; font-family: var(--mono); }
 
 <div class="wrap">
   <header class="row" style="justify-content:space-between">
-    <div><h1>Money Math <span>Sprint</span></h1><div class="tag">Midterm Review · Units 1–4 · #FutureMillionaires</div></div>
+    <div><h1>Money Math <span>Sprint</span></h1><div class="tag">Midterm Review · Units 2–5 · #FutureMillionaires</div></div>
   </header>
 
   <!-- START -->
   <section id="start" class="stack" style="margin-top:16px">
     <div class="card stack">
-      <p style="margin:0">Every problem is a calculation from the midterm: monthly pay, 401(k), net pay, YTD, overtime, commission, CDs, and credit utilization. The numbers are new every time, so you can play again and again. Get one wrong and you'll see the steps and the mistake you most likely made.</p>
+      <p style="margin:0">Every problem is a calculation from the midterm (Units 2–5): paychecks, budgets, federal taxes and banking. The numbers are new every time, so you can play again and again. Get one wrong and you'll see the steps and the mistake you most likely made.</p>
       <label class="nm" for="player">Your name (first name + last initial)
         <input type="text" id="player" maxlength="24" placeholder="e.g. Jordan M." autocomplete="off"></label>
       <div class="modes">
         <button class="mode" data-mode="sprint"><b>3-Minute Sprint</b><small>All 4 units, mixed. Streaks earn bonus points. Beat your high score!</small></button>
-        <button class="mode" data-mode="u1"><b>Unit 1 Practice</b><small>Monthly pay, 401(k) + match, net pay after taxes. No timer.</small></button>
-        <button class="mode" data-mode="u2"><b>Unit 2 Practice</b><small>Pay stub net pay, YTD months & totals, overtime, commission.</small></button>
-        <button class="mode" data-mode="u3"><b>Unit 3 Practice</b><small>CD value at maturity, one year at a time.</small></button>
-        <button class="mode" data-mode="u4"><b>Unit 4 Practice</b><small>Credit utilization and the 30% rule.</small></button>
+        <button class="mode" data-mode="u2"><b>Unit 2 · Your Paycheck</b><small>Monthly pay, 401(k) + match, net pay, pay stubs, YTD, overtime, commission. No timer.</small></button>
+        <button class="mode" data-mode="u3"><b>Unit 3 · Budgeting</b><small>Weekly → monthly, savings ability, 50/30/20, emergency fund months.</small></button>
+        <button class="mode" data-mode="u4"><b>Unit 4 · Federal Taxes</b><small>Taxable income, 2026 brackets, refund or owe.</small></button>
+        <button class="mode" data-mode="u5"><b>Unit 5 · Banking</b><small>CD value at maturity, HYSA vs. savings, overdrafts, monthly fees.</small></button>
       </div>
       <p class="muted" id="hs" style="margin:0"></p>
     </div>
@@ -151,7 +151,7 @@ const GEN = {
   monthly() {
     let s; do { s = rnd(31200, 74400, 1200); } while (AVOID_SAL.has(s));
     const n = pick(NAMES), m = s / 12;
-    return { unit: 1, prompt: `${n} is offered a job paying <b>${usd(s)} per year</b>. What is the gross <b>monthly</b> income?`,
+    return { unit: 2, prompt: `${n} is offered a job paying <b>${usd(s)} per year</b>. What is the gross <b>monthly</b> income?`,
       pre: "$", post: "", answer: m, tol: 0.01,
       steps: [`Gross monthly = annual salary ÷ 12`, `${usd(s)} ÷ 12 = <b>${usd2(m)}</b>`],
       errors: [[r2(s / 52), "That's weekly pay (÷ 52). Monthly means ÷ 12."], [s * 12, "You multiplied by 12. Annual → monthly means divide by 12."]] };
@@ -159,10 +159,10 @@ const GEN = {
   k401() {
     const m = rnd(2600, 5400, 100), p = pick([3, 4, 5, 6]), match = Math.random() < .5;
     const you = r2(m * p / 100);
-    if (!match) return { unit: 1, prompt: `Your gross monthly pay is <b>${usd(m)}</b>. You put <b>${p}%</b> into your 401(k). How much is that <b>per month</b>?`,
+    if (!match) return { unit: 2, prompt: `Your gross monthly pay is <b>${usd(m)}</b>. You put <b>${p}%</b> into your 401(k). How much is that <b>per month</b>?`,
       pre: "$", post: "", answer: you, tol: 0.01, steps: [`${p}% = ${p / 100}`, `${usd(m)} × ${p / 100} = <b>${usd2(you)}</b>`],
       errors: [[r2(m * p / 10), "Decimal slip: " + p + "% is " + (p / 100) + ", not " + (p / 10) + "."], [r2(m - you), "That's your pay after the 401(k). The question asks for the 401(k) amount."]] };
-    return { unit: 1, prompt: `Your gross monthly pay is <b>${usd(m)}</b>. You put <b>${p}%</b> in your 401(k), and your employer matches <b>100% up to ${p}%</b>. How much goes into your 401(k) <b>in total</b> each month?`,
+    return { unit: 2, prompt: `Your gross monthly pay is <b>${usd(m)}</b>. You put <b>${p}%</b> in your 401(k), and your employer matches <b>100% up to ${p}%</b>. How much goes into your 401(k) <b>in total</b> each month?`,
       pre: "$", post: "", answer: you * 2, tol: 0.01,
       steps: [`Your part: ${usd(m)} × ${p / 100} = ${usd2(you)}`, `Employer match (100%): ${usd2(you)}`, `Total = ${usd2(you)} + ${usd2(you)} = <b>${usd2(you * 2)}</b>`],
       errors: [[you, "That's only your part. Add the employer's matching amount — that's free money!"]] };
@@ -170,7 +170,7 @@ const GEN = {
   netAnnual() {
     let s; do { s = rnd(22000, 64000, 1000); } while (AVOID_SAL.has(s));
     const tax = r2(s * .1765), net = r2(s - tax), n = pick(NAMES);
-    return { unit: 1, prompt: `${n} earns <b>${usd(s)} per year</b> and pays Social Security (6.2%), Medicare (1.45%), and federal income tax (10%). What is the approximate annual <b>net</b> pay?`,
+    return { unit: 2, prompt: `${n} earns <b>${usd(s)} per year</b> and pays Social Security (6.2%), Medicare (1.45%), and federal income tax (10%). What is the approximate annual <b>net</b> pay?`,
       pre: "$", post: "", answer: net, tol: 1,
       steps: [`Add the rates: 6.2% + 1.45% + 10% = 17.65%`, `Taxes: ${usd(s)} × 0.1765 = ${usd2(tax)}`, `Net = ${usd(s)} − ${usd2(tax)} = <b>${usd2(net)}</b>`],
       errors: [[tax, "That's the total taxes. Net pay = gross − taxes."], [r2(s * .9), "You only subtracted federal tax. Social Security and Medicare (FICA) come out too."], [r2(s * (1 - .0765)), "You only subtracted FICA. Federal income tax comes out too."]] };
@@ -227,9 +227,79 @@ const GEN = {
     for (let i = 1; i <= y; i++) { const int = r2(bal * rate / 100); steps.push(`Year ${i}: ${usd2(bal)} × ${rate}% = ${usd2(int)} → ${usd2(r2(bal + int))}`); bal = r2(bal + int); }
     const simple = r2(P * (1 + rate / 100 * y));
     steps.push(`Value at maturity = <b>${usd2(bal)}</b>`);
-    return { unit: 3, prompt: `You put <b>${usd(P)}</b> in a CD earning <b>${rate}%</b> for <b>${y} years</b> (interest added once per year). What is it worth at maturity?`,
+    return { unit: 5, prompt: `You put <b>${usd(P)}</b> in a CD earning <b>${rate}%</b> for <b>${y} years</b> (interest added once per year). What is it worth at maturity?`,
       pre: "$", post: "", answer: bal, tol: 0.05, steps,
       errors: [[simple, "That's simple interest. Each year's interest is added before you find the next year's — use the new balance each year."], [r2(bal - P), "That's just the interest earned. Add it to the starting amount."], [r2(P * (1 + rate / 100)), "That's only one year. Keep going for every year of the term."]] };
+  },
+  groceries() {
+    const w = rnd(46, 128, 2), m = r2(w * 52 / 12), n = pick(NAMES);
+    return { unit: 3, prompt: `${n} spends about <b>${usd(w)} a week</b> on groceries. What is the <b>monthly</b> grocery cost for the budget?`,
+      pre: "$", post: "", answer: m, tol: 0.5,
+      steps: [`Weekly → monthly = weekly × 52 ÷ 12`, `${usd(w)} × 52 = ${usd(w * 52)}`, `${usd(w * 52)} ÷ 12 = <b>${usd2(m)}</b>`],
+      errors: [[w * 4, "× 4 misses the extra days. A year has 52 weeks: × 52 ÷ 12."], [r2(w * 52), "That's the yearly cost. Divide by 12 for monthly."]] };
+  },
+  savings() {
+    const net = rnd(2400, 4200, 50), exp = net - rnd(150, 700, 10), n = pick(NAMES);
+    return { unit: 3, prompt: `${n}'s take-home pay is <b>${usd(net)}</b> a month and total expenses are <b>${usd(exp)}</b>. What is the monthly <b>savings ability</b>?`,
+      pre: "$", post: "", answer: net - exp, tol: 0.01,
+      steps: [`Savings ability = take-home pay − total expenses`, `${usd(net)} − ${usd(exp)} = <b>${usd(net - exp)}</b>`],
+      errors: [[net + exp, "You added. Savings ability is what's LEFT: take-home − expenses."]] };
+  },
+  rule503020() {
+    const net = rnd(2200, 4600, 100), k = pick([["needs", 50], ["wants", 30], ["savings + debt payments", 20]]), a = r2(net * k[1] / 100);
+    return { unit: 3, prompt: `Using the <b>50/30/20</b> budget, how much of a <b>${usd(net)}</b> take-home pay goes to <b>${k[0]}</b>?`,
+      pre: "$", post: "", answer: a, tol: 0.01,
+      steps: [`50% needs · 30% wants · 20% savings + debt`, `${usd(net)} × ${k[1] / 100} = <b>${usd2(a)}</b>`],
+      errors: [[r2(net * k[1] / 10), `Decimal slip: ${k[1]}% = ${k[1] / 100}.`]].concat([50, 30, 20].filter(x => x !== k[1]).map(x => [r2(net * x / 100), `That's the ${x}% amount. ${k[0][0].toUpperCase() + k[0].slice(1)} get ${k[1]}%.`])) };
+  },
+  efund() {
+    const save = rnd(150, 450, 25), mo = rnd(4, 12), goal = save * mo, n = pick(NAMES);
+    return { unit: 3, prompt: `${n} wants a <b>${usd(goal)}</b> emergency fund and can save <b>${usd(save)}</b> a month. How many <b>months</b> will it take?`,
+      pre: "", post: "months", answer: mo, tol: 0,
+      steps: [`Months = goal ÷ monthly savings`, `${usd(goal)} ÷ ${usd(save)} = <b>${mo}</b> months`],
+      errors: [[goal * save, "Divide the goal by the monthly savings."]] };
+  },
+  taxable() {
+    const b1 = rnd(24000, 68000, 100), t = b1 - 16100, n = pick(NAMES);
+    return { unit: 4, prompt: `${n}'s W-2 shows <b>${usd(b1)}</b> in Box 1 (wages). Single filers take the 2026 standard deduction of <b>$16,100</b>. What is ${n}'s <b>taxable income</b>?`,
+      pre: "$", post: "", answer: t, tol: 0.01,
+      steps: [`Taxable income = Box 1 wages − standard deduction`, `${usd(b1)} − $16,100 = <b>${usd(t)}</b>`],
+      errors: [[b1 + 16100, "Subtract the standard deduction. It lowers your taxable income."], [b1, "Don't forget the $16,100 standard deduction."]] };
+  },
+  fedtax() {
+    const t = rnd(14000, 49000, 100), tax = r2(1240 + .12 * (t - 12400));
+    return { unit: 4, prompt: `Taxable income is <b>${usd(t)}</b>. Use the 2026 brackets: <b>10%</b> on the first $12,400, then <b>12%</b> on income from $12,401 to $50,400. How much <b>federal income tax</b> is owed?`,
+      pre: "$", post: "", answer: tax, tol: 0.5,
+      steps: [`First $12,400 × 10% = $1,240`, `Amount over $12,400: ${usd(t)} − $12,400 = ${usd(t - 12400)}`, `${usd(t - 12400)} × 12% = ${usd2(r2(.12 * (t - 12400)))}`, `Total = $1,240 + ${usd2(r2(.12 * (t - 12400)))} = <b>${usd2(tax)}</b>`],
+      errors: [[r2(t * .12), "Progressive tax: only the dollars ABOVE $12,400 are taxed at 12%. The first $12,400 is taxed at 10%."], [r2(.12 * (t - 12400)), "Add the $1,240 from the 10% bracket."]] };
+  },
+  refund() {
+    const tax = rnd(1400, 5200, 2), w = tax + pick([-1, 1]) * rnd(60, 640, 2), d = w - tax, n = pick(NAMES);
+    return { unit: 4, prompt: `${n} owes <b>${usd(tax)}</b> in federal tax. Box 2 of the W-2 shows <b>${usd(w)}</b> was withheld. Enter the refund as a positive number or the amount owed as a <b>negative</b> number.`,
+      pre: "$", post: "", answer: d, tol: 0.01,
+      steps: [`Withheld − tax owed = ${usd(w)} − ${usd(tax)} = ${d < 0 ? "−" + usd(-d) : usd(d)}`, d >= 0 ? `More was withheld than owed → <b>refund of ${usd(d)}</b>` : `Less was withheld than owed → <b>owes ${usd(-d)}</b> (enter −${-d})`],
+      errors: [[-d, d >= 0 ? "Flip it: more was withheld than owed, so it's a refund (positive)." : `Flip it: less was withheld than owed, so ${n} owes (negative).`]] };
+  },
+  hysa() {
+    const P = rnd(2000, 9000, 500), r = pick([3.5, 4, 4.25, 4.5]), a = r2(P * r / 100), b = r2(P * .0001), d = r2(a - b);
+    return { unit: 5, prompt: `You keep <b>${usd(P)}</b> for one year. A high-yield savings account pays <b>${r}%</b>; a regular savings account pays <b>0.01%</b>. How much <b>more</b> interest does the HYSA earn?`,
+      pre: "$", post: "", answer: d, tol: 0.02,
+      steps: [`HYSA: ${usd(P)} × ${r / 100} = ${usd2(a)}`, `Regular: ${usd(P)} × 0.0001 = ${usd2(b)}`, `Difference = <b>${usd2(d)}</b>`],
+      errors: [[a, "That's all the HYSA interest. Subtract what the regular account earns."], [r2(P * r / 10), `Decimal slip: ${r}% = ${r / 100}.`]] };
+  },
+  overdraft() {
+    const bal = rnd(20, 140, 1), spend = bal + rnd(8, 90, 1), nb = bal - spend - 35;
+    return { unit: 5, prompt: `Your checking balance is <b>${usd(bal)}</b>. You spend <b>${usd(spend)}</b> and the bank charges a <b>$35 overdraft fee</b>. What is your new balance? (Enter a negative number.)`,
+      pre: "$", post: "", answer: nb, tol: 0.01,
+      steps: [`${usd(bal)} − ${usd(spend)} = −${usd(spend - bal)}`, `Then subtract the $35 fee: <b>−${usd(-nb)}</b>`],
+      errors: [[bal - spend, "Don't forget the $35 overdraft fee."], [-nb, "You're below zero. The balance is negative."], [bal - spend + 35, "The fee comes OUT of your account: subtract $35."]] };
+  },
+  fee() {
+    const f = pick([5, 6, 8, 10, 12, 15]), cut = pick([300, 500, 1000, 1500]);
+    return { unit: 5, prompt: `Your checking account charges <b>${usd(f)} a month</b> unless your balance stays above <b>${usd(cut)}</b>. You never hit the minimum. How much do the fees cost you <b>per year</b>?`,
+      pre: "$", post: "", answer: f * 12, tol: 0.01,
+      steps: [`${usd(f)} × 12 months = <b>${usd(f * 12)}</b>`, `Tip: a free account or keeping the minimum saves this money.`],
+      errors: [[f * 52, "Fees are monthly: × 12, not × 52."], [cut - f, "The minimum balance isn't the fee. Multiply the monthly fee by 12."]] };
   },
   util() {
     const lim = pick([1000, 1200, 1500, 2000, 2400, 2500, 3000, 4000, 5000, 6000]), pct = pick([10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 75, 80]);
@@ -242,8 +312,8 @@ const GEN = {
       errors: [[lim * .7, "That's 70% of the limit. Use 30%."], [lim * 3, "Decimal slip: 30% = 0.30."]] };
   }
 };
-const UNIT_GENS = { 1: ["monthly", "k401", "netAnnual"], 2: ["netStub", "ytdMonths", "ytdSum", "overtime", "commission"], 3: ["cd"], 4: ["util"] };
-const UNIT_NAMES = { 1: "Payroll Deductions", 2: "Pay Stubs", 3: "Banking", 4: "Credit" };
+const UNIT_GENS = { 2: ["monthly", "k401", "netAnnual", "netStub", "ytdMonths", "ytdSum", "overtime", "commission"], 3: ["groceries", "savings", "rule503020", "efund"], 4: ["taxable", "fedtax", "refund"], 5: ["cd", "hysa", "overdraft", "fee"] };
+const UNIT_NAMES = { 2: "Your Paycheck", 3: "Budgeting", 4: "Federal Taxes", 5: "Banking" };
 
 let G = null, tick = null;
 const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
@@ -256,7 +326,7 @@ document.querySelectorAll(".mode").forEach(b => b.onclick = () => start(b.datase
 
 function start(mode) {
   store.set("mms-name", $("player").value.trim());
-  G = { mode, timed: mode === "sprint", t: 180, score: 0, streak: 0, best: 0, n: 0, c: 0, byUnit: { 1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0] }, last: null, done: false };
+  G = { mode, timed: mode === "sprint", t: 180, score: 0, streak: 0, best: 0, n: 0, c: 0, byUnit: { 2: [0, 0], 3: [0, 0], 4: [0, 0], 5: [0, 0] }, last: null, done: false };
   $("start").hidden = true; $("results").hidden = true; $("game").hidden = false;
   $("barWrap").hidden = !G.timed; $("tLabel").textContent = G.timed ? "Time" : "Mode";
   $("time").textContent = G.timed ? "3:00" : "Unit " + mode.slice(1);
@@ -274,7 +344,7 @@ function start(mode) {
 
 function newProblem() {
   let key;
-  if (G.mode === "sprint") { const u = pick([1, 2, 2, 3, 4]); key = pick(UNIT_GENS[u]); } else key = pick(UNIT_GENS[+G.mode.slice(1)]);
+  if (G.mode === "sprint") { const u = pick([2, 3, 4, 5]); key = pick(UNIT_GENS[u]); } else key = pick(UNIT_GENS[+G.mode.slice(1)]);
   if (key === G.last && UNIT_GENS[GEN[key]().unit].length > 1) return newProblem();
   G.last = key;
   G.p = GEN[key]();
@@ -323,13 +393,15 @@ function finish() {
   if (G.done) return; G.done = true; clearInterval(tick);
   const hs = +store.get("mms-high") || 0, newHigh = G.timed && G.score > hs;
   if (newHigh) store.set("mms-high", G.score);
+  try { const K = "fm-passport"; let p = JSON.parse(localStorage.getItem(K)); if (!p || !p.s || !p.b) p = { s: {}, b: {}, x: {} };
+    const s = p.s["money-math-sprint"] || { n: 0, best: null }; s.n++; if (G.timed && (s.best == null || G.score > s.best)) s.best = G.score; s.t = Date.now(); p.s["money-math-sprint"] = s; localStorage.setItem(K, JSON.stringify(p)); } catch (e) {}
   const name = $("player").value.trim();
-  const cards = [1, 2, 3, 4].map(u => {
+  const cards = [2, 3, 4, 5].map(u => {
     const [c, t] = G.byUnit[u]; const pct = t ? c / t : null;
     const chip = t === 0 ? `<span class="chip x">Not practiced</span>` : pct >= .8 ? `<span class="chip g">Got it</span>` : pct >= .6 ? `<span class="chip a">Almost</span>` : `<span class="chip n">Need help</span>`;
     return `<div class="res"><div class="l">Unit ${u} · ${UNIT_NAMES[u]}</div><div class="s">${c}/${t}</div>${chip}</div>`;
   }).join("");
-  const weak = [1, 2, 3, 4].filter(u => G.byUnit[u][1] && G.byUnit[u][0] / G.byUnit[u][1] < .8);
+  const weak = [2, 3, 4, 5].filter(u => G.byUnit[u][1] && G.byUnit[u][0] / G.byUnit[u][1] < .8);
   $("results").innerHTML = `<div class="card stack">
     <div class="tag">${name ? name + " · " : ""}${G.timed ? "3-Minute Sprint" : "Unit " + G.mode.slice(1) + " Practice"}</div>
     <div class="big">${G.score.toLocaleString()} pts</div>
@@ -348,4 +420,5 @@ $("next").onclick = () => { if (!G.done) newProblem(); };
 $("quit").onclick = finish;
 </script>
 
+<script src="/fm-home.js" defer></script>
 </body></html>
