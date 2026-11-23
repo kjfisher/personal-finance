@@ -1,0 +1,123 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Day 5: Where Does It Go?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: course pages for the Future Millionaires site. Navy bar with breadcrumbs, unit-colored header, cards on a pale ground. */
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--bar:#14213D;--barInk:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;--uc:#2F6FB0;--chip:#E9EEF4;
+ --display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--bar:#070C17;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--uc:#86B7EE;--chip:#1C2742;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--bar:#070C17;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--uc:#86B7EE;--chip:#1C2742;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+a{color:inherit}
+.bar{background:var(--bar);color:var(--barInk)}
+.bar .in,.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar .in{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;justify-content:space-between;padding-block:12px}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.crumbs a{text-decoration:none;opacity:.8}.crumbs a:hover{opacity:1;color:var(--gold)}
+.crumbs span{opacity:.5}
+.blocks{display:inline-flex;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px}
+.blocks button{border:0;background:transparent;color:var(--barInk);font:700 13px var(--body);padding:6px 12px;border-radius:999px;cursor:pointer;opacity:.75}
+.blocks button[aria-pressed="true"]{background:var(--gold);color:#14213D;opacity:1}
+.head{border-left:10px solid var(--uc);padding:24px 0 6px 20px;margin-top:22px;display:grid;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--uc)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,5vw,58px);line-height:1.02;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,2.6vw,30px);margin:0 0 10px}
+.sub{color:var(--muted);margin:0;max-width:70ch}
+.wrap{display:grid;gap:18px;padding-block:18px 48px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;min-width:0}
+.card.tgt{border:2px solid var(--uc)}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tgt .big{font-family:var(--display);font-weight:700;font-size:clamp(22px,2.8vw,32px);line-height:1.2;margin:0 0 8px;text-wrap:balance}
+ul,ol{margin:0;padding-left:1.3em;display:grid;gap:4px}
+.chip{display:inline-flex;gap:8px;align-items:center;background:color-mix(in srgb,var(--uc) 14%,var(--surface));border-radius:999px;padding:5px 12px;font:600 13px var(--mono);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:8px;font:700 16px var(--body);text-decoration:none;padding:10px 16px;border-radius:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.btn.go{background:var(--gold);border-color:var(--gold);color:#14213D}
+.btn.play{background:var(--money);border-color:var(--money);color:var(--money-ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.timeline{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.timeline div{display:flex;align-items:center;justify-content:center;font:600 12px var(--mono);color:#fff;overflow:hidden;white-space:nowrap;border-right:2px solid var(--surface)}
+.seg{display:grid;grid-template-columns:84px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line)}
+.seg:first-of-type{border-top:0}
+.seg .t{font-family:var(--display);font-weight:800;font-size:28px;line-height:1;color:var(--uc)}
+.seg .t small{display:block;font:500 12px var(--mono);color:var(--muted);margin-top:4px}
+.seg h3{margin:0 0 4px;font-family:var(--display);font-size:22px}
+.seg .say{margin:0 0 8px;font-weight:700}
+.seg ul{color:var(--ink)}
+.seg .g{margin-top:8px}
+@media (max-width:560px){.seg{grid-template-columns:1fr;gap:6px}}
+.tbl{width:100%;border-collapse:collapse;font-size:16px}
+.tbl th,.tbl td{text-align:left;padding:10px 8px;border-top:1px solid var(--line);vertical-align:top}
+.tbl th{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-top:0}
+.scroll{overflow-x:auto}
+.vocab{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.vocab div{background:var(--chip);border-radius:10px;padding:10px 12px;font-size:15px}
+.vocab b{display:block}
+.targets{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.targets div{border:1px solid var(--line);border-left:6px solid var(--uc);border-radius:10px;padding:10px 12px}
+.targets b{font-family:var(--mono);font-size:13px;color:var(--uc)}
+.note{font-size:14px;color:var(--muted)}
+/* projector */
+#proj{position:fixed;inset:0;background:var(--bar);color:var(--barInk);z-index:50;display:grid;grid-template-rows:auto 1fr auto;padding:max(20px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px))}
+#proj .ptop{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:15px;opacity:.9}
+#proj .ptgt{font-family:var(--display);font-weight:600;font-size:clamp(16px,2vw,24px);color:var(--gold)}
+#proj .pmid{display:grid;align-content:center;gap:18px;max-width:1300px;margin:0 auto;width:100%}
+#proj .pname{font-family:var(--mono);font-size:clamp(14px,1.6vw,20px);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+#proj .psay{font-family:var(--display);font-weight:800;font-size:clamp(34px,5.4vw,80px);line-height:1.05;text-wrap:balance}
+#proj .pclock{font-family:var(--mono);font-weight:600;font-size:clamp(48px,9vw,140px);line-height:1;font-variant-numeric:tabular-nums}
+#proj .pclock.low{color:#FF8A73}
+#proj .pbar{height:10px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden}
+#proj .pbar i{display:block;height:100%;background:var(--gold);width:0}
+#proj .pctl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#proj .pctl button{font:700 17px var(--body);padding:12px 20px;border-radius:12px;border:2px solid rgba(255,255,255,.4);background:transparent;color:var(--barInk);cursor:pointer}
+#proj .pctl button.go{background:var(--gold);border-color:var(--gold);color:#14213D}
+#proj .pgames{display:flex;gap:10px;flex-wrap:wrap}
+#proj .pgames a{background:var(--money);color:var(--money-ink);text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
+</style>
+<div class="bar"><div class="in"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Arcade</a> <span>/</span> <a href="/daily-agenda/#day-5">Daily Agenda</a> <span>/</span> <a href="/units/unit-2/">Unit 2</a> <span>/</span> <b>Day 5</b></nav><div class="blocks" role="group" aria-label="Which blocks"><button id="bA" aria-pressed="true">Blocks 1 &amp; 3</button><button id="bB" aria-pressed="false">Blocks 5 &amp; 7</button></div></div></div><div class="wrap">
+<header class="head"><div class="eyebrow">Unit 2 · Your Paycheck · Day 5 of 45 · <span data-a="Fri, Jan 15" data-b="Tue, Jan 19">Fri, Jan 15</span></div>
+<h1>Where Does It Go?</h1><p class="sub">85-minute block · 8 parts · lesson plan and slides</p></header>
+<div class="row"><a class="btn go" href="/units/unit-2/slides/day-5/">▶ Present Day 5 slides</a><a class="btn" href="/units/unit-2/notes/">Guided Notes</a><button class="btn" id="startProj" hidden>Projector mode</button><a class="btn play" href="/check-it/" target="_blank" rel="noopener">Check It! ↗</a><a class="btn play" href="/deduction-duel/" target="_blank" rel="noopener">Deduction Duel ↗</a></div>
+<section class="card tgt"><div class="label">Learning target</div><p class="big">I can identify and calculate payroll deductions.</p>
+<div class="label">Success criteria</div><ul><li>I can list federal, state, Social Security and Medicare</li><li>I can sort mandatory vs. optional deductions</li></ul><span class="chip">18 by 18 · #8 Know what you&#x27;re really earning</span></section>
+<section class="card"><div class="label">Timeline · 85 minutes</div><div class="timeline" aria-hidden="true"><div style="flex:5;background:var(--uc)" title="Bell ringer: 5 min">5′</div><div style="flex:5;background:#0F8B6C" title="Target: 5 min">5′</div><div style="flex:20;background:#B8572F" title="Mini-lesson: the deductions: 20 min">20′</div><div style="flex:10;background:#6B4FB0" title="Mandatory or optional?: 10 min">10′</div><div style="flex:15;background:#2C7A8C" title="Worked example + you try: 15 min">15′</div><div style="flex:15;background:#9A6B00" title="My career&#x27;s deductions: 15 min">15′</div><div style="flex:10;background:#7A2E52" title="Practice games: 10 min">10′</div><div style="flex:5;background:var(--uc)" title="Exit ticket: 5 min">5′</div></div>
+<div style="margin-top:8px"><div class="seg"><div class="t">5<small>min · 0–5</small></div><div><h3>Bell ringer</h3><p class="say">Name every place your paycheck goes before it reaches you.</p><ul><li>Notes box 1: list as many as they can.</li></ul></div></div><div class="seg"><div class="t">5<small>min · 5–10</small></div><div><h3>Target</h3><p class="say">Mandatory vs. optional deductions.</p><ul><li>Read the target aloud.</li></ul></div></div><div class="seg"><div class="t">20<small>min · 10–30</small></div><div><h3>Mini-lesson: the deductions</h3><p class="say">Federal · Illinois 4.95% · Social Security 6.2% · Medicare 1.45% · optional extras.</p><ul><li>Notes box 2. FICA = 6.2% + 1.45% = 7.65%. Federal withholding comes from the IRS tables based on your W-4; we&#x27;ll use the amount given.</li><li>Misconception: &quot;Taxes only come out in April.&quot; They come out of every paycheck.</li></ul></div></div><div class="seg"><div class="t">10<small>min · 30–40</small></div><div><h3>Mandatory or optional?</h3><p class="say">Sort 6 deductions.</p><ul><li>Fingers: 1 = mandatory, 2 = optional; reveal one at a time.</li></ul></div></div><div class="seg"><div class="t">15<small>min · 40–55</small></div><div><h3>Worked example + you try</h3><p class="say">$4,000 a month, then $3,400 a month.</p><ul><li>Notes box 3. Model $4,000: federal $340 (given), Illinois $198, SS $248, Medicare $58 → $844 total, net $3,156.</li><li>Students try $3,400 (federal $255 given) before the reveal: IL $168.30, SS $210.80, Medicare $49.30 → $683.40, net $2,716.60.</li></ul></div></div><div class="seg"><div class="t">15<small>min · 55–70</small></div><div><h3>My career&#x27;s deductions</h3><p class="say">Use your Day 4 gross monthly pay.</p><ul><li>Notes box 4. For federal, estimate 8% of gross (a simplified estimate; the real amount comes from the IRS tables).</li></ul></div></div><div class="seg"><div class="t">10<small>min · 70–80</small></div><div><h3>Practice games</h3><p class="say">Check It!, then Deduction Duel.</p><ul><li>Note: these older games use a flat 5% state tax for practice; on quizzes we use Illinois 4.95%.</li></ul></div></div><div class="seg"><div class="t">5<small>min · 80–85</small></div><div><h3>Exit ticket</h3><p class="say">Which deduction is optional: Social Security, Medicare, 401(k) or state tax?</p><ul><li>401(k).</li></ul></div></div></div></section>
+<div class="two">
+<section class="card"><h2>Differentiation</h2><ul><li>Support: deduction table with the rates filled in.</li><li>Extension: why does Social Security stop at a yearly wage cap? Look it up.</li><li>EL: color-code mandatory (red) and optional (green).</li></ul></section>
+<section class="card"><h2>Exit ticket</h2><p style="margin:0 0 8px;font-weight:700">Which deduction is optional: Social Security, Medicare, 401(k) or state tax?</p><div class="label">Look for</div><ul><li>401(k).</li></ul>
+<div class="label" style="margin-top:12px">Career connection</div><p style="margin:0">Payroll specialists calculate these deductions every pay period.</p>
+</section>
+</div>
+<section class="card"><h2>Materials</h2><ul><li><a href="/units/unit-2/slides/day-4/"><b>Day 4 slides: Gross Pay &amp; Your Career</b></a></li><li><a href="/units/unit-2/slides/day-5/"><b>Day 5 slides: Where Does It Go?</b></a></li><li><a href="/units/unit-2/slides/day-6/"><b>Day 6 slides: My First Paycheck</b></a></li><li><a href="/units/unit-2/slides/day-7/"><b>Day 7 slides: Hourly, Salary or Commission?</b></a></li><li><a href="/units/unit-2/slides/day-8/"><b>Day 8 slides: Read Your Pay Stub</b></a></li><li><a href="/units/unit-2/slides/day-9/"><b>Day 9 slides: Unit 2 Review</b></a></li><li><a href="/units/unit-2/notes/"><b>Unit 2 Guided Notes (PDF for Notability or print; one per day)</b></a></li><li><a href="https://www.bls.gov/ooh/" target="_blank" rel="noopener">BLS Occupational Outlook Handbook (career salaries) ↗</a></li><li><a href="https://www.dol.gov/agencies/whd/overtime" target="_blank" rel="noopener">U.S. Department of Labor: overtime pay ↗</a></li><li>Unit 2 Quiz – Version A (print) · Version B + Reassessment Ticket for retakes (Assessment Vault, teacher only)</li></ul></section>
+<div class="row"><a class="btn" href="/lessons/day-4/">← Day 4</a><a class="btn" href="/units/unit-2/">Unit 2 overview</a><a class="btn" href="/lessons/day-6/">Day 6 →</a></div>
+</div>
+<div id="proj" hidden role="dialog" aria-label="Projector mode"></div>
+<script>
+const LP={"day": 5, "target": "I can identify and calculate payroll deductions.", "segs": [{"m": 5, "n": "Bell ringer", "s": "Name every place your paycheck goes before it reaches you.", "g": false}, {"m": 5, "n": "Target", "s": "Mandatory vs. optional deductions.", "g": false}, {"m": 20, "n": "Mini-lesson: the deductions", "s": "Federal · Illinois 4.95% · Social Security 6.2% · Medicare 1.45% · optional extras.", "g": false}, {"m": 10, "n": "Mandatory or optional?", "s": "Sort 6 deductions.", "g": false}, {"m": 15, "n": "Worked example + you try", "s": "$4,000 a month, then $3,400 a month.", "g": false}, {"m": 15, "n": "My career's deductions", "s": "Use your Day 4 gross monthly pay.", "g": false}, {"m": 10, "n": "Practice games", "s": "Check It!, then Deduction Duel.", "g": true}, {"m": 5, "n": "Exit ticket", "s": "Which deduction is optional: Social Security, Medicare, 401(k) or state tax?", "g": false}], "games": [["Check It!", "/check-it/"], ["Deduction Duel", "/deduction-duel/"]]};
+(function(){const P=document.getElementById("proj");let i=0,left=0,run=false,tick=null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=s=>{const m=Math.floor(Math.abs(s)/60),x=Math.abs(s)%60;return (s<0?"−":"")+m+":"+String(x).padStart(2,"0")};
+function draw(){const s=LP.segs[i];P.innerHTML=`<div class="ptop"><span>Day ${LP.day} · Part ${i+1} of ${LP.segs.length}</span><span class="ptgt">${esc(LP.target)}</span><button id="px" class="btn" style="color:inherit;border-color:rgba(255,255,255,.4)">Exit ✕</button></div>
+<div class="pmid"><div class="pname">${esc(s.n)} · ${s.m} min</div><div class="psay">${esc(s.s)}</div><div class="pclock ${left<=60?"low":""}" id="pc">${fmt(left)}</div><div class="pbar"><i style="width:${(1-left/(s.m*60))*100}%"></i></div>
+${s.g&&LP.games.length?`<div class="pgames">${LP.games.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join("")}</div>`:""}</div>
+<div class="pctl"><button id="pp">← Back</button><button id="pr" class="go">${run?"Pause":"Start timer"}</button><button id="p1">+1 min</button><button id="pn">Next →</button></div>`;
+P.querySelector("#px").onclick=close;P.querySelector("#pp").onclick=()=>go(i-1);P.querySelector("#pn").onclick=()=>go(i+1);P.querySelector("#pr").onclick=toggle;P.querySelector("#p1").onclick=()=>{left+=60;draw()};}
+function go(k){if(k<0||k>=LP.segs.length)return;i=k;left=LP.segs[i].m*60;draw()}
+function toggle(){run=!run;clearInterval(tick);if(run)tick=setInterval(()=>{left--;const c=document.getElementById("pc");if(c){c.textContent=fmt(left);c.classList.toggle("low",left<=60)}const b=P.querySelector(".pbar i");if(b)b.style.width=Math.min(100,(1-left/(LP.segs[i].m*60))*100)+"%"},1000);draw()}
+function open(){P.hidden=false;go(0);try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}}
+function close(){run=false;clearInterval(tick);P.hidden=true;try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}}
+document.getElementById("startProj").onclick=open;
+document.addEventListener("keydown",ev=>{if(P.hidden)return;if(ev.key==="ArrowRight")go(i+1);if(ev.key==="ArrowLeft")go(i-1);if(ev.key===" "){ev.preventDefault();toggle()}if(ev.key==="Escape")close()});})();
+</script><script>
+(function(){let blk="a";try{const s=localStorage.getItem("agenda-blk");if(s==="a"||s==="b")blk=s}catch(e){}
+function set(b){blk=b;try{localStorage.setItem("agenda-blk",b)}catch(e){}document.querySelectorAll("[data-a]").forEach(x=>x.textContent=x.dataset[b]);
+document.getElementById("bA").setAttribute("aria-pressed",b==="a");document.getElementById("bB").setAttribute("aria-pressed",b==="b");}
+document.getElementById("bA").onclick=()=>set("a");document.getElementById("bB").onclick=()=>set("b");set(blk);})();
+</script>
+</body></html>
