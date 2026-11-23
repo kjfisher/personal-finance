@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life Happens</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap"><style>
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--hero:#14213D;--hero-ink:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;
+--good:#1F7A45;--good-bg:#E3F4E8;--bad:#B23A26;--bad-bg:#FBE9E5;--warn:#9A6B00;--warn-bg:#FBF1D9;--accent:var(--money);
+--display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;
+--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--hero:#101A30;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--good:#6CCB8A;--good-bg:#17301F;--bad:#F09A72;--bad-bg:#3A1F18;--warn:#F5C542;--warn-bg:#3A3015;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.top{background:var(--hero);color:var(--hero-ink)}
+.top .in{max-width:980px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.top h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1;margin:4px 0 0}
+.top nav{display:flex;gap:8px;flex-wrap:wrap}
+.top nav a{color:var(--hero-ink);text-decoration:none;border:1px solid rgba(255,255,255,.3);padding:8px 12px;border-radius:10px;font-weight:700;font-size:15px}
+main{max-width:980px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+.panel h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);line-height:1.15;margin:0}
+.lede{margin:0;color:var(--muted)}
+.label{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 16px var(--body);border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;border-radius:12px;cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--money);color:var(--money-ink);border-color:var(--money)}
+.btn.gold{background:var(--gold);color:#14213D;border-color:var(--gold)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.choices{display:grid;gap:10px}
+.choice{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.choice small{grid-column:1/-1;color:var(--muted);font-weight:400}
+.cost{font:600 15px var(--mono)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.stat b{display:block;font:600 22px var(--mono)}
+.stat.neg b{color:var(--bad)} .stat.pos b{color:var(--good)}
+.note{border-radius:12px;padding:10px 14px;font-weight:700}
+.note.ok{background:var(--good-bg);color:var(--good)} .note.no{background:var(--bad-bg);color:var(--bad)} .note.warn{background:var(--warn-bg);color:var(--warn)}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,72px);line-height:1}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:#14213D;font-weight:700;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:all .3s;z-index:50;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)} td.n,th.n{text-align:right;font-family:var(--mono)}
+.tw{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.track{display:grid;grid-template-columns:repeat(30,1fr);gap:2px}
+.track i{height:10px;border-radius:3px;background:var(--line)}
+.track i.done{background:var(--money)} .track i.now{background:var(--gold)} .track i.pay{outline:2px solid var(--money);outline-offset:-2px}
+.ev h3{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);margin:0}
+.ev p{margin:0}
+.happy{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.happy span{display:block;height:100%;background:var(--gold)}
+.stars{font-size:40px;letter-spacing:6px}
+</style></head>
+<body><header class="top"><div class="in"><div><div class="eyebrow">Unit 10 · Final Review · Solo</div><h1>Life Happens</h1></div>
+<nav><a href="/passport/">My Passport</a><a href="/">Arcade</a></nav></div></header>
+<main id="app" aria-live="polite"></main>
+<script>
+const FMP=(()=>{const K="fm-passport";
+ function get(){try{const p=JSON.parse(localStorage.getItem(K));if(p&&p.s&&p.b)return p;}catch(e){}return {s:{},b:{},x:{}};}
+ function save(p){try{localStorage.setItem(K,JSON.stringify(p));}catch(e){}}
+ return {get,
+  stamp(slug,score){const p=get();const s=p.s[slug]||{n:0,best:null};s.n++;if(score!=null&&(s.best==null||score>s.best))s.best=score;s.t=Date.now();p.s[slug]=s;save(p);},
+  badge(id,name){const p=get();if(p.b[id])return false;p.b[id]=Date.now();save(p);if(name)fmToast("🏅 Passport badge earned: "+name);return true;},
+  count(key){const p=get();p.x=p.x||{};p.x[key]=(p.x[key]||0)+1;save(p);return p.x[key];}};})();
+function fmToast(t){let el=document.getElementById("fmToast");if(!el){el=document.createElement("div");el.id="fmToast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}
+ el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3800);}
+
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const m0=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const MONTHS=["June","July","August","September","October","November","December","January","February","March","April","May"];
+const JOBS=[
+ {id:"barista",name:"Coffee shop shift lead",sal:34000},
+ {id:"medasst",name:"Medical assistant",sal:42000},
+ {id:"elec",name:"Electrician apprentice",sal:48000},
+ {id:"design",name:"Graphic designer",sal:54000},
+ {id:"acct",name:"Staff accountant",sal:66000},
+ {id:"dev",name:"Software developer",sal:85000}];
+const HOUSE=[{id:"room",name:"Apartment with 2 roommates",amt:800,util:50},{id:"studio",name:"Studio apartment",amt:1150,util:90},{id:"one",name:"One-bedroom apartment",amt:1450,util:110}];
+const RIDE=[{id:"bus",name:"Monthly transit pass",amt:90,car:false,note:"No car payment, no car insurance"},
+ {id:"used",name:"Used car",amt:480,car:true,note:"$250 payment + $140 insurance + $90 gas"},
+ {id:"new",name:"New car",amt:900,car:true,note:"$560 payment + $220 insurance + $120 gas"}];
+const PLANS=[{id:"A",name:"Plan A: high deductible",prem:90,ded:4000},{id:"B",name:"Plan B: low deductible",prem:210,ded:1000}];
+const OTHER={groceries:350,phone:60,loan:180};
+const LIMIT=2000;
+function fedTax(taxable){ taxable=Math.max(0,taxable); let t=Math.min(taxable,12400)*.10; if(taxable>12400) t+=(Math.min(taxable,50400)-12400)*.12; if(taxable>50400) t+=(Math.min(taxable,105700)-50400)*.22; if(taxable>105700) t+=(taxable-105700)*.24; return t; }
+function pay(S){ const g=S.sal/12, k=g*S.k/100, fed=fedTax(S.sal-S.sal*S.k/100-16100)/12, il=(g-k)*.0495, fica=g*.0765, prem=PLANS.find(p=>p.id===S.plan).prem;
+  return {g,k,fed,il,fica,prem,net:g-k-fed-il-fica-prem}; }
+function needs(S){ const h=HOUSE.find(x=>x.id===S.house), r=RIDE.find(x=>x.id===S.ride);
+  return h.amt+h.util+r.amt-(S.liabOnly?60:0)+OTHER.groceries+OTHER.phone+OTHER.loan+(S.renters?15:0); }
+let S;
+function fresh(){ return {step:"intro",job:null,sal:0,house:null,ride:null,liabOnly:false,plan:"B",k:5,renters:true,save:200,
+  month:0,ef:1000,card:0,score:680,k401:0,fun:0,funTotal:0,extra:0,extraLeft:0,events:[],log:[],deck:null,cur:null,result:null,inquiries:0}; }
+
+/* ---------- money moves used by events ---------- */
+function spend(amt, how){ // how: "ef" | "card"
+  let note="";
+  if(how==="ef"){ const fromEf=Math.min(S.ef,amt); S.ef-=fromEf; const rest=amt-fromEf; if(rest>0){ S.card+=rest; note=` Your emergency fund only had ${m0(fromEf)}, so ${m0(rest)} went on the card.`; } }
+  else S.card+=amt;
+  return note; }
+const hasCar=()=>RIDE.find(x=>x.id===S.ride).car;
+const ded=()=>PLANS.find(p=>p.id===S.plan).ded;
+
+/* ---------- event cards: each choice returns {text, unit} ---------- */
+const EVENTS=[
+ {id:"carRepair", when:()=>hasCar(), t:"The check-engine light", d:()=>"Your mechanic says the car needs a $900 repair this week.", unit:"Unit 8 · Expect the unexpected",
+  ch:[["Pay from my emergency fund",()=>({x:"Fixed and paid in cash."+spend(900,"ef")})],
+      ["Put it on my credit card",()=>({x:"Fixed, but the card now carries "+m0(S.card+900)+" at 24% APR."+spend(900,"card")})]]},
+ {id:"bike", when:()=>!hasCar(), t:"Flat tires and a fare hike", d:()=>"Your bike needs $150 of repairs and the transit pass goes up $15 a month.", unit:"Unit 3 · Budgeting",
+  ch:[["Fix the bike from my emergency fund",()=>({x:"Fixed. The fare hike comes out of fun money from now on."+(S.extra-=15,"")+spend(150,"ef")})],
+      ["Put the repair on my card",()=>({x:"Fixed, on the card. The fare hike comes out of fun money."+(S.extra-=15,"")+spend(150,"card")})]]},
+ {id:"er", t:"A trip to urgent care", d:()=>`You sprain your ankle playing pickup basketball. The bill is $2,600. Your plan's deductible is ${m0(ded())}.`, unit:"Unit 8 · Insurance",
+  ch:[["Pay my share from my emergency fund",()=>{const you=Math.min(2600,ded());return {x:`Insurance pays ${m0(2600-you)}. You pay ${m0(you)}.`+spend(you,"ef")};}],
+      ["Put my share on my card",()=>{const you=Math.min(2600,ded());return {x:`Insurance pays ${m0(2600-you)}. Your ${m0(you)} goes on the card.`+spend(you,"card")};}]]},
+ {id:"phone", t:"Crack!", d:()=>"Your phone screen shatters.", unit:"Unit 3 · Needs vs. wants",
+  ch:[["Repair the screen ($250, emergency fund)",()=>({x:"Good as new for $250."+spend(250,"ef")})],
+      ["Buy the newest phone on my card ($1,100)",()=>({x:"Shiny, but $1,100 more on a 24% card."+spend(1100,"card")})],
+      ["Live with the crack for now",()=>({x:"Free. Not pretty, but it works."})]]},
+ {id:"trip", t:"The group trip", d:()=>"Friends are planning a beach weekend. Your share would be $600.", unit:"Unit 3 · Spend on what matters",
+  ch:[["Go, and pay with my emergency fund",()=>({x:"Great memories, smaller safety net."+spend(600,"ef")})],
+      ["Go, and put it on my card",()=>({x:"Great memories, and a card balance that keeps growing."+spend(600,"card")})],
+      ["Skip it and plan a $80 day trip instead",()=>({x:"Cheaper, still fun, no debt."+spend(80,"ef")})]]},
+ {id:"raise", t:"You got a raise!", d:()=>"Your boss gives you a 4% raise starting this month.", unit:"Unit 9 · Retirement",
+  ch:[["Bump my 401(k) up 2 points",()=>{S.sal=Math.round(S.sal*1.04);S.k=Math.min(15,S.k+2);return {x:`Your 401(k) is now ${S.k}%. You barely notice the difference in your take-home.`};}],
+      ["Enjoy the extra fun money",()=>{S.sal=Math.round(S.sal*1.04);return {x:"More money every month for wants."};}]]},
+ {id:"hours", t:"Hours cut", d:()=>"Business is slow. For two months your take-home drops $400.", unit:"Unit 8 · Expect the unexpected",
+  ch:[["Cover it from my emergency fund",()=>({x:"Your emergency fund covers $800 over two months. That's exactly what it's for."+spend(800,"ef")})],
+      ["Cover it with my card",()=>({x:"Two months of bills on a 24% card."+spend(800,"card")})]]},
+ {id:"refund", t:"Tax refund", d:()=>"You filed your 1040 and get a $640 refund.", unit:"Unit 4 · Federal Taxes",
+  ch:[["Put it in my emergency fund",()=>{S.ef+=640;return {x:"Safety net +$640. (A big refund also means you could adjust your W-4.)"};}],
+      ["Pay down my credit card",()=>{const p=Math.min(S.card,640);S.card-=p;S.ef+=640-p;return {x:p?`Card paid down ${m0(p)}.`+(640-p?` The other ${m0(640-p)} went to savings.`:""):"No card balance, so it all went to savings."};}],
+      ["Treat myself",()=>({x:"Fun! Next year, adjust your W-4 so you get that money all year."})]]},
+ {id:"rent", t:"Lease renewal", d:()=>"Your landlord raises the rent $75 a month.", unit:"Unit 7 · Renting",
+  ch:[["Stay and cut $75 of wants",()=>{S.extra-=75;return {x:"You stay. $75 a month less for fun."};}],
+      ["Move somewhere cheaper ($600 to move, saves $100 a month)",()=>{S.extra+=100;return {x:"Moving costs $600 now, but you save $100 a month."+spend(600,"ef")};}]]},
+ {id:"theft", t:"Break-in", d:()=>"Someone breaks into your apartment and takes your $1,100 laptop.", unit:"Unit 8 · Renters insurance",
+  ch:[["File a claim / replace it",()=>{ if(S.renters){return {x:"Renters insurance pays everything over your $250 deductible. You pay $250."+spend(250,"ef")};} return {x:"No renters insurance, so you replace it yourself: $1,100."+spend(1100,"ef")};}]]},
+ {id:"drop", t:"The market drops 15%", d:()=>`Headlines scream. Your 401(k) falls from ${m0(S.k401)} to ${m0(S.k401*.85)}.`, unit:"Unit 9 · Investing",
+  ch:[["Sell everything before it drops more",()=>{S.k401*=.85;S.sold=true;return {x:"You locked in the loss and sat in cash while the market came back."};}],
+      ["Do nothing and keep investing",()=>{S.k401*=.85;S.recover=(S.recover||0)+1;return {x:"Hard to watch, but you keep buying at lower prices. Markets have always recovered over time."};}]]},
+ {id:"rise", t:"Strong year for stocks", d:()=>"Your index fund is up 10%.", unit:"Unit 9 · Investing",
+  ch:[["Stay the course",()=>{S.k401*=1.10;return {x:`Your 401(k) grows to ${m0(S.k401)}. Compounding at work.`};}]]},
+ {id:"store", t:"Checkout offer", d:()=>"\"Open a store card and save 20% on today's $200 purchase!\"", unit:"Unit 6 · Credit",
+  ch:[["Sign me up",()=>{S.score-=8;S.inquiries++;return {x:"You saved $40, but took a hard inquiry and opened a new account. Score −8."};}],
+      ["No thanks",()=>({x:"No hard inquiry, no new account to manage."})]]},
+ {id:"scam", t:"\"Your bank account is locked\"", d:()=>"A text with a link says to log in now or your account will be closed.", unit:"Unit 6 · Scams",
+  ch:[["Tap the link and log in",()=>{S.score-=20;return {x:"It was a scam. $300 vanished and it took weeks to fix. Score −20."+spend(300,"ef")};}],
+      ["Ignore it and call the number on my card",()=>({x:"Your bank says it's a scam. Nothing lost."})]]},
+ {id:"wedding", t:"Wedding season", d:()=>"Your cousin's wedding: gift and outfit come to $250.", unit:"Unit 3 · Planning ahead",
+  ch:[["Pay from my emergency fund",()=>({x:"Paid in cash."+spend(250,"ef")})],
+      ["Put it on my card",()=>({x:"On the card."+spend(250,"card")})]]},
+ {id:"crash", when:()=>hasCar(), t:"Fender bender", d:()=>"You rear-end someone at a stoplight. Their damage: $2,500. Yours: $3,000.", unit:"Unit 8 · Auto insurance",
+  ch:[["File the claim",()=>{ if(S.liabOnly){return {x:"Liability pays for the other car. You dropped collision, so your $3,000 repair is all yours."+spend(3000,"ef")};} return {x:"Liability pays for their car. Collision pays for yours after your $500 deductible."+spend(500,"ef")};}]]},
+ {id:"slip", when:()=>!hasCar(), t:"Icy sidewalk", d:()=>`You slip on ice and need an X-ray. The bill is $800. Your deductible is ${m0(ded())}.`, unit:"Unit 8 · Insurance",
+  ch:[["Pay from my emergency fund",()=>({x:`You pay ${m0(Math.min(800,ded()))}.`+spend(Math.min(800,ded()),"ef")})],
+      ["Put it on my card",()=>({x:`${m0(Math.min(800,ded()))} on the card.`+spend(Math.min(800,ded()),"card")})]]},
+ {id:"gig", t:"Side gig", d:()=>"You can design flyers for $300 a month for 3 months. Taxes aren't withheld, so set aside 25%.", unit:"Unit 2 · Paycheck · Unit 4 · Taxes",
+  ch:[["Take it and save what's left",()=>{S.ef+=675;return {x:"$900 earned, $225 set aside for taxes, $675 into savings."};}],
+      ["Take it and spend it",()=>({x:"Extra fun money. Just don't forget the tax bill in April."})],
+      ["Pass. I need my free time",()=>({x:"Rest matters too."})]]},
+ {id:"subs", t:"Subscription check", d:()=>"You find $45 a month of streaming and app subscriptions you forgot about.", unit:"Unit 3 · Budgeting",
+  ch:[["Cancel them",()=>{S.extra+=45;return {x:"+$45 a month back in your pocket."};}],
+      ["Keep them all",()=>({x:"$540 a year for things you don't use."})]]},
+ {id:"match", when:()=>S.k===0, t:"A note from HR", d:()=>"\"Reminder: we match 5% of your pay in your 401(k). You're contributing 0%.\"", unit:"Unit 9 · Retirement",
+  ch:[["Start contributing 5%",()=>{S.k=5;return {x:"You're getting the full match now: free money."};}],
+      ["Maybe next year",()=>({x:"You're leaving free money on the table every paycheck."})]]}
+];
+
+/* ---------- monthly math ---------- */
+function runMonth(){
+  const p=pay(S), n=needs(S), mo=MONTHS[S.month];
+  const match=Math.min(S.k,5)*S.sal/1200;
+  S.k401=S.k401*1.006+p.k+match;
+  const toSave=S.save;
+  const cardInt=S.card*.02; S.card+=cardInt;
+  let fun=p.net-n-toSave+S.extra;
+  let cardPay=0;
+  if(S.card>0){ cardPay=Math.min(S.card,Math.max(25,Math.min(250,fun))); if(fun<25) cardPay=Math.min(S.card,25); S.card-=cardPay; fun-=cardPay; }
+  S.ef+=toSave;
+  if(fun<0){ const need=-fun; spend(need,"ef"); fun=0; }
+  S.fun=fun; S.funTotal+=fun;
+  const util=S.card/LIMIT;
+  const ds= util>.5?-15: util>.3?-5: 4; S.score=Math.max(300,Math.min(850,S.score+ds));
+  return {mo,p,n,match,toSave,cardInt,cardPay,fun,ds};
+}
+function netWorth(){ return S.ef+S.k401-S.card; }
+
+/* ---------- screens ---------- */
+function panel(h){ return `<section class="panel">${h}</section>`; }
+function statBar(){ return `<div class="stats">
+  <div class="stat"><span class="label">Emergency fund</span><b>${m0(S.ef)}</b></div>
+  <div class="stat ${S.card>0?'neg':''}"><span class="label">Credit card (24%)</span><b>${m0(S.card)}</b></div>
+  <div class="stat"><span class="label">401(k)</span><b>${m0(S.k401)}</b></div>
+  <div class="stat ${S.score>=700?'pos':S.score<620?'neg':''}"><span class="label">Credit score</span><b>${Math.round(S.score)}</b></div></div>`; }
+function opt(label, sub, val, cur, name){ return `<button class="btn choice" data-${name}="${val}" aria-pressed="${cur===val}" style="${cur===val?'border-color:var(--money);box-shadow:0 0 0 2px var(--money) inset':''}"><span>${label}</span><span class="cost">${sub||""}</span></button>`; }
+
+function render(){
+  const a=$("app");
+  if(S.step==="intro"){
+    a.innerHTML=panel(`<div class="label">Solo · 15 minutes · Uses everything from Units 1–9</div><h2>You're 22. Life is about to happen.</h2>
+      <p class="lede">Pick a career, set up your life, then live 12 months. Every month brings a surprise: a raise, a broken phone, a market crash, a scam text. You start with a $1,000 graduation gift in your emergency fund and a credit card with a $2,000 limit.</p>
+      <p>Win by ending the year with <b>3 months of needs saved</b>, <b>no card debt</b>, a <b>700+ credit score</b> and <b>the full 401(k) match</b>.</p>
+      <div class="row"><button class="btn primary" id="go">Start my year</button></div>`);
+    $("go").onclick=()=>{S.step="job";render();}; return; }
+  if(S.step==="job"){
+    a.innerHTML=panel(`<div class="label">Step 1 of 4 · Career</div><h2>Pick your first job</h2><div class="choices">${JOBS.map(j=>opt(j.name,"$"+j.sal.toLocaleString()+"/yr",j.id,S.job,"job")).join("")}</div>
+      <div class="row"><button class="btn primary" id="next" ${S.job?"":"disabled"}>Next</button></div>`);
+    a.querySelectorAll("[data-job]").forEach(b=>b.onclick=()=>{S.job=b.dataset.job;S.sal=JOBS.find(j=>j.id===S.job).sal;render();});
+    $("next").onclick=()=>{S.step="life";render();}; return; }
+  if(S.step==="life"){
+    const p=pay({...S,house:S.house||"room",ride:S.ride||"bus"});
+    a.innerHTML=panel(`<div class="label">Step 2 of 4 · Home + ride</div><h2>Where will you live, and how will you get to work?</h2>
+      <p class="lede">Your take-home is about <b>${m0(p.net)}</b> a month. Guideline: rent at or under 30% (${m0(p.net*.3)}).</p>
+      <div class="label">Housing (rent; utilities added)</div><div class="choices">${HOUSE.map(h=>opt(h.name,m0(h.amt)+" · "+Math.round(h.amt/p.net*100)+"%",h.id,S.house,"house")).join("")}</div>
+      <div class="label">Transportation (monthly total)</div><div class="choices">${RIDE.map(r=>opt(r.name+`<br><small>${r.note}</small>`,m0(r.amt),r.id,S.ride,"ride")).join("")}</div>
+      ${S.ride&&S.ride!=="bus"?`<div class="label">Car insurance</div><div class="choices">${opt("Full coverage (liability + collision + comprehensive)","included",0,S.liabOnly?1:0,"liab")}${opt("Liability only (saves $60 a month)","−$60",1,S.liabOnly?1:0,"liab")}</div>`:""}
+      <div class="row"><button class="btn" id="back">Back</button><button class="btn primary" id="next" ${S.house&&S.ride?"":"disabled"}>Next</button></div>`);
+    a.querySelectorAll("[data-house]").forEach(b=>b.onclick=()=>{S.house=b.dataset.house;render();});
+    a.querySelectorAll("[data-ride]").forEach(b=>b.onclick=()=>{S.ride=b.dataset.ride;if(S.ride==="bus")S.liabOnly=false;render();});
+    a.querySelectorAll("[data-liab]").forEach(b=>b.onclick=()=>{S.liabOnly=b.dataset.liab==="1";render();});
+    $("back").onclick=()=>{S.step="job";render();}; $("next").onclick=()=>{S.step="protect";render();}; return; }
+  if(S.step==="protect"){
+    a.innerHTML=panel(`<div class="label">Step 3 of 4 · Protect + grow</div><h2>Insurance and retirement</h2>
+      <div class="label">Health insurance (premium comes out of your paycheck)</div><div class="choices">${PLANS.map(pl=>opt(pl.name+`<br><small>${m0(pl.ded)} deductible</small>`,m0(pl.prem)+"/mo",pl.id,S.plan,"plan")).join("")}</div>
+      <div class="label">Renters insurance</div><div class="choices">${opt("Yes, cover my stuff ($250 deductible)","$15/mo",1,S.renters?1:0,"rent")}${opt("No, skip it","$0",0,S.renters?1:0,"rent")}</div>
+      <div class="label">401(k) (your employer matches up to 5%)</div><div class="choices">${[0,5,10].map(k=>opt(k+"% of pay",k===0?"no match":k===5?"full match":"match + extra",k,S.k,"k")).join("")}</div>
+      <div class="row"><button class="btn" id="back">Back</button><button class="btn primary" id="next">Next</button></div>`);
+    a.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{S.plan=b.dataset.plan;render();});
+    a.querySelectorAll("[data-rent]").forEach(b=>b.onclick=()=>{S.renters=b.dataset.rent==="1";render();});
+    a.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{S.k=+b.dataset.k;render();});
+    $("back").onclick=()=>{S.step="life";render();}; $("next").onclick=()=>{S.step="budget";render();}; return; }
+  if(S.step==="budget"){
+    const p=pay(S), n=needs(S), left=p.net-n-S.save;
+    a.innerHTML=panel(`<div class="label">Step 4 of 4 · Your monthly budget</div><h2>Make it balance</h2>
+      <div class="tw"><table><tbody>
+      <tr><td>Gross pay</td><td class="n">${m0(p.g)}</td></tr>
+      <tr><td>− 401(k) (${S.k}%)</td><td class="n">${m0(-p.k)}</td></tr>
+      <tr><td>− Federal income tax</td><td class="n">${m0(-p.fed)}</td></tr>
+      <tr><td>− Illinois 4.95%</td><td class="n">${m0(-p.il)}</td></tr>
+      <tr><td>− Social Security + Medicare (7.65%)</td><td class="n">${m0(-p.fica)}</td></tr>
+      <tr><td>− Health insurance</td><td class="n">${m0(-p.prem)}</td></tr>
+      <tr><th>Take-home pay</th><th class="n">${m0(p.net)}</th></tr>
+      <tr><td>− Needs: rent, utilities, ride, groceries $350, phone $60, student loan $180${S.renters?", renters $15":""}</td><td class="n">${m0(-n)}</td></tr>
+      <tr><td>− Into my emergency fund</td><td class="n">${m0(-S.save)}</td></tr>
+      <tr><th>Left for wants (fun money)</th><th class="n" style="color:${left<0?'var(--bad)':'var(--good)'}">${m0(left)}</th></tr></tbody></table></div>
+      <div class="label">Pay yourself first: monthly savings</div><div class="row">${[0,100,200,400].map(v=>opt(m0(v),"",v,S.save,"save")).join("")}</div>
+      ${left<0?`<div class="note no">Your needs and savings cost more than you take home. Go back and choose cheaper housing or transportation, or save less.</div>`:left<150?`<div class="note warn">Only ${m0(left)} for fun. Tight, but it balances.</div>`:(Math.round(HOUSE.find(h=>h.id===S.house).amt/p.net*100)>30?`<div class="note warn">It balances, but rent is ${Math.round(HOUSE.find(h=>h.id===S.house).amt/p.net*100)}% of take-home (goal: 30% or less). A surprise could hurt.</div>`:`<div class="note ok">It balances. Rent is ${Math.round(HOUSE.find(h=>h.id===S.house).amt/p.net*100)}% of take-home.</div>`)}
+      <div class="row"><button class="btn" id="back">Back</button><button class="btn primary" id="next" ${left<0?"disabled":""}>Start June</button></div>`);
+    a.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>{S.save=+b.dataset.save;render();});
+    $("back").onclick=()=>{S.step="protect";render();};
+    $("next").onclick=()=>{ const pool=EVENTS.filter(e=>!e.when||e.when()); S.deck=shuffle(pool.map(e=>e.id)).slice(0,12); S.step="month"; S.cur=null; render(); }; return; }
+  if(S.step==="month"){
+    if(!S.cur){ S.monthInfo=runMonth(); let id=S.deck[S.month]; let ev=EVENTS.find(e=>e.id===id); if(ev.when&&!ev.when()){ const alt=EVENTS.find(e=>(!e.when||e.when())&&!S.deck.includes(e.id)); if(alt){id=alt.id;ev=alt;} } S.cur=id; S.result=null; }
+    const ev=EVENTS.find(e=>e.id===S.cur), mi=S.monthInfo;
+    a.innerHTML=`<div class="track" style="grid-template-columns:repeat(12,1fr)">${MONTHS.map((m,i)=>`<i class="${i<S.month?'done':i===S.month?'now':''}" title="${m}"></i>`).join("")}</div>`+statBar()+
+      panel(`<div class="label">Month ${S.month+1} of 12 · ${mi.mo}</div>
+      <p class="lede">Payday: ${m0(mi.p.net)} take-home. Bills paid, ${m0(mi.toSave)} saved, ${m0(mi.p.k+mi.match)} into your 401(k)${mi.cardPay?`, ${m0(mi.cardPay)} paid on the card (${m0(mi.cardInt)} of it was interest)`:""}. Fun money this month: ${m0(mi.fun)}.</p>
+      <div class="ev"><div class="label">${esc(ev.unit)}</div><h3>${esc(ev.t)}</h3><p>${esc(ev.d())}</p></div>
+      ${S.result?`<div class="note ${S.result.bad?'no':'ok'}">${esc(S.result.x)}</div><div class="row"><button class="btn primary" id="next">${S.month===11?"See my year":"Next month"}</button></div>`
+      :`<div class="choices">${ev.ch.map((c,i)=>`<button class="btn" data-c="${i}">${esc(c[0])}</button>`).join("")}</div>`}`);
+    a.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{ const efB=S.ef, cardB=S.card; const r=ev.ch[+b.dataset.c][1](); r.bad=S.card>cardB; S.result=r; S.log.push({m:mi.mo,t:ev.t,unit:ev.unit,c:ev.ch[+b.dataset.c][0],x:r.x}); render(); $("next")?.focus(); });
+    $("next")&&($("next").onclick=()=>{ S.month++; S.cur=null; if(S.month>=12){S.step="end";} render(); window.scrollTo(0,0); });
+    return; }
+  if(S.step==="end"){
+    const goalEf=3*needs(S), wins=[S.ef>=goalEf, S.card<1, S.score>=700, S.k>=5];
+    const stars=wins.filter(Boolean).length, nw=netWorth();
+    if(!S.stamped){ S.stamped=true; FMP.stamp("life-happens",Math.round(nw)); if(stars===4) FMP.badge("life-happens-4","Life Happens: 4 stars"); if(S.card<1) FMP.badge("debt-free-22","Debt-Free at 22"); }
+    a.innerHTML=panel(`<div class="label">Your year at 22 · ${esc(JOBS.find(j=>j.id===S.job).name)}</div>
+      <div class="big">${m0(nw)}</div><p class="lede">Net worth after 12 months (emergency fund + 401(k) − card debt)</p>
+      <div class="stars" aria-label="${stars} of 4 stars">${"★".repeat(stars)}${"☆".repeat(4-stars)}</div>`)+statBar()+
+      panel(`<h2>Your scorecard</h2><div class="choices">
+       <div class="note ${wins[0]?'ok':'no'}">${wins[0]?"✓":"✗"} Emergency fund: ${m0(S.ef)} of a ${m0(goalEf)} goal (3 months of needs) · Unit 3, #4 Expect the unexpected</div>
+       <div class="note ${wins[1]?'ok':'no'}">${wins[1]?"✓":"✗"} Credit card: ${m0(S.card)} owed at 24% · Unit 6, #6 Use debt carefully</div>
+       <div class="note ${wins[2]?'ok':'no'}">${wins[2]?"✓":"✗"} Credit score: ${Math.round(S.score)} (goal 700+) · Unit 6</div>
+       <div class="note ${wins[3]?'ok':'no'}">${wins[3]?"✓":"✗"} 401(k) at ${S.k}% ${S.k>=5?"gets the full match":"misses the free match"} · Unit 9, #1 Harness compounding</div></div>
+       <p>At 7%, the ${m0(S.k401)} in your 401(k) doubles about every 10 years: about <b>${m0(S.k401*16)}</b> by age 62 even if you never add another dollar.</p>`)+
+      panel(`<h2>Your year, month by month</h2><div class="tw"><table><thead><tr><th>Month</th><th>What happened</th><th>You chose</th></tr></thead><tbody>${S.log.map(l=>`<tr><td>${l.m}</td><td><b>${esc(l.t)}</b><br><small>${esc(l.unit)}</small></td><td>${esc(l.c)}<br><small>${esc(l.x)}</small></td></tr>`).join("")}</tbody></table></div>
+       <div class="row"><button class="btn primary" id="again">Live another year (new surprises)</button><button class="btn" id="same">Same setup, new surprises</button></div>`);
+    $("again").onclick=()=>{S=fresh();S.step="job";render();window.scrollTo(0,0);};
+    $("same").onclick=()=>{const keep={job:S.job,sal:JOBS.find(j=>j.id===S.job).sal,house:S.house,ride:S.ride,liabOnly:S.liabOnly,plan:S.plan,k:S.k,renters:S.renters,save:S.save};S=Object.assign(fresh(),keep,{step:"budget"});render();window.scrollTo(0,0);};
+  }
+}
+S=fresh(); render();
+</script>
+</body></html>
