@@ -1,0 +1,77 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Day 19 Slides: Would You Bank There?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Projector deck: lesson bar (part + timer) on top, slide in the middle, controls at the bottom. Dark on purpose for projection. */
+:root{--bg:#0E1830;--ink:#F3F5F8;--muted:#A9B4C8;--gold:#F2B83A;--money:#3CCB9F;--uc:#7FB0F0;--card:#17244A;--line:#2C3B66;--coral:#FF8A73;color-scheme:dark;
+ --display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.lbar{display:flex;align-items:center;gap:14px;padding:10px max(18px,env(safe-area-inset-right,0px)) 8px max(18px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);font-family:var(--mono);font-size:15px;color:var(--muted)}
+.lbar .pn{color:var(--gold);white-space:nowrap}.lbar .nm{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.parts{display:flex;gap:3px;flex:0 1 320px}.parts i{flex:1;height:8px;border-radius:4px;background:var(--line)}.parts i.done{background:#5D6E99}.parts i.cur{background:var(--gold)}
+#tm{font:600 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 12px;cursor:pointer;min-width:112px;text-align:center}
+#tm.run{border-color:var(--money)}#tm.low{color:var(--coral)}
+.stage{overflow:hidden;padding:clamp(14px,3vw,48px) max(clamp(18px,5vw,80px),env(safe-area-inset-right,0px)) clamp(10px,2vw,20px) max(clamp(18px,5vw,80px),env(safe-area-inset-left,0px));display:grid;align-content:center}
+.slide{display:none;gap:clamp(12px,1.8vw,24px);max-width:1400px;width:100%;margin:0 auto}
+.slide.on{display:grid}
+.k{font-family:var(--mono);font-size:clamp(13px,1.3vw,19px);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(44px,8vw,120px);line-height:.95;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(26px,4.2vw,62px);line-height:1.06;margin:0;text-wrap:balance}
+.sub{font-size:clamp(18px,2.3vw,32px);color:var(--muted);margin:0}
+ul.pts{margin:0;padding-left:1.1em;display:grid;gap:clamp(8px,1.1vw,14px);font-size:clamp(18px,2.3vw,32px);line-height:1.3}
+.ans{background:var(--card);border-left:8px solid var(--money);border-radius:14px;padding:clamp(12px,1.6vw,22px) clamp(14px,2vw,28px);font-size:clamp(18px,2.3vw,32px);line-height:1.3}
+.hide{visibility:hidden}.hint{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,28px)}
+.cmp div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,2vw,28px)}
+.cmp b{display:block;font-family:var(--display);font-size:clamp(22px,3vw,44px);color:var(--uc);margin-bottom:8px}
+.cmp p{margin:0;font-size:clamp(16px,2vw,28px);line-height:1.35}
+.rows{display:grid;gap:clamp(6px,1vw,12px)}
+.rows div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:16px;background:var(--card);border-radius:12px;padding:clamp(10px,1.2vw,16px) clamp(14px,1.6vw,22px);font-size:clamp(17px,2.1vw,30px);align-items:center}
+.rows div span:first-child{color:var(--muted)}.rows div span:last-child{font-weight:700;font-variant-numeric:tabular-nums}
+.ladder{display:grid;gap:8px}.ladder div{display:flex;align-items:center;gap:14px;font-size:clamp(16px,2.1vw,30px);padding:10px 16px;border-radius:12px;color:#0E1830;font-weight:700}
+.ladder small{font-family:var(--mono);font-weight:600;opacity:.75}
+.chk{display:grid;gap:10px}.chk div{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;background:var(--card);border-radius:12px;padding:12px 18px;font-size:clamp(16px,2.1vw,30px)}
+.chk div b{color:var(--money);font-family:var(--display)}
+.tgtbox{border:3px solid var(--uc);border-radius:20px;padding:clamp(16px,2.4vw,34px);display:grid;gap:12px}
+.chart{background:var(--card);border-radius:18px;padding:clamp(8px,1.1vw,16px)}
+.slide .cap{font-size:clamp(16px,1.9vw,26px);color:var(--muted);margin:0}.chart svg{width:100%;height:auto;max-height:42vh;display:block;font-family:var(--body)}
+.chart .src{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+.talk{border:3px dashed var(--money);border-radius:20px;padding:clamp(16px,2.2vw,30px);display:grid;gap:14px}
+.talk .who{font-family:var(--mono);font-size:clamp(13px,1.3vw,18px);color:var(--money);letter-spacing:.1em;text-transform:uppercase}
+.st{display:grid;gap:10px}.st div{background:var(--card);border-radius:12px;padding:10px 16px;font-size:clamp(17px,2.1vw,30px)}
+.agenda{display:grid;gap:6px;counter-reset:a}.agenda div{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;background:var(--card);border-radius:10px;padding:8px 16px;font-size:clamp(16px,2vw,28px)}
+.agenda div b{font-family:var(--mono);color:var(--gold)}.agenda div span:last-child{font-family:var(--mono);color:var(--muted)}
+.frame{font-size:clamp(20px,2.8vw,40px);line-height:1.5;background:var(--card);border-radius:18px;padding:clamp(16px,2.2vw,30px)}
+.ctl{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;padding:8px max(16px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:#0A1226;border-top:1px solid var(--line);font-family:var(--mono);font-size:14px}
+.ctl a,.ctl button{font:700 15px var(--body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 14px;text-decoration:none;cursor:pointer}
+.ctl button.go{background:var(--gold);color:#0E1830;border-color:var(--gold)}.ctl button:disabled{opacity:.4}
+.ctl .grp{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (max-width:760px){.cmp{grid-template-columns:1fr}.rows div{grid-template-columns:1fr;gap:4px}.parts{display:none}}
+</style>
+<header class="lbar"><span class="pn" id="pn">Part 1 of 7</span><span class="nm" id="pnm"></span><span class="parts" id="pp"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button id="tm" title="Start or pause the part timer (T)">5:00</button></header>
+<main class="stage"><section class="slide" data-p="0" aria-roledescription="slide" aria-label="Slide 1"><div class="k">Unit 5 · Day 19 · Banking</div><h1>Would You Bank There?</h1><p class="sub">Compare banks with evidence</p></section><section class="slide" data-p="0" aria-roledescription="slide" aria-label="Slide 2"><div class="k">Today's plan · 85 minutes</div><div class="agenda"><div><b>1</b><span>Bell ringer</span><span>5 min</span></div><div><b>2</b><span>Target</span><span>5 min</span></div><div><b>3</b><span>Three made-up banks</span><span>20 min</span></div><div><b>4</b><span>Match the bank to the person</span><span>10 min</span></div><div><b>5</b><span>Research a real bank</span><span>35 min</span></div><div><b>6</b><span>Bank Corners</span><span>5 min</span></div><div><b>7</b><span>Exit ticket</span><span>5 min</span></div></div></section><section class="slide" data-p="0" aria-roledescription="slide" aria-label="Slide 3"><div class="k">Bell ringer · Notes box 1</div><h2>What matters most to you in a bank: fees, interest, branches or app?</h2><div class="ans">Rank all four in box 1.</div></section><section class="slide" data-p="1" aria-roledescription="slide" aria-label="Slide 4"><div class="tgtbox"><div class="k">Learning target</div><h2>I can research and compare real banks for my needs.</h2><div class="k" style="color:var(--muted)">Success criteria</div><ul class="pts"><li>I can compare fees, interest, ATMs and app features</li><li>I can justify my choice with evidence</li></ul><div class="k" style="color:var(--uc)">18 by 18 · #16 Question financial advice · Career: Consumers who compare banks keep more of their money.</div></div></section><section class="slide" data-p="2" aria-roledescription="slide" aria-label="Slide 5"><div class="k">Three made-up banks · Notes box 2</div><h2>Compare the offers</h2><div class="rows"><div><span>Big National Bank</span><span >$15/month unless you keep $2,000 · savings 0.01% · lots of branches + ATMs</span></div><div><span>Prairie Credit Union</span><span >Free checking · savings 0.50% · members only · a few branches</span></div><div><span>Brightline Online Bank</span><span >No fees · HYSA 4.10% · no branches · refunds $10/month in ATM fees</span></div></div></section><section class="slide" data-p="2" aria-roledescription="slide" aria-label="Slide 6"><div class="k">Run the numbers</div><h2>$3,000 in savings + $600 in checking for a year</h2><div class="rows"><div><span>Interest on $3,000: Big National / Prairie / Brightline</span><span class=hide data-r>$0.30 / $15 / $123</span></div><div><span>Fees with only $600 in checking</span><span class=hide data-r>$180 / $0 / $0</span></div><div><span>Net for the year</span><span class=hide data-r>−$179.70 / +$15 / +$123</span></div></div><div class="hint">Work it in your notes first. Space reveals one line at a time.</div></section><section class="slide" data-p="3" aria-roledescription="slide" aria-label="Slide 7"><div class="k">Check for understanding · Match the bank to the person</div><div class="chk"><div><span>Jay has $300 and hates fees</span><b class="hide" data-r>Prairie or Brightline</b></div><div><span>Ana is building a $5,000 emergency fund</span><b class="hide" data-r>Brightline HYSA</b></div><div><span>Luis deposits cash tips and wants in-person help</span><b class="hide" data-r>Prairie Credit Union</b></div></div><div class="hint">Discuss with a partner, then reveal. More than one answer can work if you explain it.</div></section><section class="slide" data-p="4" aria-roledescription="slide" aria-label="Slide 8"><div class="k">Research · Notes box 3</div><h2>Banking research presentation: compare 2 real banks</h2><ul class="pts"><li>Checking: monthly fee, minimum balance, overdraft fee</li><li>Savings or HYSA: APY</li><li>ATMs, app features, FDIC or NCUA insurance (check FDIC BankFind)</li><li>Your pick for YOU, with evidence</li></ul></section><section class="slide" data-p="4" aria-roledescription="slide" aria-label="Slide 9"><div class="k">18 by 18 #16</div><h2>Question the ad. Read the fine print.</h2><ul class="pts"><li>&quot;Free checking&quot; might need direct deposit or a minimum balance</li><li>A high rate might be a short-term promo</li><li>Who benefits if you sign up?</li></ul></section><section class="slide" data-p="5" aria-roledescription="slide" aria-label="Slide 10"><div class="k">Practice</div><h2>Bank Corners</h2><ul class="pts"><li>Get up and move to your answer</li></ul></section><section class="slide" data-p="6" aria-roledescription="slide" aria-label="Slide 11"><div class="k">Exit ticket</div><h2>Which bank feature costs you money every month?</h2><p class="sub">Answer in the exit ticket box at the bottom of your notes.</p></section></main>
+<nav class="ctl" aria-label="Slide controls"><div class="grp"><a href="../../../../lessons/day-19/">← Today&#x27;s page</a><a href="../../">Unit 5</a></div>
+<div class="grp"><button id="pv" aria-label="Previous slide">←</button><span id="ct"></span><button id="nx" aria-label="Next slide">→</button><button id="rv" class="go">Reveal</button><button id="fs">Full screen</button></div></nav>
+<script>
+(function(){const P=[[5, "Bell ringer"], [5, "Target"], [20, "Three made-up banks"], [10, "Match the bank to the person"], [35, "Research a real bank"], [5, "Bank Corners"], [5, "Exit ticket"]];const S=[...document.querySelectorAll(".slide")];let i=0,cp=-1,left=0,tick=null;const tm=document.getElementById("tm");
+const m=/^#(\d+)$/.exec(location.hash);if(m)i=Math.min(S.length-1,Math.max(0,+m[1]-1));
+const fmt=s=>{const a=Math.abs(s);return(s<0?"−":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0")};
+function paint(){tm.textContent=fmt(left);tm.classList.toggle("low",left<=60);tm.classList.toggle("run",!!tick)}
+function run(on){clearInterval(tick);tick=null;if(on)tick=setInterval(()=>{left--;paint()},1000);paint()}
+function setPart(p){if(p===cp)return;const was=!!tick;cp=p;left=P[p][0]*60;document.getElementById("pn").textContent="Part "+(p+1)+" of "+P.length;document.getElementById("pnm").textContent=P[p][1];
+[...document.getElementById("pp").children].forEach((x,j)=>x.className=j<p?"done":j===p?"cur":"");run(was&&cp>0)}
+function show(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach((s,j)=>s.classList.toggle("on",j===i));setPart(+S[i].dataset.p);
+document.getElementById("ct").textContent=(i+1)+" / "+S.length;document.getElementById("rv").disabled=!S[i].querySelector("[data-r].hide");history.replaceState(null,"","#"+(i+1))}
+function reveal(){const h=S[i].querySelector("[data-r].hide");if(!h)return show(i+1);h.classList.remove("hide");if(h.hasAttribute("data-swap")){h.style.display="";S[i].querySelector("[data-sh]").style.display="none"}document.getElementById("rv").disabled=!S[i].querySelector("[data-r].hide")}
+tm.onclick=()=>run(!tick);
+document.getElementById("pv").onclick=()=>show(i-1);document.getElementById("nx").onclick=()=>show(i+1);document.getElementById("rv").onclick=reveal;
+document.getElementById("fs").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+document.addEventListener("keydown",ev=>{if(ev.key==="ArrowRight"||ev.key==="PageDown")show(i+1);else if(ev.key==="ArrowLeft"||ev.key==="PageUp")show(i-1);else if(ev.key===" "){ev.preventDefault();reveal()}else if(ev.key==="t"||ev.key==="T")run(!tick);else if(ev.key==="f"||ev.key==="F")document.getElementById("fs").click()});
+let x0=null;const st=document.querySelector(".stage");st.addEventListener("touchstart",ev=>x0=ev.touches[0].clientX,{passive:true});
+st.addEventListener("touchend",ev=>{if(x0==null)return;const dx=ev.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)show(i+(dx<0?1:-1));x0=null});
+show(i)})();
+</script>
+</body></html>
