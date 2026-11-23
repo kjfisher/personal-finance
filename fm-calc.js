@@ -4,12 +4,12 @@
 (function () {
   if (window.__fmCalc) return; window.__fmCalc = true;
   var css = `
-.fmc-btn{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9998;
+.fmc-btn{position:fixed;left:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9998;
   font:700 16px "Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;padding:12px 18px;border-radius:999px;border:2px solid #E0A800;
   background:#14213D;color:#F3F5F8;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;display:flex;gap:8px;align-items:center}
 .fmc-btn:focus-visible{outline:3px solid #E0A800;outline-offset:3px}
 .fmc{--b:#FFFFFF;--i:#14213D;--m:#5B6780;--l:#CBD3DF;--s:#EEF1F5;--g:#E0A800;--ok:#0F8B6C;--h:#14213D;--hi:#F3F5F8;
-  position:fixed;z-index:9999;right:max(14px,env(safe-area-inset-right,0px));bottom:max(76px,calc(env(safe-area-inset-bottom,0px) + 76px));
+  position:fixed;z-index:9999;left:max(14px,env(safe-area-inset-right,0px));bottom:max(76px,calc(env(safe-area-inset-bottom,0px) + 76px));
   width:min(400px,calc(100vw - 28px));max-height:min(78vh,700px);display:flex;flex-direction:column;background:var(--b);color:var(--i);
   border:1px solid var(--l);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.3);font:16px "Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;overflow:hidden}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fmc{--b:#16203A;--i:#E8EDF5;--m:#93A0B8;--l:#2A3A5E;--s:#0D1424;--g:#F5C542;--ok:#3CCB9F;--h:#101A30}}
