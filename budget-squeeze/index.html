@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Budget Squeeze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: projector-first. Left = the decision (3 big option cards + a turn-and-talk). Right = Dani's live budget: the over/under meter, 50/30/20 bar and happiness. */
+:root {
+  --bg:#EEF1F5; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6780; --line:#CBD3DF;
+  --hero:#14213D; --hero-ink:#F3F5F8; --gold:#E0A800; --ok:#0F8B6C; --ok-soft:#DDF1EA; --bad:#C23B3B; --bad-soft:#FBE7E7;
+  --need:#2F6FDB; --want:#D64545; --save:#1F9E6E; --left:#E0A800;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --need:#5B8FF0; --want:#F07070; --save:#3CCB9F; --left:#F5C542; color-scheme:dark } }
+:root[data-theme="dark"] {
+  --bg:#0D1424; --surface:#16203A; --ink:#E8EDF5; --muted:#93A0B8; --line:#2A3A5E;
+  --hero:#101A30; --gold:#F5C542; --ok:#3CCB9F; --ok-soft:#123A32; --bad:#F07070; --bad-soft:#3A1C24;
+  --need:#5B8FF0; --want:#F07070; --save:#3CCB9F; --left:#F5C542; color-scheme:dark }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:18px; }
+.bar { background:var(--hero); color:var(--hero-ink); }
+.bar .in { max-width:1400px; margin:0 auto; padding-block:14px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; justify-content:space-between; }
+.bar h1 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3.6vw, 42px); margin:0; line-height:1; }
+.bar h1 span { color:var(--gold); }
+.bar .tag { font-family:var(--mono); font-size:13px; letter-spacing:.1em; text-transform:uppercase; opacity:.8; margin-top:4px; }
+.bar .ctl { display:flex; gap:8px; flex-wrap:wrap; }
+.wrap { max-width:1400px; margin:0 auto; padding-block:18px 40px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr); gap:18px; align-items:start; }
+@media (max-width:900px) { .wrap { grid-template-columns:1fr; } }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px, 2.4vw, 28px); display:grid; gap:14px; }
+.eyebrow { font-family:var(--mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+h2 { font-family:var(--display); font-weight:800; font-size:clamp(26px, 3vw, 40px); margin:0; line-height:1.1; text-wrap:balance; }
+p { margin:0; line-height:1.45; }
+.steps { display:flex; gap:6px; flex-wrap:wrap; }
+.steps i { flex:1; min-width:24px; height:8px; border-radius:99px; background:var(--line); }
+.steps i.done { background:var(--gold); } .steps i.now { background:var(--ink); }
+.opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; }
+.opt { font:inherit; text-align:left; border:3px solid var(--line); background:var(--bg); color:var(--ink); border-radius:16px; padding:16px; display:grid; gap:8px; align-content:start; cursor:pointer; }
+.opt:hover { border-color:var(--ink); }
+.opt[aria-pressed="true"] { border-color:var(--gold); background:var(--surface); box-shadow:0 0 0 3px var(--gold) inset; }
+.opt .num { font-family:var(--display); font-weight:800; font-size:15px; color:var(--muted); }
+.opt .t { font-family:var(--display); font-weight:800; font-size:clamp(20px, 2vw, 26px); line-height:1.15; }
+.opt .cost { font-family:var(--mono); font-weight:600; font-size:clamp(22px, 2.2vw, 30px); }
+.opt .d { font-size:16px; color:var(--muted); line-height:1.35; }
+.opt .h { font-size:15px; font-weight:700; }
+.talk { background:var(--bg); border-left:5px solid var(--gold); border-radius:10px; padding:12px 16px; font-size:clamp(17px, 1.6vw, 21px); }
+.row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.btn { font:inherit; font-weight:700; padding:12px 18px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.btn.go { background:var(--ok); color:#fff; border-color:var(--ok); }
+.btn.gold { background:var(--gold); color:#14213D; border-color:var(--gold); }
+.btn.sm { padding:8px 12px; font-size:15px; }
+.btn:disabled { opacity:.45; cursor:default; }
+.btn:focus-visible, .opt:focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+.bar .btn { background:transparent; color:var(--hero-ink); border-color:rgba(255,255,255,.35); }
+/* live budget */
+.money { display:grid; gap:4px; }
+.big { font-family:var(--display); font-weight:800; font-size:clamp(34px, 4vw, 56px); line-height:1; font-variant-numeric:tabular-nums; }
+.big.over { color:var(--bad); } .big.ok { color:var(--ok); }
+.meter { height:22px; border-radius:99px; background:var(--line); position:relative; overflow:hidden; }
+.meter i { position:absolute; top:0; bottom:0; left:0; border-radius:99px; transition:width .4s; }
+.meter .cap { position:absolute; top:-4px; bottom:-4px; width:3px; background:var(--ink); }
+.split { display:flex; height:30px; border-radius:10px; overflow:hidden; background:var(--line); }
+.split span { display:block; height:100%; transition:width .4s; }
+.legend { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:6px 14px; font-size:16px; }
+.legend div { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+.legend b { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.dot { width:12px; height:12px; border-radius:3px; display:inline-block; margin-right:6px; vertical-align:-1px; }
+table.lines { width:100%; border-collapse:collapse; font-size:16px; }
+table.lines td { padding:5px 4px; border-bottom:1px solid var(--line); }
+table.lines td.n { text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+table.lines tr.tot td { font-weight:700; border-bottom:none; }
+.happy { display:flex; align-items:center; gap:10px; font-weight:700; }
+.happy .faces { font-size:28px; letter-spacing:2px; }
+@media (prefers-reduced-motion: reduce) { .meter i, .split span { transition:none; } }
+/* events + results */
+.event { border-radius:16px; padding:16px; display:grid; gap:6px; background:var(--bg); border:2px solid var(--line); }
+.event.hit { border-color:var(--bad); } .event.safe { border-color:var(--ok); }
+.event .t { font-family:var(--display); font-weight:800; font-size:clamp(20px, 2vw, 26px); }
+.event .c { font-family:var(--mono); font-weight:600; font-size:22px; }
+.checks { display:grid; gap:8px; }
+.check { display:flex; gap:10px; align-items:flex-start; font-size:clamp(17px, 1.6vw, 21px); }
+.check .m { font-weight:800; width:28px; flex:none; }
+.check.y .m { color:var(--ok); } .check.n .m { color:var(--bad); }
+.stars { font-size:clamp(34px, 4vw, 50px); letter-spacing:4px; color:var(--gold); }
+ol.qs { margin:0; padding-left:22px; display:grid; gap:6px; font-size:clamp(17px, 1.6vw, 20px); }
+</style>
+</head>
+<body>
+<header class="bar"><div class="in">
+  <div><h1>Budget <span>Squeeze</span></h1><div class="tag">Unit 3 · Budgeting · Class game</div></div>
+  <div class="ctl"><button class="btn sm" id="back">← Back</button><button class="btn sm" id="restart">Restart</button></div>
+</div></header>
+<div class="wrap">
+  <main class="card" id="stage" aria-live="polite"></main>
+  <aside class="card" id="live" aria-label="Dani's budget"></aside>
+</div>
+
+<script>
+/* ---------- Data ---------- */
+const PAY=2900, LOAN=120;
+/* Each option: cost, need/want/save split, happiness, and how it changes the Life Happens cards. */
+const STEPS=[
+ {key:"home", title:"Where will Dani live?", talk:"Is living alone a need or a want? What do you give up with a roommate?",
+  opts:[{t:"Solo apartment downtown", d:"$1,400 rent + $120 utilities. Walk to everything, total privacy.", need:1520, want:0, h:3},
+        {t:"2-bedroom with a roommate", d:"$800 rent + $70 utilities (Dani's half). Shared kitchen and chores.", need:870, want:0, h:1},
+        {t:"Stay with family", d:"Pays family $350 a month. Less freedom, a longer drive to friends.", need:350, want:0, h:-1}]},
+ {key:"ride", title:"How will Dani get around?", talk:"A reliable ride to work is a need. Which part of a NEW car is a want?",
+  opts:[{t:"Brand-new car", d:"$480 payment + $190 insurance + $140 gas. Warranty covers repairs.", need:330, want:480, h:3},
+        {t:"Paid-off used car", d:"$120 insurance + $140 gas + $60 a month saved for repairs.", need:320, want:0, h:1},
+        {t:"Bus pass + rides", d:"$80 bus pass + $50 for rideshares. Longer trips, no car costs.", need:130, want:0, h:-1}]},
+ {key:"food", title:"How will Dani eat?", talk:"Food is a need. Where does eating out move from need to want?",
+  opts:[{t:"Eat out most meals", d:"About $700 a month. Fast and fun, but pricey.", need:300, want:400, h:2},
+        {t:"Groceries + some eating out", d:"Groceries $90 a week (× 52 ÷ 12 = $390) + $120 eating out.", need:390, want:120, h:1},
+        {t:"Cook and meal prep", d:"Groceries $75 a week (× 52 ÷ 12 = $325). Sunday meal prep.", need:325, want:0, h:0}]},
+ {key:"phone", title:"Phone and streaming?", talk:"Which apps would you cut first, and why are subscriptions so easy to forget?",
+  opts:[{t:"Newest phone + 5 apps", d:"$95 phone plan with payments + $70 in subscriptions. Phone insurance included.", need:45, want:120, h:2},
+        {t:"Paid-off phone + 2 apps", d:"$45 basic plan + $25 in subscriptions.", need:45, want:25, h:1},
+        {t:"Prepaid plan + 1 app", d:"$30 prepaid plan + $10 subscription.", need:30, want:10, h:0}]},
+ {key:"fun", title:"Fun and shopping money?", talk:"Wants get 30% in 50/30/20. Is cutting ALL fun a good plan? Why or why not?",
+  opts:[{t:"Big fun budget", d:"$450 a month: concerts, clothes, going out.", need:0, want:450, h:3},
+        {t:"Medium fun budget", d:"$250 a month: pick your favorites.", need:0, want:250, h:2},
+        {t:"Tiny fun budget", d:"$100 a month: free stuff and one treat.", need:0, want:100, h:0}]},
+ {key:"save", title:"Pay yourself first?", talk:"What happens to Dani's plan the first time something goes wrong with $0 saved?",
+  opts:[{t:"Save later", d:"$0 to savings for now. Dani will save whatever is left.", save:0, h:0},
+        {t:"Save 10%", d:"$290 a month to savings, moved on payday.", save:290, h:0},
+        {t:"Save 20%", d:"$580 a month to savings, moved on payday.", save:580, h:0}]}
+];
+/* Life Happens: cost depends on Dani's choices. f(choices) -> {cost, note} ; skip = optional want */
+const EVENTS=[
+ {t:"Car trouble", f:c=>c.ride===0?{cost:0,note:"The new-car warranty covers it. (The $480 payment is still due every month.)"}:c.ride===1?{cost:650,note:"The used car needs $650 of brake work. The $60 a month repair fund helps."}:{cost:0,note:"No car, no car repairs. The bus is late, but it's free."}},
+ {t:"Dentist visit", f:c=>({cost:300,note:"A cavity: $300 after insurance."})},
+ {t:"Hours cut at work", f:c=>({cost:400,note:"Dani's paycheck is $400 smaller this month."})},
+ {t:"Roommate moves out", f:c=>c.home===1?{cost:870,note:"Dani covers the roommate's half for one month: $870."}:{cost:0,note:"No roommate, so no problem this time."}},
+ {t:"Cracked phone screen", f:c=>c.phone===0?{cost:0,note:"Phone insurance covers it."}:{cost:180,note:"Screen repair: $180."}},
+ {t:"Friend's wedding", want:true, f:c=>({cost:350,note:"Gift, outfit and travel: $350. It's a WANT: Dani can skip it, but misses a big day."})}
+];
+const MONTHS=3; /* events hit after 3 months of saving */
+
+/* ---------- State ---------- */
+const $=id=>document.getElementById(id);
+const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+let S;
+function fresh(){ return {phase:"intro", step:0, pick:{home:0,ride:0,food:0,phone:0,fun:0,save:0}, chosen:{}, extra:{save:0,fun:0}, events:[], ei:0, skipWedding:null}; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function totals(){
+  let need=LOAN, want=0, save=0, h=0;
+  STEPS.forEach(st=>{ const o=st.opts[S.pick[st.key]]; need+=o.need||0; want+=o.want||0; save+=o.save||0; h+=o.h; });
+  save+=S.extra.save; want+=S.extra.fun; h+=S.extra.fun>=100?1:0;
+  const spent=need+want+save, left=PAY-spent;
+  return {need,want,save,spent,left,h};
+}
+function happyFace(h){ return h>=10?["😄","Living large"]:h>=6?["🙂","Happy"]:h>=3?["😐","Getting by"]:["😟","Stressed"]; }
+
+/* ---------- Live budget panel ---------- */
+function renderLive(){
+  const T=totals(), over=T.left<0, pct=x=>Math.round(x/PAY*100), [face,mood]=happyFace(T.h);
+  const w=x=>Math.max(0,Math.min(100,x/Math.max(PAY,T.spent)*100));
+  const lines=[["Student loan (fixed)",LOAN]].concat(STEPS.map(st=>{ const o=st.opts[S.pick[st.key]]; return [o.t,(o.need||0)+(o.want||0)+(o.save||0)]; }));
+  if(S.extra.save) lines.push(["Extra savings",S.extra.save]); if(S.extra.fun) lines.push(["Extra fun",S.extra.fun]);
+  $("live").innerHTML=`<div class="eyebrow">Dani · age 23 · dental assistant</div>
+    <div class="money"><span>Take-home pay: <b>${money(PAY)}</b> a month</span>
+      <span class="big ${over?'over':'ok'}">${over?money(-T.left)+" over":T.left===0?"$0 left ✓":money(T.left)+" left"}</span></div>
+    <div class="meter" aria-hidden="true"><i style="width:${Math.min(100,T.spent/PAY*100/ (T.spent>PAY?T.spent/PAY:1))}%;background:${over?'var(--bad)':'var(--ok)'}"></i>${over?`<span class="cap" style="left:${PAY/T.spent*100}%"></span>`:""}</div>
+    <div class="split" role="img" aria-label="Needs ${pct(T.need)} percent, wants ${pct(T.want)} percent, savings ${pct(T.save)} percent">
+      <span style="width:${w(T.need)}%;background:var(--need)"></span><span style="width:${w(T.want)}%;background:var(--want)"></span><span style="width:${w(T.save)}%;background:var(--save)"></span>${T.left>0?`<span style="width:${w(T.left)}%;background:var(--left)"></span>`:""}</div>
+    <div class="legend">
+      <div><span><i class="dot" style="background:var(--need)"></i>Needs</span><b>${money(T.need)} · ${pct(T.need)}%</b></div>
+      <div><span><i class="dot" style="background:var(--want)"></i>Wants</span><b>${money(T.want)} · ${pct(T.want)}%</b></div>
+      <div><span><i class="dot" style="background:var(--save)"></i>Savings</span><b>${money(T.save)} · ${pct(T.save)}%</b></div>
+      <div><span><i class="dot" style="background:var(--left)"></i>No job yet</span><b>${money(Math.max(0,T.left))}</b></div></div>
+    <p style="color:var(--muted);font-size:15px">Goal: 50% needs · 30% wants · 20% savings</p>
+    <div class="happy"><span class="faces" aria-hidden="true">${face}</span><span>Dani's happiness: ${mood}</span></div>
+    <table class="lines">${lines.map(l=>`<tr><td>${l[0]}</td><td class="n">${money(l[1])}</td></tr>`).join("")}
+      <tr class="tot"><td>Total planned</td><td class="n">${money(T.spent)}</td></tr></table>`;
+}
+
+/* ---------- Stage ---------- */
+function stepsBar(){ return `<div class="steps" aria-hidden="true">${STEPS.map((_,k)=>`<i class="${k<S.step?'done':k===S.step&&S.phase==='decide'?'now':''}"></i>`).join("")}<i class="${S.phase==='assign'?'now':S.phase==='events'||S.phase==='end'?'done':''}"></i><i class="${S.phase==='events'?'now':S.phase==='end'?'done':''}"></i></div>`; }
+function render(){
+  renderLive(); $("back").disabled=S.phase==="intro";
+  const st=$("stage");
+  if(S.phase==="intro"){
+    st.innerHTML=`<div class="eyebrow">Whole class · Teams vote · 25–35 minutes</div>
+      <h2>Dani's dream budget is ${money(-totals().left)} over. Can your class make it fit?</h2>
+      <p>Dani just started a first full-time job and planned the dream life: a solo apartment, a new car, eating out, the newest phone and a big fun budget. The plan costs more than Dani makes.</p>
+      <p>For each decision, teams vote <b>1, 2 or 3</b> (hold up fingers or go to a corner). The teacher taps the winning choice. Watch the budget, the 50/30/20 bar and Dani's happiness change.</p>
+      <p>After 6 decisions, give every leftover dollar a job. Then <b>Life Happens</b>: 3 surprise cards test the plan.</p>
+      <div class="talk"><b>Before you start:</b> Which part of Dani's dream plan would YOU cut first?</div>
+      <div class="row"><button class="btn go" id="go">Start the squeeze</button></div>`;
+    $("go").onclick=()=>{ S.phase="decide"; S.step=0; render(); }; return;
+  }
+  if(S.phase==="decide"){
+    const stp=STEPS[S.step], chosen=S.chosen[stp.key];
+    st.innerHTML=`${stepsBar()}<div class="eyebrow">Decision ${S.step+1} of ${STEPS.length}</div><h2>${stp.title}</h2>
+      <div class="opts">${stp.opts.map((o,k)=>{ const cost=(o.need||0)+(o.want||0)+(o.save||0);
+        return `<button class="opt" data-k="${k}" aria-pressed="${S.pick[stp.key]===k&&chosen!==undefined}"><span class="num">Option ${k+1}</span><span class="t">${o.t}</span><span class="cost">${money(cost)}</span><span class="d">${o.d}</span>${stp.key!=="save"?`<span class="h">Happiness ${o.h>0?"+"+o.h:o.h}</span>`:""}</button>`; }).join("")}</div>
+      <div class="talk"><b>Turn and talk:</b> ${stp.talk}</div>
+      <div class="row"><button class="btn go" id="next" ${chosen===undefined?"disabled":""}>${S.step===STEPS.length-1?"Lock in the plan":"Next decision"}</button><span style="color:var(--muted)">Tap the class's choice. You can change it before moving on.</span></div>`;
+    st.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ S.pick[stp.key]=+b.dataset.k; S.chosen[stp.key]=+b.dataset.k; render(); });
+    $("next").onclick=()=>{ if(S.step<STEPS.length-1){ S.step++; } else { S.phase="assign"; } render(); };
+    return;
+  }
+  if(S.phase==="assign"){
+    const T=totals();
+    if(T.left<0){
+      st.innerHTML=`${stepsBar()}<div class="eyebrow">Zero-based check</div><h2>Still ${money(-T.left)} over.</h2>
+        <p>A budget has to fit the take-home pay. Go back and change at least one decision.</p>
+        <div class="talk"><b>Turn and talk:</b> Which ONE change gets Dani closest with the smallest hit to happiness?</div>
+        <div class="row"><button class="btn gold" id="fix">Change a decision</button></div>`;
+      $("fix").onclick=()=>{ S.phase="decide"; S.step=0; render(); }; return;
+    }
+    st.innerHTML=`${stepsBar()}<div class="eyebrow">Zero-based budget</div><h2>${T.left===0?"Every dollar has a job!":`${money(T.left)} has no job yet.`}</h2>
+      <p>${T.left===0?"Nice. Now let's see what life throws at Dani.":"In a zero-based budget, every dollar gets a job. Give it one $50 at a time, or put the rest in savings."}</p>
+      ${T.left>0?`<div class="row"><button class="btn" id="s50">+$50 savings</button><button class="btn" id="f50">+$50 fun</button><button class="btn" id="sall">Rest to savings</button><button class="btn" id="undo">Undo extras</button></div>`:(S.extra.save||S.extra.fun?`<div class="row"><button class="btn" id="undo">Undo extras</button></div>`:"")}
+      <div class="talk"><b>Turn and talk:</b> Dani wants a 3-month emergency fund. At ${money(T.save)} a month, how long will that take? Is that fast enough?</div>
+      <div class="row"><button class="btn go" id="life" ${T.left>0?"disabled":""}>Life happens →</button>${T.left>0?`<span style="color:var(--muted)">Give every dollar a job first.</span>`:""}</div>`;
+    const add=(k,n)=>{ S.extra[k]+=n; render(); };
+    $("s50")&&($("s50").onclick=()=>add("save",Math.min(50,T.left)));
+    $("f50")&&($("f50").onclick=()=>add("fun",Math.min(50,T.left)));
+    $("sall")&&($("sall").onclick=()=>add("save",T.left));
+    $("undo")&&($("undo").onclick=()=>{ S.extra={save:0,fun:0}; render(); });
+    $("life").onclick=()=>{ S.events=shuffle(EVENTS.map((_,i)=>i)).slice(0,3); S.ei=0; S.skipWedding=null; S.phase="events"; render(); };
+    return;
+  }
+  if(S.phase==="events"){
+    const T=totals(), fund=T.save*MONTHS;
+    const shown=S.events.slice(0,S.ei+1).map(i=>{ const e=EVENTS[i], r=e.f(S.pick); let cost=r.cost; if(e.want&&S.skipWedding) cost=0; return {e,r,cost}; });
+    const cur=shown[shown.length-1], used=shown.reduce((a,x)=>a+x.cost,0), last=S.ei===S.events.length-1;
+    const needsChoice=cur.e.want&&S.skipWedding===null;
+    st.innerHTML=`${stepsBar()}<div class="eyebrow">Life happens · card ${S.ei+1} of 3 · after ${MONTHS} months</div>
+      <h2>Emergency fund: ${money(fund)}</h2>
+      <p>Dani has saved ${money(T.save)} a month for ${MONTHS} months. Surprise costs come out of this fund. If it runs out, the rest goes on a credit card at 24% APR.</p>
+      ${shown.map((x,k)=>`<div class="event ${x.cost>0?'hit':'safe'}"><span class="t">${k+1}. ${x.e.t}</span><span class="c">${x.cost>0?"−"+money(x.cost):"$0"}</span><span>${x.e.want&&S.skipWedding?"Dani skipped it to protect the budget.":x.r.note}</span></div>`).join("")}
+      <div class="money"><span>Emergency fund left:</span><span class="big ${fund-used<0?'over':'ok'}">${fund-used<0?money(fund-used)+" (credit card)":money(fund-used)}</span></div>
+      ${needsChoice?`<div class="talk"><b>Class vote:</b> Go to the wedding (−$350) or skip it?</div><div class="row"><button class="btn gold" id="goW">Go to the wedding</button><button class="btn" id="skipW">Skip it</button></div>`:
+        `<div class="row"><button class="btn go" id="nextE">${last?"See the results":"Next card"}</button></div>`}`;
+    $("goW")&&($("goW").onclick=()=>{ S.skipWedding=false; render(); });
+    $("skipW")&&($("skipW").onclick=()=>{ S.skipWedding=true; render(); });
+    $("nextE")&&($("nextE").onclick=()=>{ if(last) S.phase="end"; else S.ei++; render(); });
+    return;
+  }
+  if(S.phase==="end"){
+    const T=totals(), fund=T.save*MONTHS;
+    const used=S.events.map(i=>{ const e=EVENTS[i]; return (e.want&&S.skipWedding)?0:e.f(S.pick).cost; }).reduce((a,b)=>a+b,0);
+    const debt=Math.max(0,used-fund), pct=x=>Math.round(x/PAY*100);
+    const C=[[T.left>=0,"The plan fits Dani's take-home pay (zero-based)."],
+             [T.save>=290,`Saves at least 10% (${pct(T.save)}% saved).`],
+             [T.save>=580,"Saves 20% or more (the 50/30/20 goal)."],
+             [debt===0,debt===0?"Life happens: covered without a credit card.":`Life happens: ${money(debt)} went on a credit card at 24% APR.`],
+             [T.h>=3,`Dani is still ${happyFace(T.h)[1].toLowerCase()}.`]];
+    const stars=C.filter(c=>c[0]).length;
+    st.innerHTML=`${stepsBar()}<div class="eyebrow">Results</div><h2>Dani's plan</h2>
+      <div class="stars" aria-label="${stars} of 5 stars">${"★".repeat(stars)}${"☆".repeat(5-stars)}</div>
+      <div class="checks">${C.map(c=>`<div class="check ${c[0]?'y':'n'}"><span class="m">${c[0]?"✓":"✗"}</span><span>${c[1]}</span></div>`).join("")}</div>
+      ${debt>0?`<p>That ${money(debt)} at 24% APR costs about ${money(debt*0.24/12)} in interest every month it isn't paid off (balance × APR ÷ 12). Compounding works against you (Unit 1).</p>`:""}
+      <div class="talk"><b>Exit discussion</b><ol class="qs"><li>Which decision mattered most? Why?</li><li>Needs are ${pct(T.need)}% of Dani's pay. Is that OK? What would you change?</li><li>Would you rather be happier now or safer later? Can you get both?</li></ol></div>
+      <div class="row"><button class="btn go" id="again">Play again (new life cards)</button><button class="btn" id="redo">Change decisions</button></div>`;
+    $("again").onclick=()=>{ S=fresh(); render(); };
+    $("redo").onclick=()=>{ S.phase="decide"; S.step=0; render(); };
+  }
+}
+$("back").onclick=()=>{
+  if(S.phase==="decide"){ if(S.step>0) S.step--; else S.phase="intro"; }
+  else if(S.phase==="assign"){ S.phase="decide"; S.step=STEPS.length-1; }
+  else if(S.phase==="events"){ if(S.ei>0) S.ei--; else S.phase="assign"; }
+  else if(S.phase==="end"){ S.phase="events"; }
+  render(); };
+$("restart").onclick=()=>{ const b=$("restart");
+  if(b.dataset.c){ S=fresh(); render(); b.textContent="Restart"; delete b.dataset.c; }
+  else { b.dataset.c=1; b.textContent="Click again"; setTimeout(()=>{ b.textContent="Restart"; delete b.dataset.c; },3000); } };
+S=fresh(); render();
+</script>
+<script src="/fm-home.js" defer></script>
+</body>
+</html>
