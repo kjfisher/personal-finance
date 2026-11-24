@@ -4,12 +4,12 @@
 (function () {
   if (window.__fmCalc) return; window.__fmCalc = true;
   var css = `
-.fmc-btn{position:fixed;left:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9998;
+.fmc-btn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9998;
   font:700 16px "Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;padding:12px 18px;border-radius:999px;border:2px solid #E0A800;
   background:#14213D;color:#F3F5F8;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;display:flex;gap:8px;align-items:center}
 .fmc-btn:focus-visible{outline:3px solid #E0A800;outline-offset:3px}
 .fmc{--b:#FFFFFF;--i:#14213D;--m:#5B6780;--l:#CBD3DF;--s:#EEF1F5;--g:#E0A800;--ok:#0F8B6C;--h:#14213D;--hi:#F3F5F8;
-  position:fixed;z-index:9999;left:max(14px,env(safe-area-inset-right,0px));bottom:max(76px,calc(env(safe-area-inset-bottom,0px) + 76px));
+  position:fixed;z-index:9999;left:max(14px,env(safe-area-inset-left,0px));bottom:max(76px,calc(env(safe-area-inset-bottom,0px) + 76px));
   width:min(400px,calc(100vw - 28px));max-height:min(78vh,700px);display:flex;flex-direction:column;background:var(--b);color:var(--i);
   border:1px solid var(--l);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.3);font:16px "Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;overflow:hidden}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fmc{--b:#16203A;--i:#E8EDF5;--m:#93A0B8;--l:#2A3A5E;--s:#0D1424;--g:#F5C542;--ok:#3CCB9F;--h:#101A30}}
@@ -21,7 +21,7 @@
 .fmc-top b{font:800 19px "Bricolage Grotesque","Arial Black",system-ui,sans-serif}
 .fmc-x{font:inherit;font-size:22px;line-height:1;background:none;border:0;color:var(--hi);cursor:pointer;padding:4px 8px;border-radius:8px}
 .fmc-tabs{display:flex;gap:4px}
-.fmc-tab{font:inherit;font-weight:700;font-size:15px;padding:8px 14px;border:0;border-radius:10px 10px 0 0;background:transparent;color:var(--hi);opacity:.75;cursor:pointer}
+.fmc-tab{font:inherit;font-weight:700;font-size:15px;padding:8px 11px;border:0;border-radius:10px 10px 0 0;background:transparent;color:var(--hi);opacity:.75;cursor:pointer}
 .fmc-tab[aria-selected="true"]{background:var(--b);color:var(--i);opacity:1}
 .fmc-body{padding:12px;overflow:auto;display:grid;gap:10px}
 .fmc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -43,6 +43,11 @@
 .fmc-k{font:700 20px "IBM Plex Mono",ui-monospace,Menlo,monospace;padding:12px 0;border-radius:12px;border:1px solid var(--l);background:var(--s);color:var(--i);cursor:pointer}
 .fmc-k.op{background:var(--h);color:var(--hi)}
 .fmc-k.eq{background:var(--g);color:#14213D;border-color:var(--g)}
+.fmc-keys.sci{grid-template-columns:repeat(5,1fr)}
+.fmc-keys.sci .fmc-k{font-size:17px;padding:11px 0}
+.fmc-k.fx{background:var(--b);border-color:var(--g)}
+.fmc-tip{font-size:13px;color:var(--m);margin:0;line-height:1.4}
+.fmc-tip code{font:600 13px "IBM Plex Mono",ui-monospace,Menlo,monospace;color:var(--i)}
 .fmc-ft{padding:8px 12px 12px;border-top:1px solid var(--l);font-size:13px;color:var(--m)}
 .fmc-ft a{color:inherit;font-weight:700}
 body.fmc-pad{padding-bottom:84px}
@@ -59,7 +64,7 @@ body.fmc-pad{padding-bottom:84px}
   p.className = 'fmc'; p.id = 'fmc'; p.hidden = true; p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'Calculator');
   p.innerHTML = `
 <div class="fmc-hd"><div class="fmc-top"><b>Calculator</b><button class="fmc-x" type="button" aria-label="Close calculator">×</button></div>
- <div class="fmc-tabs" role="tablist"><button class="fmc-tab" role="tab" aria-selected="true" data-t="c">Compound interest</button><button class="fmc-tab" role="tab" aria-selected="false" data-t="b">Basic</button></div></div>
+ <div class="fmc-tabs" role="tablist"><button class="fmc-tab" role="tab" aria-selected="true" data-t="c">Compound interest</button><button class="fmc-tab" role="tab" aria-selected="false" data-t="b">Basic</button><button class="fmc-tab" role="tab" aria-selected="false" data-t="s">Scientific</button></div></div>
 <div class="fmc-body" data-p="c">
  <div class="fmc-grid">
   <label>Starting amount ($)<input id="fmc-P" inputmode="decimal" value="1000" autocomplete="off"></label>
@@ -75,6 +80,11 @@ body.fmc-pad{padding-bottom:84px}
 <div class="fmc-body" data-p="b" hidden>
  <div class="fmc-disp" id="fmc-disp" aria-live="polite"><small id="fmc-exp"></small><span id="fmc-val">0</span></div>
  <div class="fmc-keys" id="fmc-keys"></div>
+</div>
+<div class="fmc-body" data-p="s" hidden>
+ <div class="fmc-disp" aria-live="polite"><small id="fmc-sexp"></small><span id="fmc-sval">0</span></div>
+ <div class="fmc-keys sci" id="fmc-skeys"></div>
+ <p class="fmc-tip">Compound growth: <code>1000 × 1.08 xʸ 10 =</code> gives $2,158.92. Rule of 72 check: <code>ln(2) ÷ ln(1.08) =</code> gives the exact years to double (9.0).</p>
 </div>
 <div class="fmc-ft">Check your work with the official SEC calculator: <a href="https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator" target="_blank" rel="noopener">investor.gov ↗</a></div>`;
   document.body.appendChild(btn); document.body.appendChild(p); document.body.classList.add('fmc-pad');
@@ -163,4 +173,72 @@ body.fmc-pad{padding-bottom:84px}
     var map = { '*': '×', '/': '÷', '-': '−', 'Enter': '=', 'Backspace': '⌫', 'Escape': null, 'Delete': 'C' }, k = e.key in map ? map[e.key] : e.key;
     if (k && /^[\d.+%()×÷−=⌫C]$/.test(k)) { e.preventDefault(); press(k); }
   });
+  /* Scientific calculator (no eval). Tokens: numbers, π, e, √ ln log, + − × ÷ ^ ( ), n% = n/100. Implied × like 2π or 3(4). */
+  var sexpr = '', sjust = false, ans = 0;
+  var SK = [['C','fn'],['⌫','fn'],['(','fn'],[')','fn'],['÷','op'],
+            ['x²','fx'],['xʸ','fx'],['√','fx'],['1/x','fx'],['×','op'],
+            ['7'],['8'],['9'],['ln','fx'],['−','op'],
+            ['4'],['5'],['6'],['log','fx'],['+','op'],
+            ['1'],['2'],['3'],['eˣ','fx'],['π','fx'],
+            ['0'],['.'],['±','fn'],['Ans','fn'],['=','eq']];
+  var SLABEL = { 'x²':'square', 'xʸ':'to the power of', '√':'square root', '1/x':'one over', 'ln':'natural log', 'log':'log base 10', 'eˣ':'e to the power of', '±':'change sign', 'Ans':'last answer', '⌫':'backspace', 'C':'clear' };
+  q('#fmc-skeys').innerHTML = SK.map(function (k) { return '<button type="button" class="fmc-k ' + (k[1] || '') + '" data-s="' + k[0] + '"' + (SLABEL[k[0]] ? ' aria-label="' + SLABEL[k[0]] + '"' : '') + '>' + k[0] + '</button>'; }).join('');
+  function sciEval(str) {
+    var src = str.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-'), toks = [], i = 0, m;
+    while (i < src.length) {
+      var c = src[i];
+      if (c === ' ') { i++; continue; }
+      if ((m = /^(\d*\.?\d+)(%?)/.exec(src.slice(i)))) { toks.push({ t: 'n', v: parseFloat(m[1]) / (m[2] ? 100 : 1) }); i += m[0].length; continue; }
+      if (src.startsWith('ln', i)) { toks.push({ t: 'f', v: 'ln' }); i += 2; continue; }
+      if (src.startsWith('log', i)) { toks.push({ t: 'f', v: 'log' }); i += 3; continue; }
+      if (c === '√') { toks.push({ t: 'f', v: 'sqrt' }); i++; continue; }
+      if (c === 'π') { toks.push({ t: 'n', v: Math.PI }); i++; continue; }
+      if (c === 'e') { toks.push({ t: 'n', v: Math.E }); i++; continue; }
+      if ('+-*/^()'.indexOf(c) >= 0) { toks.push({ t: c }); i++; continue; }
+      throw 0;
+    }
+    var pos = 0;
+    function pk() { return toks[pos] || {}; }
+    function starts(t) { return t.t === 'n' || t.t === 'f' || t.t === '('; }
+    function primary() {
+      var t = toks[pos++]; if (!t) throw 0;
+      if (t.t === 'n') return t.v;
+      if (t.t === '(') { var v = expr(); if (pk().t === ')') pos++; return v; }
+      if (t.t === 'f') { var a = unary(); if (t.v === 'sqrt') { if (a < 0) throw 0; return Math.sqrt(a); } if (a <= 0) throw 0; return t.v === 'ln' ? Math.log(a) : Math.log10(a); }
+      throw 0;
+    }
+    function pow() { var b = primary(); if (pk().t === '^') { pos++; return Math.pow(b, unary()); } return b; }
+    function unary() { if (pk().t === '-') { pos++; return -unary(); } if (pk().t === '+') { pos++; return unary(); } return pow(); }
+    function term() { var v = unary(); for (;;) { var t = pk(); if (t.t === '*') { pos++; v *= unary(); } else if (t.t === '/') { pos++; v /= unary(); } else if (starts(t)) v *= unary(); else return v; } }
+    function expr() { var v = term(); for (;;) { var t = pk(); if (t.t === '+') { pos++; v += term(); } else if (t.t === '-') { pos++; v -= term(); } else return v; } }
+    var open = (str.match(/\(/g) || []).length - (str.match(/\)/g) || []).length;
+    if (open > 0) return sciEval(str + new Array(open + 1).join(')'));
+    var v = expr(); if (pos < toks.length || !isFinite(v)) throw 0; return v;
+  }
+  function sshow(val, sub) { q('#fmc-sval').textContent = val || '0'; q('#fmc-sexp').textContent = sub || ''; }
+  function spress(k) {
+    var lastNum = /(\d*\.?\d+%?|π|e|Ans)$/;
+    if (k === 'C') { sexpr = ''; sjust = false; return sshow('0', ''); }
+    if (k === '⌫') { sexpr = sexpr.replace(/(ln\(|log\(|√\(|e\^\(|.)$/, ''); sjust = false; return sshow(sexpr, ''); }
+    if (k === '=') {
+      var miss = (sexpr.match(/\(/g) || []).length - (sexpr.match(/\)/g) || []).length; if (miss > 0) sexpr += new Array(miss + 1).join(')');
+      try { var v = sciEval(sexpr.replace(/Ans/g, '(' + ans + ')')); ans = +v.toPrecision(12);
+        sshow(ans.toLocaleString('en-US', { maximumFractionDigits: 10 }), sexpr + ' ='); sexpr = String(ans); sjust = true; }
+      catch (e) { sshow('Check your math', sexpr); }
+      return;
+    }
+    var add = { 'x²': '^2', 'xʸ': '^', '√': '√(', '1/x': '^(−1)', 'ln': 'ln(', 'log': 'log(', 'eˣ': 'e^(', 'π': 'π', 'Ans': 'Ans' }[k];
+    if (k === '±') { var mm = lastNum.exec(sexpr); sexpr = mm ? sexpr.slice(0, mm.index) + '(−' + mm[1] + ')' : sexpr + '−'; sjust = false; return sshow(sexpr, ''); }
+    if (add === undefined) add = k;
+    var continues = /^[\^+−×÷%)]/.test(add);
+    if (sjust && !continues) sexpr = '';
+    sjust = false; sexpr += add; sshow(sexpr, '');
+  }
+  q('#fmc-skeys').addEventListener('click', function (e) { var b = e.target.closest('[data-s]'); b && spress(b.dataset.s); });
+  p.addEventListener('keydown', function (e) {
+    if (q('[data-p="s"]').hidden || /INPUT|SELECT/.test(e.target.tagName)) return;
+    var map = { '*': '×', '/': '÷', '-': '−', '^': 'xʸ', 'Enter': '=', 'Backspace': '⌫', 'Delete': 'C' }, k = e.key in map ? map[e.key] : e.key;
+    if (k && /^([\d.+()×÷−=⌫C%]|xʸ)$/.test(k)) { e.preventDefault(); spress(k === '%' ? '%' : k); }
+  });
+  window.__fmSci = sciEval; /* exposed for testing */
 })();
