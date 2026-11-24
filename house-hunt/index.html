@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>House <span>Hunt</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -145,7 +146,7 @@ function mkConcepts(){ const O=["Rent","Buy"];
       {k:"c2", type:"close", choices:O, q:"Staying 10+ years, has a down payment and steady income", a:"Buy", why:"Long stays let you build equity."},
       {k:"c3", type:"close", choices:["Equity","Escrow","PMI","Appreciation"], q:"Home worth $300,000, you owe $220,000. The $80,000 is your...", a:"Equity", why:"Equity = value − loan balance."},
       {k:"c4", type:"close", choices:["The landlord","You, the homeowner"], q:"You own your home and the furnace breaks. Who pays to fix it?", a:"You, the homeowner", why:"Owners pay repairs. For renters, the landlord usually does."}]}; }
-function mkReady(){ const nm=pick(["Ava","Marcus","Lena","Theo","Imani","Jace"]), good=Math.random()<.45, bad=pick(["yrs","dti","sav","nc"]), yrs=good||bad!=="yrs"?pick([3,4,6]):pick([0.5,1]), dti=good||bad!=="dti"?pick([24,28,33]):pick([44,52]), sav=good||bad!=="sav", nc=!good&&bad==="nc", fin=pick([200000,300000,400000]), est=fin/200000*1000;
+function mkReady(){ const nm=pick((a=>{window.fmSwapData&&fmSwapData(a,["Ava:f","Marcus:m","Lena:f","Theo:m","Imani:f","Jace:m"]);return a;})(["Ava","Marcus","Lena","Theo","Imani","Jace"])), good=Math.random()<.45, bad=pick(["yrs","dti","sav","nc"]), yrs=good||bad!=="yrs"?pick([3,4,6]):pick([0.5,1]), dti=good||bad!=="dti"?pick([24,28,33]):pick([44,52]), sav=good||bad!=="sav", nc=!good&&bad==="nc", fin=pick([200000,300000,400000]), est=fin/200000*1000;
   const ready=yrs>=2&&dti<=40&&sav&&!nc;
   return {kind:"Time to buy?", title:`Is ${nm} ready?`, html:tbl([["Time at current job",yrs<1?"6 months":yrs+" years"],["Debt-to-income (DTI)",dti+"%"],["Safety net (savings)",sav?"Yes":"No"],["New credit cards this month",nc?"Opened 2":"None"],["Checklist from class","Safety net · built credit · stable job 2+ years · no new credit · DTI below 35–40% · pre-approval"]]),
    F:[{k:"r", type:"down", choices:["Ready to apply","Not ready yet"], q:`Is ${nm} ready to apply for a mortgage?`, a:ready?"Ready to apply":"Not ready yet", why:ready?"Every item on the checklist is covered. Next step: get pre-approved.":"Something on the checklist is missing: "+[yrs<2?"job under 2 years":"",dti>40?"DTI over 40%":"",!sav?"no safety net":"",nc?"new credit right before applying":""].filter(Boolean).join(", ")+"."},

@@ -62,6 +62,7 @@ main{max-width:1100px;margin:0 auto;padding-block:20px 40px;padding-left:max(16p
 </style>
 <header><h1>18 by 18: <span>Target Match</span></h1><div class="stat" id="stat"></div></header>
 <main id="app"></main>
+<script src="/fm-roster.js"></script>
 <script>
 const T=[
  [1,"Harness the power of compounding","🌱","Start early. Time does the heavy lifting."],
@@ -118,7 +119,7 @@ const S=[
  [17,"Rosa invests in a Roth IRA so her growth is tax-free in retirement."],
  [17,"Marcus puts money in his pre-tax 401(k), which lowers his taxable income."],
  [18,"Imani's plan: an emergency fund, no high-interest debt, steady investing, and giving to causes she cares about."],
- [18,"Ezra writes a money plan built around security, choices, and generosity, not just being rich."]];
+ [18,"Ezra writes a money plan built around security, choices, and generosity, not just being rich."]];;window.fmSwapData&&fmSwapData(S,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Jordan:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Maya:f", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Jordan:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Maya:f", "Nora:f", "Rosa:f", "Theo:m"]);
 const app=document.getElementById("app"), stat=document.getElementById("stat");
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));

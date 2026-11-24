@@ -89,9 +89,10 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Overtime <span>Rush</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const WAGES=[15.50,17.50,18.40,19.00,20.50,21.00,23.50,24.00,26.50,27.00,28.50,31.00];
-const NAMES=["Avery","Jalen","Priya","Marco","Leah","Diego","Tess","Omar","Hana","Ruby","Eli","Nadia","Caleb","Zoe"];
+const NAMES=["Avery","Jalen","Priya","Marco","Leah","Diego","Tess","Omar","Hana","Ruby","Eli","Nadia","Caleb","Zoe"];;window.fmSwapData&&fmSwapData(NAMES,["Avery", "Caleb:m", "Diego:m", "Eli:m", "Hana:f", "Jalen:m", "Leah:f", "Marco:m", "Nadia:f", "Omar:m", "Priya:f", "Ruby:f", "Tess:f", "Zoe:f"]);window.fmSwapDOM&&fmSwapDOM(["Avery", "Caleb:m", "Diego:m", "Eli:m", "Hana:f", "Jalen:m", "Leah:f", "Marco:m", "Nadia:f", "Omar:m", "Priya:f", "Ruby:f", "Tess:f", "Zoe:f"]);
 const JOBS=["Warehouse Associate","Line Cook","Retail Associate","Barista","Delivery Driver","Lifeguard","Stock Clerk","Hotel Front Desk","Landscaper","Shift Supervisor","Pharmacy Tech","Dental Assistant"];
 const SALES=[["car salesperson","a used SUV",[18000,36000],[3,4,5]],["real estate agent","a house",[240000,560000],[2.5,3]],["insurance agent","a year of policies",[40000,90000],[6,8,10]],["furniture salesperson","a living room set",[2200,6800],[5,6,8]]];
 const SKILL={wk:"Weekly overtime", day:"Daily overtime rule", two:"Two-week pay period", com:"Commission", cmp:"Hourly vs. salary"};

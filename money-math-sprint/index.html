@@ -134,6 +134,7 @@ td.n { text-align: right; font-family: var(--mono); }
   <section id="results" class="stack" hidden style="margin-top:16px"></section>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const rnd = (a, b, step = 1) => a + step * Math.floor(Math.random() * (Math.floor((b - a) / step) + 1));
@@ -142,7 +143,7 @@ const r2 = x => Math.round(x * 100) / 100;
 const usd = x => "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 });
 const usd2 = x => "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const NAMES = ["Maya","Leo","Sofia","Jayden","Amara","Diego","Priya","Owen","Zoe","Mateo","Lena","Kai"];
+const NAMES = ["Maya","Leo","Sofia","Jayden","Amara","Diego","Priya","Owen","Zoe","Mateo","Lena","Kai"];;window.fmSwapData&&fmSwapData(NAMES,["Amara:f", "Diego:m", "Jayden:m", "Kai:m", "Lena:f", "Leo:m", "Mateo:m", "Maya:f", "Owen:m", "Priya:f", "Sofia:f", "Zoe:f"]);window.fmSwapDOM&&fmSwapDOM(["Amara:f", "Diego:m", "Jayden:m", "Kai:m", "Lena:f", "Leo:m", "Mateo:m", "Maya:f", "Owen:m", "Priya:f", "Sofia:f", "Zoe:f"]);
 // exam/study-guide numbers to avoid so this never mirrors the real test
 const AVOID_SAL = new Set([45600, 51000, 39000, 48000, 30000, 26000, 40000, 20000, 57600, 50000]);
 

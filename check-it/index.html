@@ -88,8 +88,9 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Check <span>It!</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
-const ME={name:"Jordan Rivera", addr1:"418 Maple Ave.", addr2:"Anytown, IL 60000"};
+const ME={name:"Jordan Rivera", addr1:"418 Maple Ave.", addr2:"Anytown, IL 60000"};;window.fmSwapData&&fmSwapData(ME,["Jordan Rivera"]);window.fmSwapDOM&&fmSwapDOM(["Jordan Rivera"]);
 const PAYEES=[["Oak Street Apartments","December rent",950,1450],["Bright Smile Dental","Cleaning copay",25,90],["Riverside Auto Repair","Brake pads",180,620],
  ["Lakeview Water Dept.","Water bill",30,95],["Summit Driving School","Driver's ed",250,450],["Taylor Morgan","Babysitting",40,120],
  ["Northside Youth Soccer","Spring season fee",85,210],["Green Thumb Landscaping","Lawn care",60,175],["Anytown Electric Co.","Electric bill",48,160]];

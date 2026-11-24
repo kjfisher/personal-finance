@@ -72,6 +72,7 @@ ul.take { margin:0; padding-left:24px; font-size:clamp(19px, 2vw, 26px); line-he
     <span class="ctl"><button class="btn" id="back">← Back</button><button class="btn go" id="fwd">Next →</button></span></footer>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
 const fmt=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -104,9 +105,9 @@ const SCENES=[
  {t:"chart", show:["k300","mark"], eyebrow:"Minimum vs. $300 a month · Mark (20%)", q:"Paying more than the minimum saves decades."},
  {t:"calc"},
  {t:"end"}
-];
+];;window.fmSwapData&&fmSwapData(SCENES,["Matt:m", "Mark:m"]);window.fmSwapDOM&&fmSwapDOM(["Matt:m", "Mark:m"]);
 let S={i:0, picks:{}, calc:{bal:3000, apr:22, mode:"min", fixed:150}};
-const LINES={matt:{d:MATT,c:"--matt",n:"Matt · 10% · minimum"}, mark:{d:MARK,c:"--mark",n:"Mark · 20% · minimum"}, k300:{d:K300,c:"--matt",n:"Mark · 20% · $300/month"}};
+const LINES={matt:{d:MATT,c:"--matt",n:"Matt · 10% · minimum"}, mark:{d:MARK,c:"--mark",n:"Mark · 20% · minimum"}, k300:{d:K300,c:"--matt",n:"Mark · 20% · $300/month"}};;window.fmSwapData&&fmSwapData(LINES,["Matt:m", "Mark:m"]);
 let anim=null;
 function chartSVG(series, maxMonths){
   const W=1000,H=360,L=70,R=20,T=16,B=44, maxB=Math.max(...series.map(s=>s.d.pts[0]));
@@ -139,9 +140,9 @@ function draw(){
   $("back").disabled=S.i===0; $("fwd").textContent=S.i===SCENES.length-1?"Start over":"Next →";
   let h="";
   if(sc.t==="story") h=`<div class="eyebrow">Unit 6 · A tale of two cards</div><h2>Same couch. Same car repair. Same $10,000.</h2>
-    <p class="lead">Matt and Mark both furnished a first apartment and then had a transmission fail. Each now owes $10,000 on a credit card. Each will pay only the minimum: 2% of the balance each month.</p>
-    <div class="duo"><div class="person" style="--c:var(--matt)"><b>Matt</b><span>Good credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>10%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div>
-    <div class="person" style="--c:var(--mark)"><b>Mark</b><span>Bad credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>20%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div></div>`;
+    <p class="lead">${fmName("Matt")} and ${fmName("Mark")} both furnished a first apartment and then had a transmission fail. Each now owes $10,000 on a credit card. Each will pay only the minimum: 2% of the balance each month.</p>
+    <div class="duo"><div class="person" style="--c:var(--matt)"><b>${fmName("Matt")}</b><span>Good credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>10%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div>
+    <div class="person" style="--c:var(--mark)"><b>${fmName("Mark")}</b><span>Bad credit</span><div class="row"><span>Balance</span><span>$10,000</span></div><div class="row"><span>APR</span><span>20%</span></div><div class="row"><span>Plan</span><span>Minimum only</span></div></div></div>`;
   else if(sc.t==="vote"){ const p=S.picks[sc.key];
     h=`<div class="eyebrow">${sc.eyebrow}</div><h2>${esc(sc.q)}</h2>
       <div class="votes">${sc.opts.map((o,k)=>`<button class="vote ${p!=null?(k===sc.right?"right":p===k?"wrong":""):""}" data-k="${k}" ${p!=null?"disabled":""}><span class="k">${"ABCD"[k]}</span>${esc(o)}</button>`).join("")}</div>
@@ -157,7 +158,7 @@ function draw(){
          <div class="ctr" style="--c:var(--mark)"><span class="l">Total interest</span><span class="n">${fmt0(r.interest)}</span><span class="l">on top of ${fmt0(+C.bal)}</span></div>
          <div class="ctr" style="--c:var(--matt)"><span class="l">Total paid</span><span class="n">${fmt0(r.paid)}</span><span class="l">Pay in full each month: $0 interest</span></div>`}</div>`; }
   else h=`<div class="eyebrow">The real lesson</div><p class="big-quote">Good credit saves money. <span>Avoiding credit card debt saves much more.</span></p>
-    <ul class="take"><li>Matt (10%): ${yrs(MATT.months)} years, ${fmt0(MATT.interest)} interest. Mark (20%): ${yrs(MARK.months)} years, ${fmt0(MARK.interest)}.</li><li>Paying $300 a month cut Mark's time to ${yrs(K300.months)} years.</li><li>Credit cards are a tool to build credit and earn a few rewards, not a way to borrow money. Pay in full, on time, every time.</li></ul>`;
+    <ul class="take"><li>${fmName("Matt")} (10%): ${yrs(MATT.months)} years, ${fmt0(MATT.interest)} interest. ${fmName("Mark")} (20%): ${yrs(MARK.months)} years, ${fmt0(MARK.interest)}.</li><li>Paying $300 a month cut ${fmName("Mark")}'s time to ${yrs(K300.months)} years.</li><li>Credit cards are a tool to build credit and earn a few rewards, not a way to borrow money. Pay in full, on time, every time.</li></ul>`;
   $("scene").innerHTML=h;
   if(sc.t==="vote"&&S.picks[sc.key]==null) document.querySelectorAll(".vote").forEach(b=>b.onclick=()=>{ S.picks[sc.key]=+b.dataset.k; draw(); });
   if(sc.t==="chart"){ runChart(sc.show); $("replay").onclick=()=>runChart(sc.show); }

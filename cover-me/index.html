@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Cover <span>Me</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -131,7 +132,7 @@ function mkTypes(){ const O=["Health","Auto","Renters/Homeowners","Disability","
       {k:"t2", type:"type", choices:O, q:"Covers your stolen laptop from your apartment", a:"Renters/Homeowners", why:"Renters insurance covers your belongings."},
       {k:"t3", type:"type", choices:O, q:"Pays your family if you die", a:"Life", why:"Paid to your beneficiary."},
       {k:"t4", type:"type", choices:O, q:"Lowers the cost of a doctor visit", a:"Health", why:"Health insurance."}]}; }
-function mkLife(){ const inc=pick([45000,52000,60000,75000]), need=inc*10, nm=pick(["Maria","Devon","Hana","Andre"]);
+function mkLife(){ const inc=pick([45000,52000,60000,75000]), need=inc*10, nm=pick((a=>{window.fmSwapData&&fmSwapData(a,["Maria:f","Devon:m","Hana:f","Andre:m"]);return a;})(["Maria","Devon","Hana","Andre"]));
   return {kind:"Life insurance", title:`${nm} earns ${fmt0(inc)} and has two kids`, html:tbl([["Term life","Covers a set time (like 20 years). Much cheaper. No cash value."],["Whole life","Covers your whole life. Builds cash value. Much more expensive."],["Rule of thumb","About 10 × yearly income"]]),
    F:[{k:"n", type:"life", q:"Life insurance needed (10 × income)", a:need, miss:[[inc,"Multiply by 10."]]},{k:"k", type:"life", choices:["Term life","Whole life"], q:"Cheapest way to cover the years the kids depend on them?", a:"Term life", why:"Term covers the years your family depends on your income, for much less."},
       {k:"s", type:"life", choices:["Usually no","Yes, always"], q:"Does a single 18-year-old with no dependents usually need life insurance?", a:"Usually no", why:"Life insurance replaces income for people who depend on you."}]}; }

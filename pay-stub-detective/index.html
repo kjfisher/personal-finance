@@ -100,13 +100,14 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Pay Stub <span>Detective</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const SCHED={weekly:{n:52,label:"Weekly"}, biweekly:{n:26,label:"Bi-weekly"}, semi:{n:24,label:"Semi-monthly"}, monthly:{n:12,label:"Monthly"}};
 const COST={basic:{52:34.62,26:69.23,24:75,12:150}, premium:{52:57.69,26:115.38,24:125,12:250}, life:{52:2.31,26:4.62,24:5,12:10}};
 const CAREERS=[["Medical Assistant",41600],["Marketing Coordinator",45500],["Elementary Teacher",48360],["HR Specialist",58500],["Graphic Designer",54600],["Electrician",61880],["Police Officer",70200],["Registered Nurse",78000],["Dental Hygienist",83200],["Software Developer",96200]];
 const HJOBS=["Warehouse Associate","Line Cook","Retail Associate","Delivery Driver","Stock Clerk","Hotel Front Desk"];
 const WAGES=[16.50,17.00,18.00,19.50,20.00,21.50,23.00,25.00];
-const PEOPLE=["Maya Torres","Jordan Lee","Priya Shah","Andre Wallace","Lily Chen","Mateo Ruiz","Grace Kim","Isaiah Brooks","Sofia Novak","Ben Adeyemi","Chloe Martin","Owen Patel"];
+const PEOPLE=["Maya Torres","Jordan Lee","Priya Shah","Andre Wallace","Lily Chen","Mateo Ruiz","Grace Kim","Isaiah Brooks","Sofia Novak","Ben Adeyemi","Chloe Martin","Owen Patel"];;window.fmSwapData&&fmSwapData(PEOPLE,["Maya Torres", "Jordan Lee", "Priya Shah", "Andre Wallace", "Lily Chen", "Mateo Ruiz", "Grace Kim", "Isaiah Brooks", "Sofia Novak", "Ben Adeyemi", "Chloe Martin", "Owen Patel"]);window.fmSwapDOM&&fmSwapDOM(["Maya Torres", "Jordan Lee", "Priya Shah", "Andre Wallace", "Lily Chen", "Mateo Ruiz", "Grace Kim", "Isaiah Brooks", "Sofia Novak", "Ben Adeyemi", "Chloe Martin", "Owen Patel"]);
 const COS=["Prairie Health Partners","Lakeshore Logistics","Summit Engineering","Maple Grove Schools","Riverbend Hotel","Northgate Market","Cedar Point Dental","Bluestem Tech"];
 const SKILL={ded:"Deductions & net pay", ot:"Overtime on a stub", ytd:"Year to date", err:"Find the error", con:"Pay stub ideas"};
 const $=id=>document.getElementById(id);

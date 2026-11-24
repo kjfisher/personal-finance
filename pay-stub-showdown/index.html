@@ -88,6 +88,7 @@ select { padding:7px 10px; border-radius:8px; border:1px solid var(--line); back
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="qText" id="card"></div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const CATS = [
  { name:"Overtime", q:[
@@ -128,7 +129,7 @@ const CATS = [
   ["Take-home $1,912.40. Total deductions $587.60. Gross pay on the stub: $2,520. Is the stub right? Use claim, evidence, reasoning.","<b>Claim:</b> wrong. <b>Evidence:</b> 1,912.40 + 587.60 = $2,500, not $2,520. <b>Reasoning:</b> take-home + deductions must equal gross, so $20 is missing. Ask payroll."]]}
 ];
 const VALUES=[100,200,300,400,500];
-const FINAL={cat:"Final Round: Build the Stub", q:"Rosa earns $24 an hour and worked 47 hours this week. She puts 3% in a pre-tax 401(k). Federal tax is 8% and Illinois is 4.95% of taxable pay. FICA uses gross pay. No insurance. What is her take-home pay?", a:"Gross: 40 × $24 = $960 + 7 × $36 = $252 → <b>$1,212</b>. 401(k) $36.36 · taxable $1,175.64 · fed $94.05 · state $58.19 · SS $75.14 · Medicare $17.57 · total $281.31<br>Take-home = <b>$930.69</b>"};
+const FINAL={cat:"Final Round: Build the Stub", q:"Rosa earns $24 an hour and worked 47 hours this week. She puts 3% in a pre-tax 401(k). Federal tax is 8% and Illinois is 4.95% of taxable pay. FICA uses gross pay. No insurance. What is her take-home pay?", a:"Gross: 40 × $24 = $960 + 7 × $36 = $252 → <b>$1,212</b>. 401(k) $36.36 · taxable $1,175.64 · fed $94.05 · state $58.19 · SS $75.14 · Medicare $17.57 · total $281.31<br>Take-home = <b>$930.69</b>"};;window.fmSwapData&&fmSwapData(FINAL,["Rosa:f"]);window.fmSwapDOM&&fmSwapDOM(["Rosa:f"]);
 const KEY="pay-stub-showdown-v1";
 let S;
 function fresh(n){ const dd=[Math.floor(Math.random()*6), 2+Math.floor(Math.random()*3)];

@@ -90,6 +90,7 @@ td.num { font-family:var(--mono); font-variant-numeric:tabular-nums; }
   <div class="foot">The credit score is hidden until you decide. Teams study the report, then vote: 1 finger = Approve with the best rate, 2 = Approve with a higher rate, 3 = Deny. Click the class's choice to stamp the application.</div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const BANDS=[[300,579,"Very Poor","--b1"],[580,669,"Fair","--b2"],[670,739,"Good","--b3"],[740,799,"Very Good","--b4"],[800,850,"Exceptional","--b5"]];
 const DEC=[["Approve: best rate","Low risk. Lowest interest, least paperwork."],["Approve: higher rate","Some risk. Charge more interest, ask for proof of income."],["Deny","Too risky to lend to right now."]];
@@ -119,7 +120,7 @@ const APPS=[
  {name:"Rosa M.", age:25, req:"$16,000 car loan", hist:"5 years", inq:1, coll:"None", pub:"Bankruptcy (2 years ago)", score:563, dec:2,
   acct:[["Secured card","Revolving",90,300,A("OK OK OK OK OK OK OK OK OK OK OK OK")]],
   g:["Rebuilding with a secured card, paid on time"], r:["Bankruptcy on her public record","Very little active credit right now"]}
-];
+];;window.fmSwapData&&fmSwapData(APPS,["Dante:m", "Lena:f", "Marcus:m", "Maya:f", "Priya:f", "Rosa:f", "Theo:m", "Tony:m"]);window.fmSwapDOM&&fmSwapDOM(["Dante:m", "Lena:f", "Marcus:m", "Maya:f", "Priya:f", "Rosa:f", "Theo:m", "Tony:m"]);
 const $=id=>document.getElementById(id);
 let G;
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }

@@ -88,6 +88,7 @@ select { padding:7px 10px; border-radius:8px; border:1px solid var(--line); back
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="qText" id="card"></div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const CATS = [
  { name:"Gross & Net", q:[
@@ -128,7 +129,7 @@ const CATS = [
   ["Give TWO advantages of direct deposit for workers, and ONE reason employers like it.","Workers: <b>faster</b>, <b>safe</b>, <b>no trip to the bank</b>, no lost checks. Employers: <b>cheaper and easier</b> than printing checks."]]}
 ];
 const VALUES=[100,200,300,400,500];
-const FINAL={cat:"Final Round: Build the Paycheck", q:"Kai earns $70,800 a year. Federal rate 10%, Illinois 4.95%, plus FICA. Kai puts 3% in a 401(k), pays $120 for health and $10 for life insurance. What is Kai's NET monthly pay?", a:"Gross monthly $5,900. Taxes: SS $365.80 + Medicare $85.55 + Federal $590 + Illinois $292.05 = $1,333.40. 401(k) $177. Insurance $130.<br>5,900 − 1,333.40 − 177 − 130 = <b>$4,259.60</b>"};
+const FINAL={cat:"Final Round: Build the Paycheck", q:"Kai earns $70,800 a year. Federal rate 10%, Illinois 4.95%, plus FICA. Kai puts 3% in a 401(k), pays $120 for health and $10 for life insurance. What is Kai's NET monthly pay?", a:"Gross monthly $5,900. Taxes: SS $365.80 + Medicare $85.55 + Federal $590 + Illinois $292.05 = $1,333.40. 401(k) $177. Insurance $130.<br>5,900 − 1,333.40 − 177 − 130 = <b>$4,259.60</b>"};;window.fmSwapData&&fmSwapData(FINAL,["Kai:m"]);window.fmSwapDOM&&fmSwapDOM(["Kai:m"]);
 const KEY="deduction-showdown-v1";
 let S;
 function fresh(n){ const dd=[Math.floor(Math.random()*6), 2+Math.floor(Math.random()*3)];

@@ -92,6 +92,7 @@ header p { margin:4px 0 0; color:var(--muted); text-transform:uppercase; letter-
   </div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const BANDS=[[300,579,"Very Poor","--b1"],[580,669,"Fair","--b2"],[670,739,"Good","--b3"],[740,799,"Very Good","--b4"],[800,850,"Exceptional","--b5"]];
 const ROUNDS=[
@@ -146,7 +147,7 @@ const ROUNDS=[
   why:"$2,500 × 0.30 = $750."},
  {age:22, auto:true, title:"Time passes", text:"Two years of history go by. Every account you still have is paid on time, every month.", d:55, cat:"Payment history (35%)",
   why:"Time plus on-time payments is how scores climb. Older accounts and a clean payment history add up."}
-];
+];;window.fmSwapData&&fmSwapData(ROUNDS,["Matt:m"]);window.fmSwapDOM&&fmSwapDOM(["Matt:m"]);
 const $=id=>document.getElementById(id);
 let G;
 function fresh(){ return {i:0, score:null, hist:[], answered:false, last:null}; }

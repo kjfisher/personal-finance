@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Grow <span>It</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -116,7 +117,7 @@ const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return
 const SKILL={c:"Compound growth", r72:"Rule of 72", early:"Start early", match:"401(k) match", acct:"Retirement accounts"};
 const fv=(m,apr,y)=>{ const q=apr/1200, n=y*12; return r2(m*(Math.pow(1+q,n)-1)/q); };
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];;window.fmSwapData&&fmSwapData(NAMES,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);
 function mkComp(){ const P=pick([1500,2500,4000,6000]), rate=pick([5,6,7,8]), d=rate/100, b1=r2(P+r2(P*d)), b2=r2(b1+r2(b1*d)), b3=r2(b2+r2(b2*d));
   return {kind:"Compound growth", title:`${fmt0(P)} invested at ${rate}% a year`, html:tbl([["Starting amount",fmt0(P)],["Average yearly return (practice)",rate+"%"],["New money added","None"]])+`<div class="rule">Each year: growth = balance × ${d}. New balance = balance + growth. Round each year.</div>`,
    F:[{k:"b1", type:"c", q:"Balance after year 1", a:b1, miss:[[P*d,"That's just the growth. Add it to the balance."]]},

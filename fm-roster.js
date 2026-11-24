@@ -15,14 +15,39 @@ window.fmNames = function (n, fallback) {
 };
 /* fmSwapData(data, ["Jordan","Maya"]): replaces each made-up name inside every string of an object/array
    (in place) with a different random roster name. Returns the {old: new} map. */
+/* Names used with he/she wording get a student with a typically matching first name (FM_F / FM_M).
+   Edit these two lists if a student's name is in the wrong one. */
+window.FM_F = ["Jennifer","Maria","Bri","Jasmine","Michelle","Ellie","Valentina","Angelleana","Sofia","Vivianne","Alanis","Jimena","Erika","Magda","Angelina","Tatiana","Kenia","Anna","Melissa","Bella","Nicole","Aliyah","Julia","Judi","Abby","Kaylee","Keisha","Jacqueline","Emily","Deisy","Brianna","Abigail","Jodi","Yolanda","Ciara","Yarely","Anette","Luisa","Luz","Giana","Ava"];
+window.FM_M = ["Edwin","Alejandro","Andy","Brandon","Mason","Nick","Arsen","Georgi","Billy","Zach","Russell","Ole","Rodrigo","Oscar","Alan","Filip","Jose","Adrian","Daniel","Joshua","Ethan","Ben","Pierre","Uriel","Bart","Dean","Axel","Marcello","Omar","Noah","Erik","Arthur","David","Nestor","Max","Kayne","Anthony","Eli","Stepan"];
+window.__fmMap = window.__fmMap || {}; window.__fmUsed = window.__fmUsed || {};
+function fmTake(g) {
+  var r = (window.FM_ROSTER || []).filter(function (n) { if (window.__fmUsed[n]) return false; if (!g) return true; var f = n.split(' ')[0]; return (g === 'f' ? window.FM_F : window.FM_M).indexOf(f) >= 0; });
+  if (!r.length) return null;
+  var n = r[Math.floor(Math.random() * r.length)]; window.__fmUsed[n] = 1; return n + '.';
+}
+/* fmSwapData(data, ["Jordan","Maya:f","Theo:m"]): replaces each made-up name inside every string of an
+   object/array (in place) with a roster name. The same made-up name always gets the same student on a page.
+   ":f" / ":m" = the text uses she/he for that person. Returns the {old: new} map. */
 window.fmSwapData = function (data, olds) {
-  var nn = window.fmNames(olds.length, olds), map = {};
-  olds.forEach(function (o, i) { map[o] = nn[i]; });
-  var re = new RegExp('\\b(' + olds.join('|') + ')\\b(\\.)?', 'g');
-  function fix(s) { return s.replace(re, function (m, o, dot) { return map[o]; }); }
+  var names = [];
+  olds.forEach(function (o) { var p = o.split(':'), n = p[0], g = p[1];
+    if (!window.__fmMap[n]) window.__fmMap[n] = fmTake(g) || fmTake() || n; names.push(n); });
+  var map = window.__fmMap;
+  var re = new RegExp('\\b(' + names.join('|') + ')\\b(?: [A-Z]\\.)?', 'g');
+  function fix(s) { return s.replace(re, function (m, o) { return map[o]; }); }
   (function walk(x) {
     if (Array.isArray(x)) { for (var i = 0; i < x.length; i++) { if (typeof x[i] === 'string') x[i] = fix(x[i]); else if (x[i] && typeof x[i] === 'object') walk(x[i]); } }
     else if (x && typeof x === 'object') { for (var k in x) { if (typeof x[k] === 'string') x[k] = fix(x[k]); else if (x[k] && typeof x[k] === 'object') walk(x[k]); } }
   })(data);
   return map;
+};
+/* fmName("Theo") = the student standing in for "Theo" on this page (for names written in code). */
+window.fmName = function (n) { return (window.__fmMap && window.__fmMap[n]) || n; };
+/* fmSwapDOM(["Jada:f"]): swap made-up names in text already on the page (intro text written in the HTML). */
+window.fmSwapDOM = function (olds) {
+  var holder = {t: ''}, names = olds.map(function (o) { return o.split(':')[0]; });
+  window.fmSwapData([], olds);
+  var map = window.__fmMap, re = new RegExp('\\b(' + names.join('|') + ')\\b(?: [A-Z]\\.)?', 'g');
+  var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return /SCRIPT|STYLE/.test(n.parentNode.nodeName) ? 2 : 1; } }), n;
+  while ((n = w.nextNode())) if (re.test(n.nodeValue)) { re.lastIndex = 0; n.nodeValue = n.nodeValue.replace(re, function (m, o) { return map[o]; }); }
 };

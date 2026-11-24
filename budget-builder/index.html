@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Budget <span>Builder</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -115,7 +116,7 @@ function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.fl
 const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
 const SKILL={goal:"Savings ability & goals", b:"50/30/20 budget", sort:"Needs vs. wants", ef:"Emergency fund", bal:"Balance the budget"};
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];;window.fmSwapData&&fmSwapData(NAMES,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);
 function mk503020(){ const net=rnd(24,52)*100, nm=pick(NAMES);
   return {kind:"50/30/20 budget", title:`${nm} takes home ${fmt0(net)} a month`, html:tbl([["50% Needs","Housing, utilities, groceries, insurance, transportation, minimum debt payments"],["30% Wants","Eating out, streaming, concerts, shopping"],["20% Savings","Emergency fund, retirement, extra debt payoff"]])+`<div class="rule">Use take-home (net) pay.</div>`,
    F:[{k:"n", type:"b", q:"Needs (50%)", a:r2(net*.5), miss:[[net*.05,"50% = 0.50."]]},{k:"w", type:"b", q:"Wants (30%)", a:r2(net*.3), miss:[[net*.03,"30% = 0.30."]]},{k:"s", type:"b", q:"Savings (20%)", a:r2(net*.2), miss:[[net*.02,"20% = 0.20."]]}]}; }

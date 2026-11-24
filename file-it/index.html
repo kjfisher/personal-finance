@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>File <span>It</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -118,7 +119,7 @@ const SD=16100, B=[[12400,.10],[50400,.12],[105700,.22],[201775,.24]];
 function tax(ti){ let t=0, lo=0; for(const [hi,r] of B){ if(ti>lo) t+=(Math.min(ti,hi)-lo)*r; lo=hi; } return r2(t); }
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
 const BRK=`<table><tr><th>Taxable income (single, 2026)</th><th>Rate</th></tr><tr><td>$0 – $12,400</td><td>10%</td></tr><tr><td>$12,401 – $50,400</td><td>12%</td></tr><tr><td>$50,401 – $105,700</td><td>22%</td></tr><tr><td>$105,701 – $201,775</td><td>24%</td></tr></table><div class="rule">2026 standard deduction (single): $16,100. Each rate applies only to the dollars inside its bracket.</div>`;
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];;window.fmSwapData&&fmSwapData(NAMES,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);
 function mkTI(){ const w=rnd(240,720)*100, k=pick([0,0,1500,2400]), ti=Math.max(0,w-k-SD), nm=pick(NAMES);
   return {kind:"Taxable income", title:`${nm}'s W-2`, html:tbl([["Wages",fmt0(w)],["Pre-tax 401(k)",k?fmt0(k):"None"],["Filing status","Single"]])+`<div class="rule">Taxable income = wages − pre-tax 401(k) − standard deduction ($16,100). Box 1 of a W-2 already has the 401(k) taken out.</div>`,
    F:[...(k?[{k:"b1", type:"ti", q:"W-2 Box 1 wages (after the pre-tax 401(k))", a:w-k, miss:[[w,"Subtract the pre-tax 401(k)."]]}]:[]),

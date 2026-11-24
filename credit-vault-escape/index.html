@@ -83,6 +83,7 @@ input.ans, select.ans { font:inherit; font-family:var(--mono); padding:8px 10px;
   <div id="finalBox"></div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const N=s=>String(s).toLowerCase().replace(/[\s$,%]/g,"");
 const LOCKS=[
@@ -115,7 +116,7 @@ const LOCKS=[
  {id:"sort", title:"Help, Hurt, or No Effect", digit:6, hint:"Only one of these helps. Two have no effect at all.",
   body:`<p>Sort each action.</p>${[["s1","Applying for 3 cards in one month"],["s2","Checking your own credit score"],["s3","Paying every bill on time"],["s4","Closing your oldest card"],["s5","Using a debit card"],["s6","Maxing out your card"]].map(([id,l])=>`<div class="sortrow"><label for="${id}">${l}</label><select class="ans" id="${id}"><option value="">—</option><option>Help</option><option>Hurt</option><option>No effect</option></select></div>`).join("")}`,
   check:()=>v("s1")==="Hurt"&&v("s2")==="No effect"&&v("s3")==="Help"&&v("s4")==="Hurt"&&v("s5")==="No effect"&&v("s6")==="Hurt"}
-];
+];;window.fmSwapData&&fmSwapData(LOCKS,["Jaylen:m"]);window.fmSwapDOM&&fmSwapDOM(["Jaylen:m"]);
 const CODE=LOCKS.map(l=>l.digit).join("");
 const $=id=>document.getElementById(id);
 const v=id=>($(id)?.value||"").trim();

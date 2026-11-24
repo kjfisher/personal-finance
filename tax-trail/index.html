@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Tax <span>Trail</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -115,7 +116,7 @@ function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.fl
 const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
 const SKILL={pay:"Payroll vs. income tax", gig:"Side gigs", where:"Where taxes go", smart:"Smart filing"};
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];;window.fmSwapData&&fmSwapData(NAMES,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);
 function mkPayroll(){ const g=rnd(180,420)*10, ss=r2(g*.062), med=r2(g*.0145), fica=r2(ss+med);
   return {kind:"Payroll taxes", title:`${fmt0(g)} paycheck`, html:tbl([["Social Security","6.2% of gross"],["Medicare","1.45% of gross"],["FICA","Social Security + Medicare"],["Federal income tax","Depends on your W-4 and income"]])+`<div class="rule">Payroll taxes (FICA) fund Social Security and Medicare. Income tax is figured on your 1040.</div>`,
    F:[{k:"ss", type:"pay", q:"Social Security", a:ss, miss:[[g*.62,"6.2% = 0.062."]]},

@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Rent <span>Ready</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -114,7 +115,7 @@ const pick=a=>a[rnd(0,a.length-1)];
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return s===""||isNaN(s)?NaN:+s; };
 const SKILL={rule:"How much rent?", move:"Move-in costs", month:"Monthly costs", lease:"Lease terms"};
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];;window.fmSwapData&&fmSwapData(NAMES,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
 function mk30(){ const n=pick(NAMES), yr=pick([36000,40800,45600,52800,58200]), m=r2(yr/12), max=r2(m*.3), rent=pick([975,1150,1295,1425,1550]), ok=rent<=max, inc3=rent*3;
   return {kind:"How much rent?", title:`${n} earns ${fmt0(yr)} a year`, html:tbl([["Gross monthly pay","yearly ÷ 12"],["30% rule","rent ≤ 30% of gross monthly pay"],["Landlord rule","gross monthly pay ≥ 3 × rent"],["Apartment rent",fmt0(rent)+"/month"]]),

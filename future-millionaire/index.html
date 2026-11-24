@@ -148,6 +148,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   <div class="modal" id="endBody"></div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const LADDER = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
 const SAFE = new Set([4, 9]); // index of $1,000 and $32,000
@@ -199,7 +200,7 @@ hard: [
  [5, "<b>$5,500</b> for one year: an HYSA at <b>4%</b> vs. savings at <b>0.01%</b>. How much <b>more</b> does the HYSA earn?", ["$219.45", "$220.00", "$22.00", "$0.55"], "Find both, then subtract.", "HYSA: $5,500 × 0.04 = $220. Savings: $5,500 × 0.0001 = $0.55. Difference: $219.45."],
  [5, "Balance <b>$47</b>. You spend <b>$85</b> and get a <b>$35</b> overdraft fee. New balance?", ["–$73", "–$38", "–$3", "$73"], "Subtract the purchase, then the fee.", "$47 − $85 = −$38. −$38 − $35 = −$73."],
  [5, "Why is a 5-year CD a bad place to keep your <b>emergency fund</b>?", ["You'd pay a penalty to take it out early", "CDs aren't FDIC insured", "CDs never earn interest", "Only businesses can open CDs"], "Emergencies don't wait for maturity dates.", "Emergency money needs to be available right away. A CD locks it up and charges a penalty to take it out early. Use an HYSA."]
-]};
+]};;window.fmSwapData&&fmSwapData(BANK,["Ava:f"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f"]);
 
 const tierOf = i => i < 5 ? "easy" : i < 10 ? "medium" : "hard";
 const $ = id => document.getElementById(id);

@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Deal <span>Desk</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -117,7 +118,7 @@ const SKILL={know:"Car-buying basics", otd:"Out-the-door price", fin:"Amount fin
 const pmt=(P,apr,n)=>{ const r=apr/1200; return r2(P*r/(1-Math.pow(1+r,-n))); };
 const bal=(P,apr,n,k)=>{ const r=apr/1200, p=pmt(P,apr,n); let b=P; for(let i=0;i<k;i++){ b=r2(b+r2(b*r)-p); } return b; };
 const CARS=["2022 compact sedan","2021 small SUV","2023 hybrid hatchback","2020 midsize sedan","2022 pickup truck","2021 crossover"];
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];;window.fmSwapData&&fmSwapData(NAMES,["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);window.fmSwapDOM&&fmSwapDOM(["Ava:f", "Ezra:m", "Imani:f", "Jace:m", "Kai:m", "Lena:f", "Luis:m", "Maddie:f", "Marcus:m", "Nora:f", "Rosa:f", "Theo:m"]);
 const TIERS=[["740–850","5.99%"],["581–739","14.99%"],["300–580","26.99%"]];
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
 function mkOTD(){ const P=rnd(24,64)*500, ttr=r2(P*.10), tot=r2(P+ttr);

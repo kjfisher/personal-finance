@@ -65,6 +65,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); margin:0
 
 <div id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const BANK=[
  ["What range do FICO scores fall in?",["300 to 850","0 to 100","100 to 1,000","350 to 900"],"FICO scores run from 300 to 850."],
@@ -99,7 +100,7 @@ const BANK=[
  ["Who gets hurt if a cosigned loan is paid late?",["Both borrower and cosigner","Only the borrower","Only the bank","Nobody"],"Late payments land on both reports."],
  ["Getting a raise at work does what to your score?",["Nothing","Raises it","Lowers it","Resets it"],"Income is not part of your FICO score."],
  ["What does FICO stand for?",["Fair Isaac Corporation","Federal Income Credit Office","Financial Interest Co.","First Investors Credit Org."],"Fair Isaac Corporation created the FICO score."]
-];
+];;window.fmSwapData&&fmSwapData(BANK,["Isaac:m", "Matt:m"]);window.fmSwapDOM&&fmSwapDOM(["Isaac:m", "Matt:m"]);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
