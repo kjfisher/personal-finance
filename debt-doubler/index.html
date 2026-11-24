@@ -79,6 +79,7 @@ label.f { display:grid; gap:4px; font-weight:700; font-size:15px; }
 </div></header>
 <main id="app" aria-live="polite"></main>
 
+<script src="/fm-roster.js"></script>
 <script>
 const CARDS=[
  {kind:"intro"},
@@ -87,12 +88,12 @@ const CARDS=[
   hint:"72 ÷ 24 = years per doubling. 9 years is how many doublings?",
   why:"72 ÷ 24 = <b>3 years</b> per doubling. 9 years = 3 doublings: 1,500 → 3,000 → 6,000 → <b>$12,000</b>.",
   ladder:{start:1500, every:3, times:3}},
- {title:"The store card", story:"Maya opens a store card for a <b>$800</b> TV. The APR is <b>18%</b>. She ignores the bill.",
+ {title:"The store card", story:"Maya opens a store card for a <b>$800</b> TV. The APR is <b>18%</b>, and the bill goes unpaid.",
   fields:[{label:"Years for the debt to double", a:4, tol:.05},{label:"Balance after 8 years ($)", a:3200, tol:1}],
   hint:"72 ÷ 18. Then count the doublings in 8 years.",
   why:"72 ÷ 18 = <b>4 years</b>. 8 years = 2 doublings: 800 → 1,600 → <b>$3,200</b>. Four times the price of the TV.",
   ladder:{start:800, every:4, times:2}},
- {title:"The penalty APR", story:"Theo misses two payments, and his card jumps to a <b>29.99% penalty APR</b>. He owes <b>$2,000</b>. Round the rate to 30%.",
+ {title:"The penalty APR", story:"Theo misses two payments, and the card jumps to a <b>29.99% penalty APR</b>. The balance is <b>$2,000</b>. Round the rate to 30%.",
   fields:[{label:"Years for the debt to double", a:2.4, tol:.05},{label:"Balance after 2 doublings ($)", a:8000, tol:1}],
   hint:"72 ÷ 30 = 2.4. Each doubling is × 2.",
   why:"72 ÷ 30 = <b>2.4 years</b>. Two doublings (about 4.8 years): 2,000 → 4,000 → <b>$8,000</b>.",
@@ -116,6 +117,7 @@ const CARDS=[
  {title:"Beat the doubler", mc:{q:"Which move stops a credit card balance from doubling on you?", opts:["Pay the full balance every month","Pay only the minimum","Open a second card to pay the first","Skip a payment when money is tight"], right:0},
   why:"Pay in full and you pay <b>$0 interest</b>, so there's nothing to double. Minimum payments and missed payments let interest keep piling up."}
 ];
+const NM=window.fmSwapData?fmSwapData(CARDS,["Jordan","Maya","Theo","Kai","Ava","Nia","Leo"]):{};
 const DEBT_CARDS=CARDS.filter(c=>c.title).length;
 const $=id=>document.getElementById(id);
 const money=n=>"$"+Math.round(n).toLocaleString("en-US");
@@ -172,7 +174,7 @@ function finish(point, ok){
   if(c.fields) c.fields.forEach((f,k)=>{ const el=$("f"+k); el.disabled=true; if(!el.classList.contains("right")){ el.value=(f.a%1?f.a:f.a.toLocaleString("en-US")); el.classList.remove("wrong"); el.classList.add("shown"); } });
   $("check")&&$("check").remove(); $("hint")&&$("hint").remove();
   let lad="";
-  if(c.ladder2) lad=`<p><b style="color:var(--grow)">Nia's investment at 8%</b></p>${ladder(c.ladder2,"grow","Investment growth")}<p><b style="color:var(--debt)">Leo's debt at 24%</b></p>${ladder(c.ladder,"","Debt growth")}`;
+  if(c.ladder2) lad=`<p><b style="color:var(--grow)">${NM.Nia||"Nia"}'s investment at 8%</b></p>${ladder(c.ladder2,"grow","Investment growth")}<p><b style="color:var(--debt)">${NM.Leo||"Leo"}'s debt at 24%</b></p>${ladder(c.ladder,"","Debt growth")}`;
   else if(c.ladder) lad=`<p><b>Watch it double</b></p>${ladder(c.ladder,"","Debt growth")}`;
   $("fb").innerHTML=`<div class="fb ${ok?"ok":"no"}"><b>${point?"Yes! +1":ok?"Got it on the second try.":"Here's how it works."}</b><div class="math">${c.why}</div></div>${lad}
     <div class="row"><button class="btn go" id="next">${i===CARDS.length-1?"See my score":"Next card"}</button></div>`;

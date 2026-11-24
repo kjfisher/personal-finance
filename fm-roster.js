@@ -13,3 +13,16 @@ window.fmNames = function (n, fallback) {
   for (var k = 0; k < n; k++) out.push(r[k] ? r[k] + '.' : (fallback && fallback[k]) || 'Student');
   return out;
 };
+/* fmSwapData(data, ["Jordan","Maya"]): replaces each made-up name inside every string of an object/array
+   (in place) with a different random roster name. Returns the {old: new} map. */
+window.fmSwapData = function (data, olds) {
+  var nn = window.fmNames(olds.length, olds), map = {};
+  olds.forEach(function (o, i) { map[o] = nn[i]; });
+  var re = new RegExp('\\b(' + olds.join('|') + ')\\b(\\.)?', 'g');
+  function fix(s) { return s.replace(re, function (m, o, dot) { return map[o]; }); }
+  (function walk(x) {
+    if (Array.isArray(x)) { for (var i = 0; i < x.length; i++) { if (typeof x[i] === 'string') x[i] = fix(x[i]); else if (x[i] && typeof x[i] === 'object') walk(x[i]); } }
+    else if (x && typeof x === 'object') { for (var k in x) { if (typeof x[k] === 'string') x[k] = fix(x[k]); else if (x[k] && typeof x[k] === 'object') walk(x[k]); } }
+  })(data);
+  return map;
+};

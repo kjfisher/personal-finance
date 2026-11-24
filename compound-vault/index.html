@@ -83,6 +83,7 @@ input.ans, select.ans { font:inherit; font-family:var(--mono); padding:8px 10px;
   <div id="finalBox"></div>
 </div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const N=s=>String(s).toLowerCase().replace(/[\s$,%]/g,"");
 const LOCKS=[
@@ -103,7 +104,7 @@ const LOCKS=[
  {id:"debt", title:"Debt That Doubles", digit:1, hint:"72 ÷ 24 = 3 years per double. 9 years = 3 doubles.",
   body:`<p>Eli owes <b>$2,000</b> on a card at <b>24%</b> and pays nothing. Use the Rule of 72.</p>
     <div class="field"><label for="debt-a">Years for the debt to double</label><input class="ans" id="debt-a" inputmode="numeric" autocomplete="off"></div>
-    <div class="field"><label for="debt-b">What he owes after 9 years ($)</label><input class="ans" id="debt-b" inputmode="decimal" autocomplete="off"></div>`,
+    <div class="field"><label for="debt-b">What Eli owes after 9 years ($)</label><input class="ans" id="debt-b" inputmode="decimal" autocomplete="off"></div>`,
   check:()=>N(v("debt-a"))==="3"&&["16000","16000.00"].includes(N(v("debt-b")))},
  {id:"infl", title:"Inflation", digit:9, hint:"Inflation doubles prices with the Rule of 72 too: 72 ÷ 3.",
   body:`<p>A week of groceries costs <b>$50</b> today. Prices rise <b>3%</b> a year.</p>
@@ -115,6 +116,7 @@ const LOCKS=[
   body:`<p>Is compounding working <b>for</b> you or <b>against</b> you?</p>${[["s1","A high-yield savings account"],["s2","A credit card balance you don't pay off"],["s3","Reinvesting dividends in an index fund"],["s4","A payday loan"],["s5","Cash sitting in a drawer while prices rise"],["s6","A 401(k) with an employer match"]].map(([id,l])=>`<div class="sortrow"><label for="${id}">${l}</label><select class="ans" id="${id}"><option value="">—</option><option>For me</option><option>Against me</option></select></div>`).join("")}`,
   check:()=>v("s1")==="For me"&&v("s2")==="Against me"&&v("s3")==="For me"&&v("s4")==="Against me"&&v("s5")==="Against me"&&v("s6")==="For me"}
 ];
+window.fmSwapData&&fmSwapData(LOCKS,["Ava","Eli"]);
 const CODE=LOCKS.map(l=>l.digit).join("");
 const $=id=>document.getElementById(id);
 const v=id=>($(id)?.value||"").trim();

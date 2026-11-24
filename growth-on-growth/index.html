@@ -102,6 +102,7 @@ body { background:var(--bg); color:var(--ink); font-family:var(--body); font-siz
 <header class="bar"><div class="inner"><h1>Growth on <span>Growth</span></h1><div class="stats" id="stats"></div></div></header>
 <div class="wrap" id="root"></div>
 
+<script src="/fm-roster.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -116,7 +117,7 @@ const num=s=>{ s=String(s).replace(/[$,%\s]/g,"").replace(/[a-z]+/ig,""); return
 const SKILL={grow:"Growth on growth", r72:"Rule of 72", time:"Time is your superpower", force:"For me or against me", think:"Financial thinking"};
 const tbl=rows=>`<table>${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
 const fv=(m,apr,y)=>{ const q=apr/1200, n=y*12; return r2(m*(Math.pow(1+q,n)-1)/q); };
-const NAMES=["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
+const NAMES=window.fmNames?fmNames(12,["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"]):["Ava","Marcus","Lena","Theo","Imani","Jace","Rosa","Kai","Nora","Luis","Maddie","Ezra"];
 function mkPenny(){ const d=pick([10,15,20,25]), v=r2(Math.pow(2,d-1)/100), v29=r2(Math.pow(2,28)/100);
   return {kind:"Discover the magic", title:"1¢ doubled every day for 30 days", html:tbl([["Day 1","$0.01"],["Day 2","$0.02"],["Day 3","$0.04"],["Day 4","$0.08"],["Day 29",fmt(v29)],["Day 30","$5,368,709.12"]])+`<div class="rule">Each day the amount doubles. Day n = $0.01 × 2<sup>n − 1</sup>.</div>`,
    F:[{k:"d", type:"grow", q:`What is it worth on day ${d}?`, sub:`$0.01 × 2^${d-1}`, a:v, miss:[[r2(Math.pow(2,d)/100),"Day 1 is 1¢, so use 2^"+(d-1)+"."],[r2(0.01*2*d),"That's adding, not doubling."]]},
@@ -143,7 +144,7 @@ function mkThree(){ const m=pick([100,150,200]), r=pick([7,8]), A=fv(m,r,44), B=
 function mkForce(){ const C=["Works for me","Works against me"], items=shuffle([["Investing $50 a month starting at 18","Works for me"],["A credit card balance you only pay the minimum on","Works against me"],["$5,000 sitting in cash for 20 years while prices rise","Works against me"],["Reinvesting the growth in a retirement account","Works for me"],["An unpaid payday loan","Works against me"],["Taking your employer's 401(k) match early in your career","Works for me"]]).slice(0,4);
   return {kind:"For me or against me", title:"Compounding is neutral", html:`<div class="rule">The same math that grows an investment also grows debt, and inflation shrinks what cash can buy.</div>`,
    F:items.map((it,i)=>({k:"f"+i, type:"force", choices:C, q:it[0], a:it[1], why:it[1]==="Works for me"?"Growth builds on growth.":"Interest or rising prices build against you."}))}; }
-function mkAva(){ const nm=pick(["Ava","Jordan","Maya","Eli"]);
+function mkAva(){ const nm=pick(NAMES);
   return {kind:"Money decision", title:`${nm} can invest $100 a month`, html:`<div class="rule">${nm} says: "$100 a month is nothing. I'll wait until I make real money."</div>`+tbl([["Life rule","Start early. Time does the heavy lifting."],["The first $100K","Usually the hardest: your contributions do most of the work until the balance grows"]]),
    F:[{k:"a", type:"think", choices:["Start now if the $100 is truly extra","Wait for a bigger paycheck","Never invest"], q:`Best advice for ${nm}?`, a:"Start now if the $100 is truly extra", why:"Early dollars get the most years to grow. Raise the amount later."},
       {k:"m", type:"think", choices:["Emergency savings and high-interest debt","Favorite color","Shoe size"], q:"What should you ask before advising?", a:"Emergency savings and high-interest debt", why:"Also: job stability, an employer match and short-term goals."},
