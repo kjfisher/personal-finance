@@ -93,6 +93,7 @@ table.lines tr.tot td { font-weight:700; border-bottom:none; }
 .stars { font-size:clamp(34px, 4vw, 50px); letter-spacing:4px; color:var(--gold); }
 ol.qs { margin:0; padding-left:22px; display:grid; gap:6px; font-size:clamp(17px, 1.6vw, 20px); }
 </style>
+<script src="/fm-roster.js"></script>
 </head>
 <body>
 <header class="bar"><div class="in">
@@ -149,7 +150,7 @@ const MONTHS=3; /* events hit after 3 months of saving */
 const $=id=>document.getElementById(id);
 const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
 let S;
-function fresh(){ return {phase:"intro", step:0, pick:{home:0,ride:0,food:0,phone:0,fun:0,save:0}, chosen:{}, extra:{save:0,fun:0}, events:[], ei:0, skipWedding:null}; }
+function fresh(){ return {who:(window.fmNames?fmNames(1,["Dani"])[0]:"Dani"), phase:"intro", step:0, pick:{home:0,ride:0,food:0,phone:0,fun:0,save:0}, chosen:{}, extra:{save:0,fun:0}, events:[], ei:0, skipWedding:null}; }
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 function totals(){
@@ -186,7 +187,10 @@ function renderLive(){
 
 /* ---------- Stage ---------- */
 function stepsBar(){ return `<div class="steps" aria-hidden="true">${STEPS.map((_,k)=>`<i class="${k<S.step?'done':k===S.step&&S.phase==='decide'?'now':''}"></i>`).join("")}<i class="${S.phase==='assign'?'now':S.phase==='events'||S.phase==='end'?'done':''}"></i><i class="${S.phase==='events'?'now':S.phase==='end'?'done':''}"></i></div>`; }
-function render(){
+function nameSwap(el){ if(!S||S.who==="Dani") return; const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())) if(n.nodeValue.indexOf("Dani")>=0) n.nodeValue=n.nodeValue.replace(/Dani/g,S.who);
+  el.querySelectorAll("[aria-label]").forEach(x=>x.setAttribute("aria-label",x.getAttribute("aria-label").replace(/Dani/g,S.who))); }
+function render(){ render0(); nameSwap($("stage")); nameSwap($("live")); }
+function render0(){
   renderLive(); $("back").disabled=S.phase==="intro";
   const st=$("stage");
   if(S.phase==="intro"){
