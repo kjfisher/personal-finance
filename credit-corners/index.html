@@ -76,6 +76,15 @@ label.inline { display:flex; gap:6px; align-items:center; color:var(--muted); fo
 <script>
 const H3=["Helps my score","Hurts my score","No effect"];
 const ROUNDS=[
+ {k:"Pay down to 30%", s:"You owe $1,500 on a $3,000 limit. How much must you pay off to reach 30%?", o:["$450", "$600", "$900", "$1,050"], c:1, w:"30% of the LIMIT = $900. $1,500 − $900 = <b>$600</b>. ($450 is 30% of the balance, a common mistake.)"},
+ {k:"Two cards", s:"Card A: $2,500 limit, $0. Card B: $500 limit, $450. You close Card A. Utilization goes from…", o:["15% to 90%", "90% to 15%", "15% to 15%", "90% to 90%"], c:0, w:"$450 ÷ $3,000 = 15% → $450 ÷ $500 = <b>90%</b>. Closing an unused card raises utilization."},
+ {k:"Which FICO part?", s:"You've had your first card for 6 years.", o:["Payment history", "Amounts owed", "Length of history", "New credit"], c:2, w:"<b>Length of credit history</b> (15%)."},
+ {k:"Which FICO part?", s:"You have a car loan AND a credit card.", o:["Credit mix", "Amounts owed", "New credit", "Payment history"], c:0, w:"<b>Credit mix</b> (10%): installment + revolving."},
+ {k:"Revolving or installment?", s:"A student loan with the same payment for 10 years.", o:["Revolving", "Installment"], c:1, w:"<b>Installment:</b> a set amount, equal payments, a set time."},
+ {k:"What should you do?", s:"Your report shows a card you never opened.", o:["Ignore it", "Pay it", "Dispute it with the bureau", "Close your bank account"], c:2, w:"<b>Dispute it</b> with the bureau (and check for identity theft)."},
+ {k:"Help, Hurt or No Effect?", s:"You're an authorized user on your aunt's card. She pays late and is maxed out.", o:H3, c:1, w:"<b>Hurts.</b> Her late payments and high balance show on YOUR report."},
+ {k:"Monthly interest", s:"$1,500 balance at 20% APR. Interest added in one month?", o:["$25", "$300", "$30", "$20"], c:0, w:"$1,500 × 0.20 ÷ 12 = <b>$25</b>. ($300 is the whole year.)"},
+ {k:"Smart, not smart or partly smart?", s:"Ana pays in full every month but puts $450 a month on a $500 secured card.", o:["Smart", "Partly smart", "Not smart"], c:1, w:"<b>Partly smart.</b> Paying in full helps payment history, but 90% utilization hurts amounts owed. Keep it under $150."},
  {k:"Help, Hurt or No Effect?", s:"Paying your phone bill and credit card on time, every month.", o:H3, c:0, w:"<b>Helps.</b> Payment history is the biggest part of your score (35%)."},
  {k:"Help, Hurt or No Effect?", s:"Checking your own credit report on annualcreditreport.com.", o:H3, c:2, w:"<b>No effect.</b> Checking your own credit is a soft inquiry."},
  {k:"Help, Hurt or No Effect?", s:"Charging $950 on a card with a $1,000 limit.", o:H3, c:1, w:"<b>Hurts.</b> That's 95% utilization. Keep it at or below 30%."},
