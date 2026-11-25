@@ -163,7 +163,7 @@ try{ best=JSON.parse(localStorage.getItem("overtime-rush-best")||"null"); }catch
 const clock=ms=>{ const s=Math.floor(ms/1000); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); };
 function elapsed(){ return G? (G.end||Date.now())-G.t0 : 0; }
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 2: Reading a Pay Stub</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 2: Your Paycheck</span>`; return; }
   el.innerHTML=`<span>Card <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span><span>Time <b id="clk">${clock(elapsed())}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){

@@ -148,7 +148,7 @@ function makeRound(){ return [mkSteps(), mk30(), mkMove(), mkMonth(), ...shuffle
 let G=null, best=null;
 try{ best=+localStorage.getItem("rent-ready-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 7: Real Estate</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 7: Big Purchases</span>`; return; }
   el.innerHTML=`<span>Listing <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){

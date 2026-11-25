@@ -172,12 +172,12 @@ function makeRound(){ return [mkKnow(), mkOTD(), mkEst(), mkCost(), ...shuffle([
 let G=null, best=null;
 try{ best=+localStorage.getItem("deal-desk-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 7: Cars & Lending</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 7: Big Purchases</span>`; return; }
   el.innerHTML=`<span>Deal <b>${Math.min(G.i+1,G.cards.length)}</b>/${G.cards.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
   G=null; stats();
-  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Cars & Lending</div>
+  $("root").innerHTML=`<div class="eyebrow" style="font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Unit 7 · Big Purchases</div>
     <h2>The sticker price is just the start.</h2>
     <p>Seven deals: make vs. model and warranties, adding 10% for tax, title &amp; registration, the $115-per-$5,000 payment estimate, the true cost of a loan, and three more from down payments, 48 vs. 72 months, credit score rates, affordability and being upside down.</p>
     <ol class="steps"><li><b>Total cost</b> ≈ price + 10% for tax, title &amp; registration. <b>Amount financed</b> = total − down payment − trade-in.</li><li><b>Total of payments</b> = monthly payment × months. <b>Interest</b> = total of payments − amount financed.</li><li>The lender gives you the monthly payment. Use a calculator and round to the cent.</li></ol>

@@ -222,7 +222,7 @@ function makeGame(){ return [normalSalary(), ...shuffle([normalHourly(), normalS
 let G=null, best=null;
 try{ best=+localStorage.getItem("pay-stub-detective-best")||null; }catch(e){}
 function stats(){ const el=$("stats");
-  if(!G){ el.innerHTML=`<span>Unit 2: Reading a Pay Stub</span>`; return; }
+  if(!G){ el.innerHTML=`<span>Unit 2: Your Paycheck</span>`; return; }
   el.innerHTML=`<span>Case <b>${Math.min(G.ci+1,G.cases.length)}</b>/${G.cases.length}</span><span>Score <b>${G.score}</b></span>${G.phase==="play"?`<button class="btn" id="quit">Quit</button>`:""}`;
   $("quit")&&($("quit").onclick=intro); }
 function intro(){
