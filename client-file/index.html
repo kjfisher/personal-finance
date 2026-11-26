@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Client File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/case-kit.css">
+<style>
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 14px; }
+@media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 1000px) { .file table { font-size: 14px; } .file { padding: 18px 14px 14px; } }
+.sticky { position: sticky; top: 12px; }
+@media (max-width: 720px) { .sticky { position: static; } }
+.sticky { max-height: calc(100vh - 24px); overflow: auto; }
+@media (max-width: 720px) { .sticky { max-height: none; } }
+.docs { display: grid; gap: 10px; }
+.doc { border: 1px solid var(--line); border-radius: 10px; background: var(--tint); padding: 10px 12px; }
+.doc h4 { margin: 0 0 6px; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+td, th { border-bottom: 1px solid var(--line); padding: 5px 6px; text-align: left; }
+td.n { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.qs { display: flex; gap: 6px; flex-wrap: wrap; }
+.qs span { font-family: var(--mono); font-size: 12px; padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.qs span.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.qs span.done { color: var(--good); border-color: var(--good); }
+.order { display: grid; gap: 8px; }
+.order button { text-align: left; border: 2px solid var(--line); background: var(--tint); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: center; min-height: 52px; }
+.order button .num { font-family: var(--mono); font-weight: 800; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; flex: none; }
+.order button.picked { border-color: var(--accent); } .order button.picked .num { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.order button.right { border-color: var(--good); } .order button.right .num { background: var(--good); border-color: var(--good); color: #fff; }
+.order button.wrong { border-color: var(--bad); }
+.event { border: 3px dashed var(--bad); border-radius: 14px; padding: 14px; background: color-mix(in srgb, var(--bad) 8%, var(--card)); }
+.event .tag { color: var(--bad); }
+.memo { font-size: 16px; }
+.memo dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+.memo dt { font-weight: 700; } .memo dd { margin: 0; font-family: var(--mono); }
+.clients { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+</style>
+</head><body>
+<div class="wrap">
+  <header><h1>Client <span>File</span></h1><div class="tag">Unit 10 · Final Case Study Practice · Future Millionaires Advisors</div></header>
+
+  <section id="pick" class="stack" style="margin-top:16px">
+    <div class="card stack">
+      <p style="margin:0">You're the financial advisor. Open a client's file, find their monthly take-home pay and what's left over, put fixes in the <b>advising order</b>, then handle a surprise Life Event. Every answer needs a number. You get two tries on each.</p>
+      <div class="model"><div><b>The advising order</b>1. Stop the bleeding (fees, payday loans, high-interest debt) → 2. A starter cushion (~$1,000 in an FDIC-insured HYSA) → 3. Free money (the full match) → 4. Bigger goals</div></div>
+      <label class="nm" for="player">Advisor name(s)
+        <input type="text" id="player" maxlength="40" placeholder="e.g. Jordan M. & Ava T." autocomplete="off"></label>
+    </div>
+    <h2 style="font-size:20px">Choose a client</h2>
+    <div class="clients" id="clients"></div>
+  </section>
+
+  <section id="play" hidden>
+    <div class="row" style="margin-top:14px"><div class="qs" id="qs"></div><span class="spacer"></span><span class="tag" id="score"></span></div>
+    <div class="layout">
+      <article class="file sticky" id="file" data-tab="Client file"></article>
+      <div class="card stack" id="q" style="margin-top:36px"></div>
+    </div>
+    <div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn ghost" id="leave">← All clients</button></div>
+  </section>
+
+  <section id="memo" hidden class="stack" style="margin-top:16px"></section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const usd = x => (x < 0 ? "−$" : "$") + Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 });
+const usd2 = x => (x < 0 ? "−$" : "$") + Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* Each bill: [name, amount, how often ("mo" | "wk" | "6mo"), monthly value]. Monthly values are checked in the verify script. */
+const CLIENTS = [
+{ id: "danielle", name: "Danielle R.", age: 24, job: "Dental assistant", blurb: "Paid every 2 weeks. A credit card balance, overdraft fees and no retirement savings.",
+  pay: { per: 1380, freq: "every 2 weeks", mult: "× 26 ÷ 12", monthly: 2990 },
+  bills: [["Rent", 1100, "mo", 1100], ["Car payment", 365, "mo", 365], ["Car insurance", 840, "6mo", 140], ["Phone", 85, "mo", 85], ["Groceries", 95, "wk", 411.67],
+          ["Gas", 160, "mo", 160], ["Eating out", 260, "mo", 260], ["Subscriptions", 55, "mo", 55], ["Credit card minimum", 75, "mo", 75], ["Overdraft fees (2 × $35)", 70, "mo", 70]],
+  spend: 2721.67, left: 268.33,
+  accounts: [["Credit card", "$2,400 balance · $3,000 limit · 26% APR"], ["Savings", "$150 at 0.01% (big bank)"], ["Job", "$41,600 a year · 401(k): employer matches 100% up to 3% · Danielle puts in 0%"], ["Overdraft coverage", "ON"]],
+  checks: [
+    { q: "How much interest will her credit card charge this month? (APR ÷ 12)", pre: "$", post: "", a: 52, tol: .02, steps: ["$2,400 × 0.26 ÷ 12 = <b>$52.00</b>"], hint: "Balance × APR ÷ 12." },
+    { q: "How much free 401(k) match money is she missing each year?", pre: "$", post: "", a: 1248, tol: .01, steps: ["Full match = 3% of salary", "$41,600 × 0.03 = <b>$1,248</b> a year"], hint: "Salary × the match %." }],
+  order: ["Turn off overdraft coverage and pay down the 26% credit card", "Build a $1,000 starter cushion in an FDIC-insured HYSA", "Put 3% in her 401(k) to get the full employer match", "Start saving for a condo down payment"],
+  fix: { q: "Danielle turns off overdraft coverage (no more $70 in fees) and cuts eating out from $260 to $160. How much is left over each month now?", a: 438.33, tol: .05,
+         steps: ["Fees saved: $70", "Eating out saved: $260 − $160 = $100", "$268.33 + $70 + $100 = <b>$438.33</b>"], hint: "Start with what's left now, then add each saving." },
+  event: { title: "The transmission goes out", text: "Danielle's car needs a <b>$1,100</b> transmission repair. She needs the car to get to work.", cost: 1100, costQ: null,
+           months: 2.5, monthsSteps: ["$1,100 ÷ $438.33 a month = 2.51 → <b>about 2.5 months</b>"],
+           protect: [["An emergency fund in an HYSA", true, "Exactly what it's for: surprises like car repairs."], ["A longer car loan", false, "More interest, and it doesn't pay for repairs."], ["A bigger tax refund", false, "Comes once a year and is her own over-withheld money."]] } },
+{ id: "andre", name: "Andre B.", age: 29, job: "Warehouse lead", blurb: "Paid weekly. Some savings in the wrong place, ATM fees and a partial 401(k) match.",
+  pay: { per: 835, freq: "every week", mult: "× 52 ÷ 12", monthly: 3618.33 },
+  bills: [["Rent", 1250, "mo", 1250], ["Phone", 110, "mo", 110], ["Groceries", 120, "wk", 520], ["Gym", 45, "mo", 45], ["Streaming", 48, "mo", 48], ["Car insurance", 190, "mo", 190],
+          ["Gas", 55, "wk", 238.33], ["Student loan", 230, "mo", 230], ["Eating out", 380, "mo", 380], ["Game purchases", 90, "mo", 90], ["Out-of-network ATM fees (8 × $4)", 32, "mo", 32]],
+  spend: 3133.33, left: 485,
+  accounts: [["Savings", "$2,000 at 0.01% (big bank) · an FDIC-insured HYSA pays 4%"], ["Credit card", "Paid in full every month"], ["Job", "$52,000 a year · 401(k): employer matches 100% up to 5% · Andre puts in 2%"], ["Health plan", "$1,000 deductible, then 20% coinsurance"]],
+  checks: [
+    { q: "How much free 401(k) match money is Andre missing each year?", pre: "$", post: "", a: 1560, tol: .01, steps: ["He puts in 2%, and the match goes up to 5%. He's missing 3%.", "$52,000 × 0.03 = <b>$1,560</b> a year"], hint: "He's already getting 2%. What % is he missing?" },
+    { q: "How much MORE interest would his $2,000 earn in a year at the 4% HYSA instead of 0.01%?", pre: "$", post: "", a: 79.8, tol: .02, steps: ["HYSA: $2,000 × 0.04 = $80.00", "Now: $2,000 × 0.0001 = $0.20", "Difference: <b>$79.80</b>"], hint: "Find both, then subtract." }],
+  order: ["Use in-network ATMs to stop the $32 a month in fees", "Move his $2,000 cushion into an FDIC-insured HYSA", "Raise his 401(k) from 2% to 5% to get the full match", "Open a Roth IRA and invest more for retirement"],
+  fix: { q: "Andre stops the ATM fees, cuts eating out from $380 to $200 and games from $90 to $40. How much is left over each month now?", a: 747, tol: .05,
+         steps: ["ATM fees: +$32", "Eating out: $380 − $200 = +$180", "Games: $90 − $40 = +$50", "$485 + $32 + $180 + $50 = <b>$747</b>"], hint: "Add all three savings to $485." },
+  event: { title: "An ER visit", text: "Andre breaks his wrist playing basketball. The covered ER bill is <b>$2,800</b>. His plan: <b>$1,000 deductible</b>, then <b>20% coinsurance</b>.", cost: 1360,
+           costQ: { q: "How much of the $2,800 bill does Andre pay?", pre: "$", post: "", a: 1360, tol: .01, steps: ["Deductible: $1,000", "20% of the rest: ($2,800 − $1,000) × 0.20 = $360", "Total: <b>$1,360</b>"], hint: "Deductible first, then 20% of what's left." },
+           months: 1.8, monthsSteps: ["$1,360 ÷ $747 a month = 1.82 → <b>about 1.8 months</b>"],
+           protect: [["His $2,000 emergency fund and his health insurance", true, "He can pay it today without debt, and insurance cut a $2,800 bill to $1,360."], ["Skipping health insurance to save the premium", false, "He'd owe all $2,800."], ["Putting it on a credit card and paying the minimum", false, "Turns a one-time bill into months of interest."]] } },
+{ id: "keisha", name: "Keisha M.", age: 21, job: "Part-time retail + college student", blurb: "Paid every 2 weeks. Spending more than she earns, a payday loan and a maxed-out card.",
+  pay: { per: 720, freq: "every 2 weeks", mult: "× 26 ÷ 12", monthly: 1560 },
+  bills: [["Rent (her share)", 650, "mo", 650], ["Phone", 60, "mo", 60], ["Groceries", 65, "wk", 281.67], ["Car insurance", 120, "mo", 120], ["Gas", 40, "wk", 173.33],
+          ["Subscriptions", 40, "mo", 40], ["Eating out", 180, "mo", 180], ["Payday loan fees", 90, "mo", 90], ["Credit card minimum", 35, "mo", 35]],
+  spend: 1630, left: -70,
+  accounts: [["Credit card", "$900 balance · $1,000 limit · 29% APR"], ["Payday loan", "Rolls over every month for a $90 fee"], ["Savings", "$0"], ["College", "Hasn't filed the FAFSA"]],
+  checks: [
+    { q: "What is Keisha's credit utilization?", pre: "", post: "%", a: 90, tol: .5, steps: ["$900 ÷ $1,000 × 100 = <b>90%</b>", "Way over the 30% guideline"], hint: "Balance ÷ limit × 100." },
+    { q: "How much interest will her card charge this month? (APR ÷ 12)", pre: "$", post: "", a: 21.75, tol: .02, steps: ["$900 × 0.29 ÷ 12 = <b>$21.75</b>"], hint: "Balance × APR ÷ 12." }],
+  order: ["Pay off the payday loan and stop taking new ones", "Build a $1,000 starter cushion in an FDIC-insured HYSA", "File the FAFSA for free grant money", "Save for a replacement car"],
+  fix: { q: "Keisha uses her $200 birthday money to pay off the payday loan (no more $90 fees) and cuts eating out from $180 to $80. How much is left over each month now?", a: 120, tol: .05,
+         steps: ["Payday fees: +$90", "Eating out: $180 − $80 = +$100", "−$70 + $90 + $100 = <b>$120</b>"], hint: "Start at −$70 (the shortfall), then add each saving." },
+  event: { title: "Laptop crash", text: "Keisha's laptop dies during finals week. A basic replacement costs <b>$600</b>.", cost: 600, costQ: null,
+           months: 5, monthsSteps: ["$600 ÷ $120 a month = <b>5 months</b>"],
+           protect: [["An emergency fund, even a small starter one", true, "Even $600 saved means no new debt."], ["Another payday loan", false, "That's the bleeding she just stopped. Fees of 300%+ APR."], ["Raising her credit limit", false, "Just more room for 29% debt."]] } }
+];
+const FREQ = { mo: "a month", wk: "a week", "6mo": "every 6 months" };
+const STEPS = ["Take-home", "Spending", "Left over", "Checks", "Order", "Fix", "Life Event", "Memo"];
+
+let C = null, S = null;
+const saved = store.get("cf-name"); if (saved) $("player").value = saved;
+$("player").oninput = e => store.set("cf-name", e.target.value.trim());
+let done = {}; try { done = JSON.parse(store.get("cf-done")) || {}; } catch {}
+function drawClients() {
+  $("clients").innerHTML = CLIENTS.map(c => `<button class="case-card" data-id="${c.id}"><small>${esc(c.job)}, ${c.age}</small><b>${esc(c.name)}</b><small>${esc(c.blurb)}</small>${done[c.id] != null ? `<span class="pill g">Best ${done[c.id]}%</span>` : `<span class="pill x">New client</span>`}</button>`).join("");
+  $("clients").querySelectorAll(".case-card").forEach(b => b.onclick = () => open(b.dataset.id));
+}
+drawClients();
+$("leave").onclick = () => { $("play").hidden = true; $("memo").hidden = true; $("pick").hidden = false; drawClients(); window.scrollTo(0, 0); };
+
+function fileHTML(c) {
+  return `<div class="who">${esc(c.job)} · age ${c.age}</div><h2 style="margin-top:4px">${esc(c.name)}</h2>
+  <div class="docs" style="margin-top:10px">
+    <div class="doc"><h4>Pay stub</h4>Net pay <b>${usd2(c.pay.per)}</b> per check, paid <b>${c.pay.freq}</b></div>
+    <div class="doc"><h4>Monthly spending (as the client wrote it)</h4><table>${c.bills.map(b => `<tr><td>${esc(b[0])}</td><td class="n">${usd(b[1])} ${FREQ[b[2]]}</td></tr>`).join("")}</table></div>
+    <div class="doc"><h4>Accounts & benefits</h4><table>${c.accounts.map(a => `<tr><td><b>${esc(a[0])}</b></td><td>${esc(a[1])}</td></tr>`).join("")}</table></div>
+  </div>`;
+}
+function open(id) {
+  C = CLIENTS.find(c => c.id === id);
+  S = { k: 0, pts: 0, max: 0, tries: 0, answers: {}, orderPick: [], orderShuffled: shuffle(C.order.map((t, i) => ({ t, i }))) };
+  $("file").innerHTML = fileHTML(C);
+  $("pick").hidden = true; $("memo").hidden = true; $("play").hidden = false; draw(); window.scrollTo(0, 0);
+}
+function bar() {
+  $("qs").innerHTML = STEPS.map((n, i) => `<span class="${i === S.k ? "on" : i < S.k ? "done" : ""}">${i + 1}. ${n}</span>`).join("");
+  $("score").textContent = S.max ? `Points: ${S.pts} / ${S.max}` : "";
+}
+function go() { S.k++; S.tries = 0; if (S.k >= STEPS.length - 1) return memo(); draw(); $("q").scrollIntoView({ behavior: "smooth", block: "start" }); }
+
+/* numeric question with two tries: 1 point first try, 0.5 second */
+function numQ(o, key, onDone) {
+  const id = "a" + Math.random().toString(36).slice(2, 7);
+  const html = `<h3>${o.q}</h3><form class="answer" id="${id}f" autocomplete="off" onsubmit="return false"><span class="unitmark">${o.pre ?? "$"}</span><input type="number" step="any" inputmode="decimal" id="${id}" aria-label="Your answer"><span class="unitmark">${o.post ?? ""}</span><button class="btn primary" type="submit">Check</button></form><div id="${id}o"></div>`;
+  setTimeout(() => {
+    let tries = 0; const f = $(id + "f"); $(id).focus();
+    f.onsubmit = e => {
+      e.preventDefault(); const raw = $(id).value.trim(); if (!raw) return;
+      const v = parseFloat(raw.replace(/[$,%\s]/g, "").replace("−", "-")); tries++;
+      const ok = Math.abs(v - o.a) <= o.tol + 1e-9;
+      if (!ok && tries === 1) { $(id + "o").innerHTML = `<div class="fb half pop"><div class="t">Not yet. One more try.</div><p style="margin:6px 0 0">Hint: ${o.hint}</p></div>`; $(id).select(); return; }
+      const p = ok ? (tries === 1 ? 1 : .5) : 0; S.pts += p; S.max += 1; S.answers[key] = ok ? o.a : v;
+      f.querySelectorAll("input,button").forEach(x => x.disabled = true);
+      const shown = (o.pre ?? "$") === "$" ? usd2(o.a) : o.a + (o.post === "%" ? "%" : " " + (o.post || ""));
+      $(id + "o").innerHTML = `<div class="fb ${p === 1 ? "ok" : p ? "half" : "no"} pop"><div class="t">${ok ? "Correct" : "The answer is " + shown} · +${p}</div><ol>${o.steps.map(s => `<li>${s}</li>`).join("")}</ol></div>`;
+      bar(); onDone && onDone();
+    };
+  });
+  return html;
+}
+const nextBtn = (l = "Next →") => `<div class="row"><button class="btn primary" id="go">${l}</button></div>`;
+function addNext(container, l) { $(container).insertAdjacentHTML("beforeend", nextBtn(l)); $("go").onclick = go; $("go").focus(); }
+
+function draw() {
+  bar(); const c = C, q = $("q");
+  if (S.k === 0) {
+    q.innerHTML = `<div class="tag">Q1 · Take-home pay</div><p style="margin:0">Every plan starts with <b>monthly</b> take-home pay. Biweekly × 2 is NOT monthly.</p>` +
+      numQ({ q: `${c.name.split(" ")[0]} takes home ${usd2(c.pay.per)} ${c.pay.freq}. What is the monthly take-home pay?`, a: c.pay.monthly, tol: .05, hint: `Paid ${c.pay.freq}: per check ${c.pay.mult}.`,
+        steps: [`${usd2(c.pay.per)} ${c.pay.mult} = <b>${usd2(c.pay.monthly)}</b> a month`] }, "pay", () => addNext("q"));
+  } else if (S.k === 1) {
+    const conv = c.bills.filter(b => b[2] !== "mo");
+    q.innerHTML = `<div class="tag">Q2 · Monthly spending</div><p style="margin:0">Turn every bill into a <b>monthly</b> number first (weekly × 52 ÷ 12; every 6 months ÷ 6), then add them all.</p>` +
+      numQ({ q: "What is the total monthly spending?", a: c.spend, tol: 1, hint: `Convert ${conv.map(b => b[0].toLowerCase()).join(" and ")} to monthly, then add every line.`,
+        steps: [...conv.map(b => `${b[0]}: ${usd(b[1])} ${FREQ[b[2]]} → ${usd2(b[3])} a month`), `Add all ${c.bills.length} lines = <b>${usd2(c.spend)}</b>`] }, "spend", () => addNext("q"));
+  } else if (S.k === 2) {
+    q.innerHTML = `<div class="tag">Q3 · Left over or short?</div><p style="margin:0">Take-home − spending. Negative = a <b>shortfall</b> (enter a negative number).</p>` +
+      numQ({ q: `Take-home ${usd2(c.pay.monthly)} − spending ${usd2(c.spend)} = ?`, a: c.left, tol: 1, hint: "Take-home minus spending. Is it positive or negative?",
+        steps: [`${usd2(c.pay.monthly)} − ${usd2(c.spend)} = <b>${usd2(c.left)}</b>`, c.left < 0 ? `A shortfall: she spends more than she earns, so it's turning into debt.` : `That's what's left each month to fix problems and reach goals.`] }, "left", () => addNext("q"));
+  } else if (S.k === 3) {
+    let n = 0; const both = () => { if (++n === 2) addNext("q"); };
+    q.innerHTML = `<div class="tag">Q4 · Run the numbers</div><p style="margin:0">Advice needs numbers. Find these two.</p>` + numQ(c.checks[0], "c0", both) + `<hr style="border:0;border-top:1px solid var(--line);width:100%">` + numQ(c.checks[1], "c1", both);
+  } else if (S.k === 4) {
+    q.innerHTML = `<div class="tag">Q5 · The advising order</div><h3>Tap the four moves in the order you'd do them.</h3><p class="muted" style="margin:0">1. Stop the bleeding → 2. Starter cushion → 3. Free money → 4. Bigger goals</p>
+      <div class="order" id="ord">${S.orderShuffled.map((o, j) => `<button data-j="${j}"><span class="num"></span><span>${esc(o.t)}</span></button>`).join("")}</div>
+      <div class="row"><button class="btn ghost" id="clr">Clear</button><button class="btn primary" id="chk" disabled>Check order</button></div><div id="oo"></div>`;
+    const paint = () => { $("ord").querySelectorAll("button").forEach(b => { const p = S.orderPick.indexOf(+b.dataset.j); b.classList.toggle("picked", p >= 0); b.querySelector(".num").textContent = p >= 0 ? p + 1 : ""; }); $("chk").disabled = S.orderPick.length !== 4; };
+    $("ord").querySelectorAll("button").forEach(b => b.onclick = () => { if (S.orderLocked) return; const j = +b.dataset.j, p = S.orderPick.indexOf(j); if (p >= 0) S.orderPick.splice(p, 1); else S.orderPick.push(j); paint(); });
+    $("clr").onclick = () => { if (!S.orderLocked) { S.orderPick = []; paint(); } };
+    $("chk").onclick = () => {
+      const right = S.orderPick.filter((j, pos) => S.orderShuffled[j].i === pos).length; S.tries++;
+      if (right < 4 && S.tries === 1) { $("oo").innerHTML = `<div class="fb half pop"><div class="t">${right} of 4 in the right spot. One more try.</div><p style="margin:6px 0 0">Fees and high-interest debt cost money every month, so they come first. Free money comes after a starter cushion.</p></div>`; return; }
+      S.orderLocked = true; const p = right === 4 ? (S.tries === 1 ? 1 : .5) : 0; S.pts += p; S.max += 1; bar();
+      $("ord").querySelectorAll("button").forEach(b => { const o = S.orderShuffled[+b.dataset.j]; b.disabled = true; b.classList.add(S.orderPick.indexOf(+b.dataset.j) === o.i ? "right" : "wrong"); b.querySelector(".num").textContent = o.i + 1; });
+      $("chk").disabled = true; $("clr").disabled = true;
+      $("oo").innerHTML = `<div class="fb ${p === 1 ? "ok" : p ? "half" : "no"} pop"><div class="t">${right === 4 ? "Right order" : "Here's the right order"} · +${p}</div><ol>${c.order.map(t => `<li>${esc(t)}</li>`).join("")}</ol></div>`;
+      addNext("q");
+    };
+  } else if (S.k === 5) {
+    q.innerHTML = `<div class="tag">Q6 · Make a fix</div><p style="margin:0">Advice is stronger when you show what it changes.</p>` + numQ({ ...c.fix, pre: "$", post: "" }, "fix", () => addNext("q"));
+  } else if (S.k === 6) {
+    const e = c.event; let parts = e.costQ ? 3 : 2, n = 0; const step = () => { if (++n === parts) addNext("q", "Write the advisor memo →"); };
+    q.innerHTML = `<div class="event"><div class="tag">⚡ Life Event card</div><h3>${esc(e.title)}</h3><p style="margin:6px 0 0">${e.text}</p></div>` +
+      (e.costQ ? numQ(e.costQ, "cost", step) + `<hr style="border:0;border-top:1px solid var(--line);width:100%">` : "") +
+      numQ({ q: `With ${usd2(c.fix.a)} left over each month (after your fix), how many months of left-over money does the ${usd(e.cost)} cost? (1 decimal)`, pre: "", post: "months", a: e.months, tol: .1, hint: "Cost ÷ monthly left over.", steps: e.monthsSteps }, "months", step) +
+      `<hr style="border:0;border-top:1px solid var(--line);width:100%"><h3>What would protect ${esc(c.name.split(" ")[0])} from a surprise like this?</h3>
+       <div class="opts" id="prot">${shuffle(e.protect).map(p => `<button class="opt" data-ok="${p[1]}" data-why="${esc(p[2])}"><span>${esc(p[0])}</span></button>`).join("")}</div><div id="po"></div>`;
+    $("prot").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      const ok = b.dataset.ok === "true"; const p = ok ? 1 : 0; S.pts += p; S.max += 1; bar();
+      $("prot").querySelectorAll(".opt").forEach(o => { o.disabled = true; if (o.dataset.ok === "true") o.classList.add("right"); else if (o === b) o.classList.add("wrong"); o.querySelector("span").insertAdjacentHTML("beforeend", `<span class="why">${o.dataset.why}</span>`); });
+      $("po").innerHTML = `<div class="fb ${ok ? "ok" : "no"} pop"><div class="t">${ok ? "Right" : "Not quite"} · +${p}</div></div>`; step();
+    });
+  }
+}
+
+function memo() {
+  const c = C, pct = Math.round(S.pts / S.max * 100), name = $("player").value.trim();
+  done[c.id] = Math.max(done[c.id] ?? 0, pct); store.set("cf-done", JSON.stringify(done));
+  try { const K = "fm-passport"; let p = JSON.parse(localStorage.getItem(K)); if (!p || !p.s || !p.b) p = { s: {}, b: {}, x: {} };
+    const st = p.s["client-file"] || { n: 0, best: null }; st.n++; if (st.best == null || pct > st.best) st.best = pct; st.t = Date.now(); p.s["client-file"] = st; localStorage.setItem(K, JSON.stringify(p)); } catch (e) {}
+  $("play").hidden = true; $("memo").hidden = false;
+  $("memo").innerHTML = `<div class="card stack memo">
+    <div class="tag">Advisor memo · ${name ? esc(name) : "Future Millionaires Advisors"}</div>
+    <h2>Plan for ${esc(c.name)}</h2>
+    <div class="row"><span class="big" style="font-size:44px">${S.pts} / ${S.max}</span><span class="muted">${pct}% of the numbers on the first or second try</span></div>
+    <dl>
+      <dt>Monthly take-home</dt><dd>${usd2(c.pay.monthly)}</dd>
+      <dt>Monthly spending</dt><dd>${usd2(c.spend)}</dd>
+      <dt>${c.left < 0 ? "Shortfall" : "Left over"}</dt><dd>${usd2(c.left)}</dd>
+      <dt>After your fix</dt><dd>${usd2(c.fix.a)} a month</dd>
+      <dt>Life Event</dt><dd>${esc(c.event.title)}: ${usd(c.event.cost)} = ${c.event.months} months of left-over money</dd>
+    </dl>
+    <div><b>Advising order</b><ol style="margin:4px 0 0">${c.order.map(t => `<li>${esc(t)}</li>`).join("")}</ol></div>
+    <label class="nm" for="top">Your #1 move for ${esc(c.name.split(" ")[0])}, and the number that proves it
+      <textarea id="top" placeholder="e.g. Turn off overdraft coverage: that saves $70 a month, $840 a year."></textarea></label>
+    <div class="row"><span class="muted" id="topChk">Needs a number.</span></div>
+    <div class="row"><button class="btn" onclick="window.print()">Print / save PDF</button><button class="btn primary" id="again">Try another client</button></div></div>`;
+  $("top").oninput = () => { const t = $("top").value; $("topChk").textContent = /\d/.test(t) ? "✓ Backed by a number. That's real advice." : "Needs a number."; $("topChk").style.color = /\d/.test(t) ? "var(--good)" : ""; };
+  $("again").onclick = () => $("leave").click();
+  window.scrollTo(0, 0);
+}
+</script>
+<script src="/fm-home.js" defer></script>
+</body></html>

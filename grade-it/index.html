@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Grade It</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/case-kit.css">
+<style>
+.rub { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 14px; }
+.rub div { border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: var(--tint); }
+.rub b { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+@media (max-width: 620px) { .rub { grid-template-columns: 1fr 1fr; } }
+.paper { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; font-size: 18px; line-height: 1.6;
+  background-image: repeating-linear-gradient(transparent 0 28px, color-mix(in srgb, var(--accent) 12%, transparent) 28px 29px); }
+.scorer { display: grid; gap: 8px; }
+.srow { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: var(--card); }
+.srow .nm { font-weight: 700; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button { min-width: 64px; min-height: 44px; border: 2px solid var(--line); border-radius: 10px; background: var(--tint); font-family: var(--mono); font-weight: 700; font-size: 17px; }
+.seg button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.seg button.teach { box-shadow: 0 0 0 3px var(--good); }
+.srow .why { grid-column: 1 / -1; font-size: 15px; }
+.srow.match { border-color: var(--good); } .srow.close { border-color: var(--mid); } .srow.off { border-color: var(--bad); }
+details.case summary { cursor: pointer; font-weight: 700; }
+@media (max-width: 480px) { .srow { grid-template-columns: 1fr; } }
+</style>
+</head><body>
+<div class="wrap">
+  <header><h1>Grade <span>It</span></h1><div class="tag">Case Study Practice · Units 1–9 · Think like the teacher</div></header>
+
+  <section id="startS" class="stack" style="margin-top:16px">
+    <div class="card stack">
+      <p style="margin:0">You're the teacher. Read a student's case study answer and score each box <b>0, 0.5 or 1</b>. Then see how the teacher scored it and why. Once you can spot a 4 / 4 answer, you can write one.</p>
+      <div class="rub" aria-label="4-box rubric">
+        <div><b>Claim</b>Smart, not smart or PARTLY smart, naming the smart part AND the not-smart part.</div>
+        <div><b>Calculate</b>One correct number that proves it, with the work shown.</div>
+        <div><b>Evidence</b>What the number means + one more fact from the unit.</div>
+        <div><b>Advice</b>A specific next step with a number + 2 word-bank words.</div>
+      </div>
+      <label class="nm" for="player">Your name, or both partners' names
+        <input type="text" id="player" maxlength="40" placeholder="e.g. Jordan M. & Ava T." autocomplete="off"></label>
+      <div class="chips" id="filter" role="group" aria-label="Filter by unit"></div>
+      <div class="row"><button class="btn primary" id="go6">Grade 6 answers</button><button class="btn" id="go12">Grade 12 answers</button><span class="muted" id="hs"></span></div>
+      <p class="muted" style="margin:0">Partners: take turns reading the answer out loud, agree on each score, then check.</p>
+    </div>
+  </section>
+
+  <section id="play" hidden style="margin-top:16px" class="stack">
+    <div class="row"><span class="tag" id="prog"></span><span class="spacer"></span><span class="tag" id="pts"></span></div>
+    <details class="case card" id="caseBox" open></details>
+    <div class="card stack">
+      <div class="tag">Student answer</div>
+      <div class="paper" id="paper"></div>
+      <div class="scorer" id="scorer"></div>
+      <div id="out"></div>
+      <div class="row"><button class="btn primary" id="check" disabled>Check my scores</button><button class="btn primary" id="next" hidden>Next answer →</button><span class="spacer"></span><button class="btn ghost" id="quit">End</button></div>
+    </div>
+  </section>
+
+  <section id="result" class="stack" hidden style="margin-top:16px"></section>
+</div>
+
+<script src="/case-bank.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const BOXES = ["Claim", "Calculate", "Evidence", "Advice"], VALS = [0, .5, 1];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let filter = "all", G = null;
+const saved = store.get("gi-name"); if (saved) $("player").value = saved;
+function showHS() { const h = store.get("gi-best"); $("hs").textContent = h ? `Your best match rate: ${h}%` : ""; }
+showHS();
+function renderFilter() {
+  $("filter").innerHTML = [["all", "All units"], ...Object.keys(CASE_UNITS).map(u => [u, `Unit ${u}`])].map(([f, l]) => `<button class="chip" data-f="${f}" aria-pressed="${f === filter}">${l}</button>`).join("");
+  $("filter").querySelectorAll(".chip").forEach(c => c.onclick = () => { filter = c.dataset.f; renderFilter(); });
+}
+renderFilter();
+
+function build(n) {
+  const cases = CASES.filter(c => filter === "all" || String(c.unit) === filter);
+  // mix strong, middle and weak answers; never the same case twice in a row
+  let pool = shuffle(cases.flatMap(c => c.samples.map((s, i) => ({ c, s, i }))));
+  const out = []; let last = null;
+  while (out.length < n && pool.length) { let k = pool.findIndex(x => x.c.id !== last); if (k < 0) k = 0; const x = pool.splice(k, 1)[0]; out.push(x); last = x.c.id; if (!pool.length && out.length < n) pool = shuffle(cases.flatMap(c => c.samples.map((s, i) => ({ c, s, i })))); }
+  return out;
+}
+function start(n) {
+  store.set("gi-name", $("player").value.trim());
+  G = { list: build(n), k: 0, match: 0, total: 0, diff: 0, byBox: [0, 0, 0, 0] };
+  $("startS").hidden = true; $("result").hidden = true; $("play").hidden = false; show();
+}
+$("go6").onclick = () => start(6); $("go12").onclick = () => start(12);
+
+function show() {
+  const { c, s } = G.list[G.k]; G.pick = [null, null, null, null]; G.checked = false;
+  $("prog").textContent = `Answer ${G.k + 1} of ${G.list.length}`; $("pts").textContent = `Matches: ${G.match} / ${G.total}`;
+  $("caseBox").innerHTML = `<summary>Unit ${c.unit} · ${esc(c.title)} (${esc(c.who)})</summary><p class="story">${c.story}</p><p class="quote">“${esc(c.quote)}”</p><p class="ask">${c.ask}</p>
+    <p class="muted" style="margin:8px 0 0;font-size:15px">Word bank: ${c.words.map(esc).join(" · ")}</p>`;
+  $("caseBox").open = G.k === 0 || G.list[G.k - 1].c.id !== c.id;
+  $("paper").textContent = s.t;
+  $("scorer").innerHTML = BOXES.map((b, i) => `<div class="srow" id="r${i}"><span class="nm">${b}</span><div class="seg">${VALS.map(v => `<button data-b="${i}" data-v="${v}" aria-pressed="false" aria-label="${b}: ${v}">${v}</button>`).join("")}</div></div>`).join("");
+  $("scorer").querySelectorAll(".seg button").forEach(btn => btn.onclick = () => {
+    if (G.checked) return; const b = +btn.dataset.b; G.pick[b] = +btn.dataset.v;
+    btn.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === btn));
+    $("check").disabled = G.pick.some(p => p == null);
+  });
+  $("out").innerHTML = ""; $("check").hidden = false; $("check").disabled = true; $("next").hidden = true;
+  window.scrollTo(0, 0);
+}
+$("check").onclick = () => {
+  const { c, s } = G.list[G.k]; G.checked = true; let m = 0;
+  s.s.forEach((t, i) => {
+    const p = G.pick[i], row = $("r" + i), d = Math.abs(p - t);
+    G.total++; G.diff += p - t; if (d === 0) { G.match++; m++; G.byBox[i]++; }
+    row.classList.add(d === 0 ? "match" : d === .5 ? "close" : "off");
+    row.querySelectorAll(".seg button").forEach(b => { b.disabled = true; if (+b.dataset.v === t) b.classList.add("teach"); });
+    row.insertAdjacentHTML("beforeend", `<div class="why">${d === 0 ? "✓ Match." : `Teacher: <b>${t}</b>.`} ${esc(s.why[i])}</div>`);
+  });
+  const you = G.pick.reduce((a, b) => a + b, 0), tch = s.s.reduce((a, b) => a + b, 0);
+  $("out").innerHTML = `<div class="fb ${m === 4 ? "ok" : m >= 2 ? "half" : "no"} pop"><div class="t">You matched ${m} of 4 boxes</div><p style="margin:6px 0 0">You gave <b>${you} / 4</b>. The teacher gave <b>${tch} / 4</b>. The green ring shows the teacher's score.</p>
+    ${tch < 4 ? `<details style="margin-top:8px"><summary><b>See a 4 / 4 answer for this case</b></summary><div class="model" style="margin-top:8px"><div><b>Claim</b>${esc(c.model.claim)}</div><div><b>Calculate</b>${esc(c.model.calc)}</div><div><b>Evidence</b>${esc(c.model.evidence)}</div><div><b>Advice</b>${esc(c.model.advice)}</div></div></details>` : ""}</div>`;
+  $("pts").textContent = `Matches: ${G.match} / ${G.total}`;
+  $("check").hidden = true; $("next").hidden = false; $("next").textContent = G.k + 1 < G.list.length ? "Next answer →" : "See results →"; $("next").focus();
+};
+$("next").onclick = () => { G.k++; if (G.k >= G.list.length) finish(); else show(); };
+$("quit").onclick = () => finish();
+
+function finish() {
+  if (!G.total) { $("play").hidden = true; $("startS").hidden = false; return; }
+  const rate = Math.round(G.match / G.total * 100), per = G.total / 4;
+  const prev = +store.get("gi-best") || 0; if (rate > prev) store.set("gi-best", rate);
+  try { const K = "fm-passport"; let p = JSON.parse(localStorage.getItem(K)); if (!p || !p.s || !p.b) p = { s: {}, b: {}, x: {} };
+    const st = p.s["grade-it"] || { n: 0, best: null }; st.n++; if (st.best == null || rate > st.best) st.best = rate; st.t = Date.now(); p.s["grade-it"] = st; localStorage.setItem(K, JSON.stringify(p)); } catch (e) {}
+  const avg = G.diff / per; // + = graded easier than the teacher
+  const style = Math.abs(avg) < .5 ? "You grade a lot like the teacher. You know what a 4 / 4 looks like." : avg > 0 ? `You were an <b>easier</b> grader than the teacher (about ${avg.toFixed(1)} points per answer). Watch for missing numbers, vague advice and claims that name only one side.` : `You were a <b>tougher</b> grader than the teacher (about ${(-avg).toFixed(1)} points per answer). Half credit (0.5) is for a box that's partly there.`;
+  const weakest = BOXES.map((b, i) => [b, G.byBox[i] / per]).sort((a, b) => a[1] - b[1])[0];
+  const name = $("player").value.trim();
+  $("play").hidden = true; $("result").hidden = false;
+  $("result").innerHTML = `<div class="card stack"><div class="tag">${name ? esc(name) + " · " : ""}Grade It</div>
+    <div class="big">${rate}%</div><p style="margin:0">You matched the teacher on <b>${G.match} of ${G.total}</b> boxes.</p>
+    <div class="boxes">${BOXES.map((b, i) => `<div class="bx"><div class="l">${b}</div><div class="v">${G.byBox[i]}/${per}</div></div>`).join("")}</div>
+    <p style="margin:0">${style}</p><p style="margin:0">Hardest box to grade: <b>${weakest[0]}</b>. Look at that row of the rubric before your next case study.</p>
+    <div class="row"><button class="btn primary" id="again">Grade more</button><a class="btn" href="/make-the-call/" style="text-decoration:none">Write your own in Make the Call →</a></div></div>`;
+  $("again").onclick = () => { $("result").hidden = true; $("startS").hidden = false; showHS(); };
+}
+</script>
+<script src="/fm-home.js" defer></script>
+</body></html>

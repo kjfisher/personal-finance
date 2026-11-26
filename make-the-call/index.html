@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Make the Call</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/case-kit.css">
+</head><body>
+<div class="wrap">
+  <header><h1>Make the <span>Call</span></h1><div class="tag">Case Study Practice · Units 1–9 · Claim · Calculate · Evidence · Advice</div></header>
+
+  <!-- PICK A CASE -->
+  <section id="pick" class="stack" style="margin-top:16px">
+    <div class="card stack">
+      <p style="margin:0">Read a real-life money decision, then build a 4-box answer, one box at a time, just like your unit case study. Each box is worth 0, 0.5 or 1 point. Aim for <b>4 / 4</b>.</p>
+      <label class="nm" for="player">Your name (first name + last initial)
+        <input type="text" id="player" maxlength="24" placeholder="e.g. Jordan M." autocomplete="off"></label>
+      <div class="chips" id="filter" role="group" aria-label="Filter by unit"></div>
+    </div>
+    <div class="row"><h2 style="font-size:20px">Pick a case</h2><span class="spacer"></span><button class="btn" id="random">🎲 Random case</button></div>
+    <div class="grid-cases" id="caseList"></div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="play" hidden>
+    <div class="boxes" id="boxes" style="margin-top:16px"></div>
+    <article class="file" id="file" data-tab="Case file"></article>
+    <div class="card stack" id="step" style="margin-top:14px"></div>
+    <div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn ghost" id="leave">← All cases</button></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="stack" hidden style="margin-top:16px"></section>
+</div>
+
+<script src="/case-bank.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const usd2 = x => (x < 0 ? "−$" : "$") + Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtAns = c => c.pre === "$" ? usd2(c.answer) : c.answer + (c.post === "%" ? "%" : c.post ? " " + c.post : "");
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const BOXES = ["Claim", "Calculate", "Evidence", "Advice"];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// word-bank matching: "401(k) (pre-tax)" → "401(k)", "need / want" → need, want
+function variants(term) { return term.replace(/\s*\((?!k\))[^)]*\)/g, "").split(/\s\/\s|,\s/).map(s => s.trim().toLowerCase()).filter(Boolean); }
+function usedWords(text, words) { const t = " " + text.toLowerCase().replace(/[’']/g, "'") + " "; return words.filter(w => variants(w).some(v => t.includes(v))); }
+
+let filter = "all", S = null;
+let best = {}; try { best = JSON.parse(store.get("mtc-best")) || {}; } catch {}
+const saved = store.get("mtc-name"); if (saved) $("player").value = saved;
+$("player").oninput = e => store.set("mtc-name", e.target.value.trim());
+
+function renderFilter() {
+  $("filter").innerHTML = [["all", "All units"], ...Object.entries(CASE_UNITS).map(([u, n]) => [u, `Unit ${u}`])]
+    .map(([f, l]) => `<button class="chip" data-f="${f}" aria-pressed="${f === filter}">${l}</button>`).join("");
+  $("filter").querySelectorAll(".chip").forEach(c => c.onclick = () => { filter = c.dataset.f; renderFilter(); renderList(); });
+}
+function listCases() { return CASES.filter(c => filter === "all" || String(c.unit) === filter); }
+function renderList() {
+  $("caseList").innerHTML = listCases().map(c => {
+    const b = best[c.id]; const pill = b == null ? `<span class="pill x">Not tried</span>` : b >= 4 ? `<span class="pill g">Best ${b}/4</span>` : b >= 3 ? `<span class="pill a">Best ${b}/4</span>` : `<span class="pill n">Best ${b}/4</span>`;
+    return `<button class="case-card" data-id="${c.id}"><small>Unit ${c.unit} · ${CASE_UNITS[c.unit]}</small><b>${esc(c.title)}</b><small>${esc(c.who)}</small><span>${pill}</span></button>`;
+  }).join("");
+  $("caseList").querySelectorAll(".case-card").forEach(b => b.onclick = () => start(b.dataset.id));
+}
+$("random").onclick = () => { const l = listCases(); const untried = l.filter(c => best[c.id] == null || best[c.id] < 4); start((untried.length ? untried : l)[Math.floor(Math.random() * (untried.length ? untried : l).length)].id); };
+$("leave").onclick = () => { $("play").hidden = true; $("result").hidden = true; $("pick").hidden = false; renderList(); window.scrollTo(0, 0); };
+
+function start(id) {
+  const c = CASES.find(x => x.id === id);
+  S = { c, i: 0, score: [null, null, null, null], tries: 0, evPick: new Set(), ev: shuffle(c.evidence), ad: shuffle(c.advice), adPick: null, text: "" };
+  $("pick").hidden = true; $("result").hidden = true; $("play").hidden = false;
+  $("file").innerHTML = `<div class="who">Unit ${c.unit} · ${CASE_UNITS[c.unit]} · ${esc(c.who)}</div><h2 style="margin-top:4px">${esc(c.title)}</h2>
+    <p class="story">${c.story}</p><p class="quote">“${esc(c.quote)}”</p>`;
+  drawBoxes(); step(); window.scrollTo(0, 0);
+}
+function drawBoxes() {
+  $("boxes").innerHTML = BOXES.map((b, i) => `<div class="bx ${i === S.i ? "now" : ""}"><div class="l">${i + 1} · ${b}</div><div class="v">${S.score[i] == null ? "–" : S.score[i]}</div></div>`).join("");
+}
+function next() { S.i++; drawBoxes(); if (S.i > 3) return finish(); step(); $("step").scrollIntoView({ behavior: "smooth", block: "start" }); }
+const nextBtn = (label = "Next box →") => `<div class="row"><button class="btn primary" id="go">${label}</button></div>`;
+function fbBox(pts, title, body) { const cls = pts === 1 ? "ok" : pts === .5 ? "half" : "no"; return `<div class="fb ${cls} pop"><div class="t">${title} · ${pts} / 1</div>${body}</div>`; }
+
+function step() {
+  const c = S.c, el = $("step");
+  if (S.i === 0) {
+    el.innerHTML = `<div class="tag">Box 1 · Claim</div><h3>Is this decision smart, not smart, or PARTLY smart?</h3>
+      <div class="opts">${["smart", "not", "partly"].map(k => `<button class="opt" data-k="${k}"><span>${CLAIM_LABEL[k]}</span></button>`).join("")}</div><div id="out"></div>`;
+    el.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      const k = b.dataset.k, pts = k === c.claim ? 1 : (k === "partly" || c.claim === "partly") ? .5 : 0;
+      S.score[0] = pts; el.querySelectorAll(".opt").forEach(o => { o.disabled = true; if (o.dataset.k === c.claim) o.classList.add("right"); else if (o === b) o.classList.add("wrong"); });
+      const parts = `<ul>${c.smart ? `<li><b>Smart:</b> ${esc(c.smart)}</li>` : ""}${c.notSmart ? `<li><b>Not smart:</b> ${esc(c.notSmart)}</li>` : ""}</ul>`;
+      const title = pts === 1 ? "Right call" : pts === .5 ? "Half right" : "Not this time";
+      const note = pts === 1 ? "" : pts === .5 ? `<p style="margin:6px 0 0">It's <b>${CLAIM_LABEL[c.claim]}</b>. ${c.claim === "partly" ? "There's a smart part AND a not-smart part. Name both." : "You saw part of it, but look at the whole decision."}</p>` : `<p style="margin:6px 0 0">It's <b>${CLAIM_LABEL[c.claim]}</b>.</p>`;
+      $("out").innerHTML = fbBox(pts, title, note + parts) + nextBtn(); $("go").onclick = next; drawBoxes();
+    });
+  } else if (S.i === 1) {
+    const k = c.calc;
+    el.innerHTML = `<div class="tag">Box 2 · Calculate</div><h3>${c.ask}</h3><p class="muted" style="margin:0">Work it out on paper or in Notability first. You get two tries: first try = 1 point, second try = 0.5.</p>
+      <form class="answer" id="f" autocomplete="off"><span class="unitmark">${k.pre}</span><input type="number" step="any" inputmode="decimal" id="ans" aria-label="Your answer"><span class="unitmark">${k.post}</span><button class="btn primary" type="submit">Check</button></form><div id="out"></div>`;
+    $("ans").focus();
+    $("f").onsubmit = e => {
+      e.preventDefault(); const raw = $("ans").value.trim(); if (!raw) return;
+      const v = parseFloat(raw.replace(/[$,%\s]/g, "")); S.tries++;
+      const ok = Math.abs(v - k.answer) <= k.tol + 1e-9;
+      const hit = !ok && k.errors.find(([x]) => Math.abs(v - x) <= Math.max(k.tol, .01) + 1e-9);
+      if (!ok && S.tries === 1) { $("out").innerHTML = `<div class="fb half pop"><div class="t">Not yet. One more try.</div>${hit ? `<p style="margin:6px 0 0">Hint: ${hit[1]}</p>` : `<p style="margin:6px 0 0">Check each step and label your numbers (per month? per year?).</p>`}</div>`; $("ans").select(); return; }
+      const pts = ok ? (S.tries === 1 ? 1 : .5) : 0; S.score[1] = pts;
+      $("f").querySelectorAll("input,button").forEach(x => x.disabled = true);
+      $("out").innerHTML = fbBox(pts, ok ? "Correct" : `The answer is ${fmtAns(k)}`, (hit ? `<p style="margin:6px 0 0"><b>Common mistake:</b> ${hit[1]}</p>` : "") + `<ol>${k.steps.map(s => `<li>${s}</li>`).join("")}</ol>`) + nextBtn();
+      $("go").onclick = next; drawBoxes();
+    };
+  } else if (S.i === 2) {
+    el.innerHTML = `<div class="tag">Box 3 · Evidence</div><h3>Pick the <u>two</u> statements that best back up your claim.</h3><p class="muted" style="margin:0">Strong evidence says what your number means AND adds one more fact from the unit.</p>
+      <div class="opts">${S.ev.map((e, i) => `<button class="opt" data-i="${i}" aria-pressed="false"><span class="k">${"ABCD"[i]}</span><span>${esc(e.t)}</span></button>`).join("")}</div>
+      <div class="row"><button class="btn primary" id="evCheck" disabled>Check my 2</button></div><div id="out"></div>`;
+    el.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      const i = +b.dataset.i; if (S.evPick.has(i)) S.evPick.delete(i); else { if (S.evPick.size >= 2) return; S.evPick.add(i); }
+      b.setAttribute("aria-pressed", S.evPick.has(i)); $("evCheck").disabled = S.evPick.size !== 2;
+    });
+    $("evCheck").onclick = () => {
+      const right = [...S.evPick].filter(i => S.ev[i].ok).length, pts = right === 2 ? 1 : right === 1 ? .5 : 0; S.score[2] = pts;
+      el.querySelectorAll(".opt").forEach(o => { const e = S.ev[+o.dataset.i]; o.disabled = true; o.classList.add(e.ok ? "right" : S.evPick.has(+o.dataset.i) ? "wrong" : "x");
+        if (!e.ok && e.why) o.querySelector("span:last-child").insertAdjacentHTML("beforeend", `<span class="why">✗ ${esc(e.why)}</span>`); });
+      $("evCheck").disabled = true;
+      $("out").innerHTML = fbBox(pts, right === 2 ? "Strong evidence" : right === 1 ? "One of two" : "Not these", `<p style="margin:6px 0 0">The green statements are true AND connect your number to the decision.</p>`) + nextBtn(); $("go").onclick = next; drawBoxes();
+    };
+  } else if (S.i === 3) {
+    el.innerHTML = `<div class="tag">Box 4 · Advice</div><h3>Which next step is the best advice?</h3><p class="muted" style="margin:0">Great advice is specific, realistic and backed by a number.</p>
+      <div class="opts">${S.ad.map((a, i) => `<button class="opt" data-i="${i}"><span class="k">${"ABC"[i]}</span><span>${esc(a.t)}</span></button>`).join("")}</div><div id="out"></div>`;
+    el.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      const i = +b.dataset.i; S.adPick = i; const ok = S.ad[i].ok;
+      el.querySelectorAll(".opt").forEach(o => { const a = S.ad[+o.dataset.i]; o.disabled = true; if (a.ok) o.classList.add("right"); else if (+o.dataset.i === i) o.classList.add("wrong");
+        if (!a.ok && a.why) o.querySelector("span:last-child").insertAdjacentHTML("beforeend", `<span class="why">✗ ${esc(a.why)}</span>`); });
+      $("out").innerHTML = `<div class="fb ${ok ? "ok" : "no"} pop" style="margin-top:4px"><div class="t">${ok ? "Best step: +0.5" : "Not the best step: +0"}</div></div>
+        <h3 style="margin-top:10px">Now write it in your own words for the other 0.5</h3>
+        <p class="muted" style="margin:0">Your advice needs <b>a number</b> and <b>2 word-bank words</b>.</p>
+        <div class="wb" id="wb">${c.words.map(w => `<span>${esc(w)}</span>`).join("")}</div>
+        <textarea id="adv" aria-label="Your advice" placeholder="${esc(c.who.split(" ")[0])} should…"></textarea>
+        <div class="row"><span id="meter" class="muted">Words: 0 of 2 · Number: no</span><span class="spacer"></span><button class="btn primary" id="adCheck">Score my advice</button></div><div id="out2"></div>`;
+      const upd = () => { const t = $("adv").value, used = usedWords(t, c.words), num = /\d/.test(t);
+        $("wb").querySelectorAll("span").forEach((s, j) => s.classList.toggle("on", used.includes(c.words[j])));
+        $("meter").textContent = `Words: ${Math.min(used.length, 2)} of 2 · Number: ${num ? "yes" : "no"}`; };
+      $("adv").oninput = upd; $("adv").focus();
+      $("adCheck").onclick = () => {
+        const t = $("adv").value.trim(); if (t.length < 8) { $("adv").focus(); return; }
+        const used = usedWords(t, c.words), num = /\d/.test(t), w = used.length >= 2 && num ? .5 : 0;
+        S.text = t; S.score[3] = (ok ? .5 : 0) + w; $("adv").disabled = true; $("adCheck").disabled = true;
+        const miss = []; if (used.length < 2) miss.push(`only ${used.length} word-bank word${used.length === 1 ? "" : "s"}`); if (!num) miss.push("no number");
+        $("out2").innerHTML = `<div class="fb ${w ? "ok" : "no"} pop"><div class="t">${w ? "Specific + vocabulary: +0.5" : "+0 for this part"}</div>${w ? "" : `<p style="margin:6px 0 0">Missing: ${miss.join(" and ")}. Look at the model answer next.</p>`}</div>` + nextBtn("See my score →");
+        $("go").onclick = next; drawBoxes();
+      };
+    });
+  }
+}
+
+function finish() {
+  const c = S.c, total = S.score.reduce((a, b) => a + b, 0);
+  best[c.id] = Math.max(best[c.id] ?? 0, total); store.set("mtc-best", JSON.stringify(best));
+  try { const K = "fm-passport"; let p = JSON.parse(localStorage.getItem(K)); if (!p || !p.s || !p.b) p = { s: {}, b: {}, x: {} };
+    const s = p.s["make-the-call"] || { n: 0, best: null }; s.n++; if (s.best == null || total > s.best) s.best = total; s.t = Date.now(); p.s["make-the-call"] = s; localStorage.setItem(K, JSON.stringify(p)); } catch (e) {}
+  const name = $("player").value.trim();
+  const msg = total === 4 ? "Perfect case study. Every box earned its point." : total >= 3 ? "Strong! Check the model answer for the box you missed." : "Compare your boxes with the model answer, then try this case again.";
+  const l = listCases(), idx = l.findIndex(x => x.id === c.id), nxt = l[(idx + 1) % l.length];
+  $("play").hidden = true; $("result").hidden = false;
+  $("result").innerHTML = `<div class="card stack">
+    <div class="tag">${name ? esc(name) + " · " : ""}Unit ${c.unit} · ${esc(c.title)}</div>
+    <div class="big">${total} / 4</div><p style="margin:0">${msg}</p>
+    <div class="boxes">${BOXES.map((b, i) => `<div class="bx"><div class="l">${b}</div><div class="v">${S.score[i]}</div></div>`).join("")}</div>
+    ${S.text ? `<div><b>Your advice</b><p class="quote" style="font-style:normal">${esc(S.text)}</p></div>` : ""}
+    <h3>Model answer (4 / 4)</h3>
+    <div class="model"><div><b>Claim</b>${esc(c.model.claim)}</div><div><b>Calculate</b>${esc(c.model.calc)}</div><div><b>Evidence</b>${esc(c.model.evidence)}</div><div><b>Advice</b>${esc(c.model.advice)}</div></div>
+    <div class="row"><button class="btn" id="again">Try this case again</button><button class="btn primary" id="nextCase">Next case: ${esc(nxt.title)} →</button><button class="btn ghost" id="all">All cases</button></div></div>`;
+  $("again").onclick = () => start(c.id); $("nextCase").onclick = () => start(nxt.id); $("all").onclick = () => $("leave").click();
+  window.scrollTo(0, 0);
+}
+renderFilter(); renderList();
+</script>
+<script src="/fm-home.js" defer></script>
+</body></html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Case Study Showdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/case-kit.css">
+<style>
+/* Projector layout: big type, scoreboard rail on the right (bottom on narrow screens). */
+body { font-size: clamp(17px, 1.6vw, 24px); }
+.wrap { max-width: 1400px; }
+.stage { display: grid; grid-template-columns: 1fr minmax(220px, 300px); gap: 16px; margin-top: 14px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+.board .story { font-size: 1.1em; }
+.qbig { font-family: var(--display); font-weight: 800; font-size: clamp(24px, 2.6vw, 40px); line-height: 1.2; text-wrap: balance; margin: 4px 0 10px; }
+.opts .opt { font-size: 1em; }
+.teams { display: grid; gap: 8px; }
+.team { border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; background: var(--card); display: grid; grid-template-columns: 1fr auto; gap: 4px; align-items: center; }
+.team .n { font-weight: 700; } .team .s { font-family: var(--mono); font-weight: 700; font-size: 1.5em; color: var(--accent); }
+.team .aw { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.team .aw button { border: 1px solid var(--line); background: var(--tint); border-radius: 10px; padding: 6px 10px; font-weight: 700; font-family: var(--mono); min-height: 40px; }
+.team .aw button[aria-pressed="true"] { background: var(--good); color: #fff; border-color: var(--good); }
+.team.lead { border-color: var(--gold); }
+.timer { font-family: var(--mono); font-weight: 700; font-size: clamp(30px, 3.4vw, 52px); color: var(--accent); }
+.timer.low { color: var(--bad); }
+.steps { display: flex; gap: 6px; flex-wrap: wrap; }
+.steps span { font-family: var(--mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.steps span.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.steps span.done { color: var(--good); border-color: var(--good); }
+.reveal { font-family: var(--mono); font-size: clamp(34px, 4vw, 64px); font-weight: 700; color: var(--good); }
+.setupTeams { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+.keys { font-size: 14px; color: var(--muted); }
+.podium { display: grid; gap: 10px; }
+.podium .team { font-size: 1.2em; }
+</style>
+</head><body>
+<div class="wrap">
+  <header class="row"><div><h1>Case Study <span>Showdown</span></h1><div class="tag">Whole class · Teams · Claim · Calculate · Evidence · Advice</div></div></header>
+
+  <!-- SETUP -->
+  <section id="setup" class="stack" style="margin-top:16px">
+    <div class="card stack">
+      <p style="margin:0">Teams race through a real case one box at a time. Write each answer on a whiteboard, show it when time's up, then reveal. Tap the teams that earned points.</p>
+      <div><b>Teams</b> <span class="muted">(2–8)</span></div>
+      <div class="setupTeams" id="teamInputs"></div>
+      <div class="row"><button class="btn" id="addTeam">+ Team</button><button class="btn ghost" id="rmTeam">− Team</button></div>
+      <div><b>Cases</b></div>
+      <div class="chips" id="filter" role="group" aria-label="Choose unit"></div>
+      <div class="row"><label class="row">Cases to play <select id="nCases" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--card)"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+        <label class="row">Seconds per box <select id="secs" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--card)"><option>45</option><option selected>90</option><option>120</option><option>180</option></select></label></div>
+      <div class="row"><button class="btn primary" id="begin">Start the Showdown</button></div>
+      <p class="keys" style="margin:0">Keyboard: <b>Space</b> = next step / reveal · <b>T</b> = start or pause the timer</p>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" hidden>
+    <div class="stage">
+      <div class="stack board">
+        <div class="row"><div class="steps" id="steps"></div><span class="spacer"></span><span class="timer" id="timer" aria-live="off">--</span><button class="btn" id="tbtn">Start timer</button></div>
+        <div class="card stack" id="main"></div>
+        <div class="row"><button class="btn ghost" id="back">← Back</button><span class="spacer"></span><button class="btn primary" id="adv">Next →</button></div>
+      </div>
+      <aside class="stack"><div class="tag">Scoreboard</div><div class="teams" id="teams"></div><button class="btn ghost" id="end">End game</button></aside>
+    </div>
+  </section>
+
+  <section id="final" hidden class="stack" style="margin-top:16px"></section>
+</div>
+
+<script src="/case-bank.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const usd2 = x => (x < 0 ? "−$" : "$") + Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtAns = c => c.pre === "$" ? usd2(c.answer) : c.answer + (c.post === "%" ? "%" : c.post ? " " + c.post : "");
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+// points per box, and the step names inside each case
+const PTS = { claim: 100, calc: 200, evidence: 200, advice: 200, bonus: 100 };
+const STEP_NAMES = ["Case", "Claim", "Calculate", "Evidence", "Advice", "Model"];
+
+let teamNames = (() => { try { return JSON.parse(store.get("csd-teams")) || null; } catch { return null; } })() || ["Team 1", "Team 2", "Team 3", "Team 4"];
+let filter = "all";
+function drawTeamInputs() {
+  $("teamInputs").innerHTML = teamNames.map((n, i) => `<input type="text" maxlength="20" value="${esc(n)}" data-i="${i}" aria-label="Team ${i + 1} name">`).join("");
+  $("teamInputs").querySelectorAll("input").forEach(inp => inp.oninput = () => { teamNames[+inp.dataset.i] = inp.value; });
+}
+$("addTeam").onclick = () => { if (teamNames.length < 8) { teamNames.push("Team " + (teamNames.length + 1)); drawTeamInputs(); } };
+$("rmTeam").onclick = () => { if (teamNames.length > 2) { teamNames.pop(); drawTeamInputs(); } };
+function renderFilter() {
+  $("filter").innerHTML = [["all", "Any unit"], ...Object.entries(CASE_UNITS).map(([u, n]) => [u, `Unit ${u}`])].map(([f, l]) => `<button class="chip" data-f="${f}" aria-pressed="${f === filter}">${l}</button>`).join("");
+  $("filter").querySelectorAll(".chip").forEach(c => c.onclick = () => { filter = c.dataset.f; renderFilter(); });
+}
+drawTeamInputs(); renderFilter();
+
+let G = null, tick = null;
+$("begin").onclick = () => {
+  teamNames = teamNames.map((n, i) => n.trim() || "Team " + (i + 1)); store.set("csd-teams", JSON.stringify(teamNames));
+  const pool = shuffle(CASES.filter(c => filter === "all" || String(c.unit) === filter));
+  const n = Math.min(+$("nCases").value, pool.length);
+  G = { cases: pool.slice(0, n).map(c => ({ c, ev: shuffle(c.evidence), ad: shuffle(c.advice) })), ci: 0, step: 0, revealed: false,
+        secs: +$("secs").value, left: 0, running: false, teams: teamNames.map(n => ({ n, s: 0 })), awards: {} };
+  $("setup").hidden = true; $("final").hidden = true; $("game").hidden = false; render();
+};
+
+function key() { return `${G.ci}-${G.step}`; }
+function award(ti, kind) { // toggle points for a team in this step
+  const k = key(); G.awards[k] = G.awards[k] || {}; const a = G.awards[k];
+  const id = ti + ":" + kind; if (a[id]) { delete a[id]; G.teams[ti].s -= PTS[kind]; } else { a[id] = true; G.teams[ti].s += PTS[kind]; }
+  drawTeams();
+}
+function drawTeams() {
+  const max = Math.max(...G.teams.map(t => t.s)), st = G.step, kind = [null, "claim", "calc", "evidence", "advice", null][st], a = G.awards[key()] || {};
+  $("teams").innerHTML = G.teams.map((t, i) => `<div class="team ${t.s === max && max > 0 ? "lead" : ""}"><span class="n">${esc(t.n)}</span><span class="s">${t.s}</span>
+    ${kind && G.revealed ? `<div class="aw"><button data-t="${i}" data-k="${kind}" aria-pressed="${!!a[i + ":" + kind]}">+${PTS[kind]}</button>${kind === "advice" ? `<button data-t="${i}" data-k="bonus" aria-pressed="${!!a[i + ":bonus"]}" title="2 word-bank words + a number on the whiteboard">+${PTS.bonus} words</button>` : ""}</div>` : ""}</div>`).join("");
+  $("teams").querySelectorAll(".aw button").forEach(b => b.onclick = () => award(+b.dataset.t, b.dataset.k));
+}
+function setTimer(on) {
+  clearInterval(tick); G.running = on; $("tbtn").textContent = on ? "Pause" : (G.left > 0 && G.left < G.secs ? "Resume" : "Start timer");
+  if (on) tick = setInterval(() => { G.left--; showTime(); if (G.left <= 0) { setTimer(false); $("timer").textContent = "Time!"; } }, 1000);
+}
+function showTime() { $("timer").textContent = `${Math.floor(G.left / 60)}:${String(Math.max(0, G.left) % 60).padStart(2, "0")}`; $("timer").classList.toggle("low", G.left <= 10); }
+$("tbtn").onclick = () => { if (!G || G.step === 0 || G.step === 5) return; if (G.left <= 0) G.left = G.secs; setTimer(!G.running); showTime(); };
+
+function render() {
+  const { c, ev, ad } = G.cases[G.ci], st = G.step, R = G.revealed;
+  $("steps").innerHTML = `<span>Case ${G.ci + 1}/${G.cases.length}</span>` + STEP_NAMES.map((n, i) => `<span class="${i === st ? "on" : i < st ? "done" : ""}">${n}</span>`).join("");
+  const head = `<div class="who">Unit ${c.unit} · ${CASE_UNITS[c.unit]} · ${esc(c.who)}</div>`;
+  let h = "";
+  if (st === 0) h = `${head}<h2 style="font-size:clamp(28px,3vw,46px)">${esc(c.title)}</h2><p class="story">${c.story}</p><p class="quote">“${esc(c.quote)}”</p><p class="muted" style="margin:0">Read it together. Next: the Claim.</p>`;
+  else if (st === 1) h = `${head}<div class="tag">Box 1 · Claim · ${PTS.claim} pts</div><div class="qbig">Smart, not smart, or PARTLY smart?</div><p class="muted" style="margin:0">On your whiteboard: your claim + what's smart and what isn't.</p>
+      <div class="opts">${["smart", "not", "partly"].map(k => `<div class="opt ${R ? (k === c.claim ? "right" : "") : ""}"><span>${CLAIM_LABEL[k]}</span></div>`).join("")}</div>
+      ${R ? `<div class="fb ok pop"><div class="t">${CLAIM_LABEL[c.claim]}</div><ul>${c.smart ? `<li><b>Smart:</b> ${esc(c.smart)}</li>` : ""}${c.notSmart ? `<li><b>Not smart:</b> ${esc(c.notSmart)}</li>` : ""}</ul></div>` : ""}`;
+  else if (st === 2) h = `${head}<div class="tag">Box 2 · Calculate · ${PTS.calc} pts</div><div class="qbig">${c.ask}</div><p class="story" style="font-size:.9em">${c.story}</p>
+      ${R ? `<div class="reveal pop">${fmtAns(c.calc)}</div><ol>${c.calc.steps.map(s => `<li>${s}</li>`).join("")}</ol>` : `<p class="muted" style="margin:0">Show your work on the whiteboard.</p>`}`;
+  else if (st === 3) h = `${head}<div class="tag">Box 3 · Evidence · ${PTS.evidence} pts</div><div class="qbig">Which TWO statements are the best evidence?</div>
+      <div class="opts">${ev.map((e, i) => `<div class="opt ${R ? (e.ok ? "right" : "wrong") : ""}"><span class="k">${"ABCD"[i]}</span><span>${esc(e.t)}${R && !e.ok && e.why ? `<span class="why">✗ ${esc(e.why)}</span>` : ""}</span></div>`).join("")}</div>
+      <p class="muted" style="margin:0">Whiteboards: two letters. Both right to score.</p>`;
+  else if (st === 4) h = `${head}<div class="tag">Box 4 · Advice · ${PTS.advice} pts + ${PTS.bonus} bonus</div><div class="qbig">Which is the best advice?</div>
+      <div class="opts">${ad.map((a, i) => `<div class="opt ${R ? (a.ok ? "right" : "wrong") : ""}"><span class="k">${"ABC"[i]}</span><span>${esc(a.t)}${R && !a.ok && a.why ? `<span class="why">✗ ${esc(a.why)}</span>` : ""}</span></div>`).join("")}</div>
+      <p style="margin:0"><b>Bonus +${PTS.bonus}:</b> write your OWN advice with a number and 2 word-bank words:</p><div class="wb">${c.words.map(w => `<span>${esc(w)}</span>`).join("")}</div>`;
+  else h = `${head}<div class="tag">Model answer · 4 / 4</div><h2>${esc(c.title)}</h2>
+      <div class="model"><div><b>Claim</b>${esc(c.model.claim)}</div><div><b>Calculate</b>${esc(c.model.calc)}</div><div><b>Evidence</b>${esc(c.model.evidence)}</div><div><b>Advice</b>${esc(c.model.advice)}</div></div>`;
+  $("main").innerHTML = h;
+  const isQ = st >= 1 && st <= 4;
+  $("adv").textContent = isQ && !R ? "Reveal" : st === 5 ? (G.ci + 1 < G.cases.length ? "Next case →" : "Final scores →") : "Next →";
+  $("tbtn").disabled = !isQ; $("back").disabled = st === 0 && G.ci === 0;
+  if (!isQ) { setTimer(false); $("timer").textContent = "--"; $("timer").classList.remove("low"); }
+  drawTeams();
+}
+function advance() {
+  const st = G.step, isQ = st >= 1 && st <= 4;
+  if (isQ && !G.revealed) { G.revealed = true; setTimer(false); render(); return; }
+  if (st === 5) { if (G.ci + 1 < G.cases.length) { G.ci++; G.step = 0; G.revealed = false; render(); } else finish(); return; }
+  G.step++; G.revealed = false; G.left = G.secs; render();
+  if (G.step >= 1 && G.step <= 4) { showTime(); setTimer(true); }
+}
+function back() {
+  if (G.revealed) { G.revealed = false; render(); return; }
+  if (G.step > 0) { G.step--; G.revealed = G.step >= 1 && G.step <= 4; render(); return; }
+  if (G.ci > 0) { G.ci--; G.step = 5; G.revealed = false; render(); }
+}
+$("adv").onclick = advance; $("back").onclick = back; $("end").onclick = finish;
+document.addEventListener("keydown", e => {
+  if ($("game").hidden || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  if (e.code === "Space") { e.preventDefault(); advance(); } else if (e.key === "t" || e.key === "T") $("tbtn").click();
+});
+function finish() {
+  setTimer(false);
+  try { const K = "fm-passport"; let p = JSON.parse(localStorage.getItem(K)); if (!p || !p.s || !p.b) p = { s: {}, b: {}, x: {} };
+    const s = p.s["case-showdown"] || { n: 0, best: null }; s.n++; s.t = Date.now(); p.s["case-showdown"] = s; localStorage.setItem(K, JSON.stringify(p)); } catch (e) {}
+  const ranked = G.teams.slice().sort((a, b) => b.s - a.s), top = ranked[0].s;
+  $("game").hidden = true; $("final").hidden = false;
+  $("final").innerHTML = `<div class="card stack"><div class="tag">Final scores</div><h2 style="font-size:clamp(30px,3.4vw,52px)">${ranked.filter(t => t.s === top).map(t => esc(t.n)).join(" & ")} win${ranked.filter(t => t.s === top).length > 1 ? "" : "s"}!</h2>
+    <div class="podium">${ranked.map((t, i) => `<div class="team ${t.s === top ? "lead" : ""}"><span class="n">${i + 1}. ${esc(t.n)}</span><span class="s">${t.s}</span></div>`).join("")}</div>
+    <p style="margin:0">Exit question: which box is hardest for your team: Claim, Calculate, Evidence or Advice? What will you do differently on the case study?</p>
+    <div class="row"><button class="btn primary" id="again">New Showdown</button></div></div>`;
+  $("again").onclick = () => { $("final").hidden = true; $("setup").hidden = false; drawTeamInputs(); };
+}
+</script>
+<script src="/fm-home.js" defer></script>
+</body></html>
