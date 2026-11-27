@@ -1,0 +1,431 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//D214 Personal Finance//Due dates//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Personal Finance (Blocks 5 & 7)
+X-WR-TIMEZONE:America/Chicago
+BEGIN:VEVENT
+UID:pf-day3-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270112
+DTEND;VALUE=DATE:20270113
+SUMMARY:PF due: Unit 1 Quiz + Case Study · Syllabus signed
+DESCRIPTION:Day 3: Time is your superpower. Plan\, slides and notes: http
+ s://214-personal-finance.vercel.app/lessons/day-3/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 1 Quiz + Case Study · Syllabus signed
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day6-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270121
+DTEND;VALUE=DATE:20270122
+SUMMARY:PF due: Days 4–6 guided notes
+DESCRIPTION:Day 6: My First Paycheck. Plan\, slides and notes: https://21
+ 4-personal-finance.vercel.app/lessons/day-6/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Days 4–6 guided notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day8-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270127
+DTEND;VALUE=DATE:20270128
+SUMMARY:PF due: Days 7–8 guided notes
+DESCRIPTION:Day 8: Reading a pay stub & YTD. Plan\, slides and notes: htt
+ ps://214-personal-finance.vercel.app/lessons/day-8/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Days 7–8 guided notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day9-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270129
+DTEND;VALUE=DATE:20270130
+SUMMARY:PF due: Unit 2 Quiz + Case Study
+DESCRIPTION:Day 9: Review + Unit 2 Quiz. Plan\, slides and notes: https:/
+ /214-personal-finance.vercel.app/lessons/day-9/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 2 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day11-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270204
+DTEND;VALUE=DATE:20270205
+SUMMARY:PF due: My budget (Notes box 4)
+DESCRIPTION:Day 11: Build a zero-based budget. Plan\, slides and notes: h
+ ttps://214-personal-finance.vercel.app/lessons/day-11/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: My budget (Notes box 4)
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day12-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270208
+DTEND;VALUE=DATE:20270209
+SUMMARY:PF due: Let's Go on Vacation budget (Notes box 3–4)
+DESCRIPTION:Day 12: Let's Go on Vacation. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-12/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Let's Go on Vacation budget (Notes box 3–
+ 4)
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day13-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270210
+DTEND;VALUE=DATE:20270211
+SUMMARY:PF due: Unit 3 Quiz + Case Study · Adult Budget Consult (bonus)
+DESCRIPTION:Day 13: Review + Unit 3 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-13/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 3 Quiz + Case Study · Adult Budget Co
+ nsult (bonus)
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day15-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270218
+DTEND;VALUE=DATE:20270219
+SUMMARY:PF due: Days 14–15 guided notes
+DESCRIPTION:Day 15: W-2\, W-4\, 1040 & refunds. Plan\, slides and notes: 
+ https://214-personal-finance.vercel.app/lessons/day-15/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Days 14–15 guided notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day16-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270222
+DTEND;VALUE=DATE:20270223
+SUMMARY:PF due: Unit 4 Quiz + Case Study
+DESCRIPTION:Day 16: Review + Unit 4 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-16/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 4 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day18-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270226
+DTEND;VALUE=DATE:20270227
+SUMMARY:PF due: Days 17–18 guided notes
+DESCRIPTION:Day 18: Checking\, statements & debit cards. Plan\, slides an
+ d notes: https://214-personal-finance.vercel.app/lessons/day-18/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Days 17–18 guided notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day19-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270302
+DTEND;VALUE=DATE:20270303
+SUMMARY:PF due: Banking research presentation
+DESCRIPTION:Day 19: Would You Bank There?. Plan\, slides and notes: https
+ ://214-personal-finance.vercel.app/lessons/day-19/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Banking research presentation
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day20-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270304
+DTEND;VALUE=DATE:20270305
+SUMMARY:PF due: Unit 5 Quiz + Case Study
+DESCRIPTION:Day 20: Review + Unit 5 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-20/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 5 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day21-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270308
+DTEND;VALUE=DATE:20270309
+SUMMARY:PF due: Midterm study guide
+DESCRIPTION:Day 21: Midterm review. Plan\, slides and notes: https://214-
+ personal-finance.vercel.app/lessons/day-21/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Midterm study guide
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day22-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270310
+DTEND;VALUE=DATE:20270311
+SUMMARY:PF due: Midterm Exam (Part 1 + Part 2)
+DESCRIPTION:Day 22: Midterm Exam (Units 2–5). Plan\, slides and notes: 
+ https://214-personal-finance.vercel.app/lessons/day-22/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Midterm Exam (Part 1 + Part 2)
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day25-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270318
+DTEND;VALUE=DATE:20270319
+SUMMARY:PF due: Days 23–25 guided notes
+DESCRIPTION:Day 25: Credit cards\, APR & utilization. Plan\, slides and n
+ otes: https://214-personal-finance.vercel.app/lessons/day-25/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Days 23–25 guided notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day26-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270329
+DTEND;VALUE=DATE:20270330
+SUMMARY:PF due: Unit 6 Quiz + Case Study
+DESCRIPTION:Day 26: Review + Unit 6 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-26/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 6 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day28-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270402
+DTEND;VALUE=DATE:20270403
+SUMMARY:PF due: Car Lending Poster
+DESCRIPTION:Day 28: Pre-approval\, timing & loan math. Plan\, slides and 
+ notes: https://214-personal-finance.vercel.app/lessons/day-28/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Car Lending Poster
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day31-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270414
+DTEND;VALUE=DATE:20270415
+SUMMARY:PF due: Unit 7 Quiz + Case Study
+DESCRIPTION:Day 31: Review + Unit 7 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-31/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 7 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day33-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270420
+DTEND;VALUE=DATE:20270421
+SUMMARY:PF due: Days 32–33 guided notes
+DESCRIPTION:Day 33: Deductibles\, premiums & real scenarios. Plan\, slide
+ s and notes: https://214-personal-finance.vercel.app/lessons/day-33/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Days 32–33 guided notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day34-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270422
+DTEND;VALUE=DATE:20270423
+SUMMARY:PF due: Unit 8 Quiz + Case Study
+DESCRIPTION:Day 34: Review + Unit 8 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-34/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 8 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day37-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270430
+DTEND;VALUE=DATE:20270501
+SUMMARY:PF due: Unit 9 Guided Notes
+DESCRIPTION:Day 37: Retirement: 401(k)\, Roth & Social Security. Plan\, s
+ lides and notes: https://214-personal-finance.vercel.app/lessons/day-37/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 9 Guided Notes
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day38-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270504
+DTEND;VALUE=DATE:20270505
+SUMMARY:PF due: Mock Trust
+DESCRIPTION:Day 38: Wills\, trusts & beneficiaries. Plan\, slides and not
+ es: https://214-personal-finance.vercel.app/lessons/day-38/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Mock Trust
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day39-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270506
+DTEND;VALUE=DATE:20270507
+SUMMARY:PF due: Unit 9 Quiz + Case Study
+DESCRIPTION:Day 39: Review + Unit 9 Quiz. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-39/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Unit 9 Quiz + Case Study
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day41-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270512
+DTEND;VALUE=DATE:20270513
+SUMMARY:PF due: Team Worksheet
+DESCRIPTION:Day 41: Advise Your Client. Plan\, slides and notes: https://
+ 214-personal-finance.vercel.app/lessons/day-41/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Team Worksheet
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day42-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270514
+DTEND;VALUE=DATE:20270515
+SUMMARY:PF due: Final Case Study: Team Worksheet + Advisor Memo
+DESCRIPTION:Day 42: Pitch + Advisor Memo. Plan\, slides and notes: https:
+ //214-personal-finance.vercel.app/lessons/day-42/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Final Case Study: Team Worksheet + Advisor 
+ Memo
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day44-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270520
+DTEND;VALUE=DATE:20270521
+SUMMARY:PF due: Classroom poster
+DESCRIPTION:Day 44: Poster Finish + Gallery Walk. Plan\, slides and notes
+ : https://214-personal-finance.vercel.app/lessons/day-44/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Classroom poster
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-day45-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270524
+DTEND;VALUE=DATE:20270525
+SUMMARY:PF due: Final study guide
+DESCRIPTION:Day 45: Final exam review: all units. Plan\, slides and notes
+ : https://214-personal-finance.vercel.app/lessons/day-45/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF due: Final study guide
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-final-b@214-personal-finance.vercel.app
+DTSTAMP:20261127T000000Z
+DTSTART;VALUE=DATE:20270526
+DTEND;VALUE=DATE:20270527
+SUMMARY:PF Final Exam (Units 1–9)
+DESCRIPTION:5 pages\, 50 points. Review: https://214-personal-finance.ver
+ cel.app/review/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: PF Final Exam (Units 1–9)
+TRIGGER:-PT6H
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Case Studies · Personal Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="/fm-page.css">
+<style>
+.rub{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:720px){.rub{grid-template-columns:1fr 1fr}}
+.rub div{border:2px solid var(--uc);border-radius:14px;padding:12px;background:var(--surface)}
+.rub b{display:block;font-family:var(--display);font-size:20px}
+.rub small{display:block;margin-top:6px;color:var(--muted);font-size:14px}
+.ucards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.uc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.uc h3{margin:0}
+.uc .when{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.uc ul{font-size:15px}
+.uc a{font-weight:700}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.games a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface)}
+.games a b{display:block;font-family:var(--display);font-size:18px}
+.games a small{color:var(--muted)}
+</style>
+<link rel="stylesheet" href="/fm-nav.css"></head><body><nav class="snav" aria-label="Course menu"><a class="skip" href="#fm-content">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/">Start Here</a></li><li><a href="/readings/">Readings</a></li><li><a href="/cases/" aria-current="page">Case Studies</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/review/">Final Review</a></li><li><a href="/careers/">Careers</a></li><li><a href="/resources/">Resources</a></li><li><a href="/">Arcade</a></li></ul></nav><span id="fm-content" tabindex="-1"></span>
+<div class="wrap">
+  <header class="head"><div class="eyebrow">Personal Finance · Units 1–10</div><h1>Case Studies</h1>
+    <p class="sub">Every unit ends with a case study: a real-life money decision you judge and back up with a number. It's its own grade, separate from the quiz.</p></header>
+
+  <section class="card">
+    <h2>The 4-box rubric</h2>
+    <p style="margin:0 0 12px">Each box is worth <b>0, 0.5 or 1</b> point, for a total of 4.</p>
+    <div class="rub">
+      <div><b>Claim</b>Smart, not smart, or PARTLY smart?<small>Name what's smart AND what isn't.</small></div>
+      <div><b>Calculate</b>One number that proves it.<small>Show your work, and label it (per month? per year?).</small></div>
+      <div><b>Evidence</b>What the number means.<small>Plus one more fact from the unit.</small></div>
+      <div><b>Advice</b>A specific next step.<small>With a number and 2 word-bank words.</small></div>
+    </div>
+    <p class="note" style="margin:14px 0 0"><b>Weak advice:</b> “Spend less and save more.” <b>Strong advice:</b> “Cut eating out from $410 to $200 and set up autopay of $210 to the HYSA: that's $2,520 a year.”</p>
+    <p class="muted" style="margin:10px 0 0">Unit 2 uses Claim · Evidence · Reasoning (with 2 word-bank words in the reasoning).</p>
+  </section>
+
+  <section class="card">
+    <h2>Practice games</h2>
+    <div class="games">
+      <a href="/make-the-call/"><b>Make the Call</b><small>Solo · build a 4-box answer one box at a time, 18 cases</small></a>
+      <a href="/grade-it/"><b>Grade It</b><small>Solo or partners · score answers like the teacher</small></a>
+      <a href="/case-showdown/"><b>Case Study Showdown</b><small>Class · teams race through a case</small></a>
+      <a href="/case-files/"><b>Case Files</b><small>Solo · claim, evidence, reasoning</small></a>
+      <a href="/client-file/"><b>Client File</b><small>Solo · practice for the Unit 10 final case study</small></a>
+      <a href="/would-you-rather/"><b>Money Would You Rather</b><small>Class · vote, then the math reveal</small></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Unit by unit</h2>
+    <div class="ucards" id="ucards"></div>
+  </section>
+
+  <section class="card">
+    <h2>Unit 10 · Final Case Study</h2>
+    <p style="margin-top:0">Your team advises a real-looking client: find monthly take-home pay and the shortfall, fix things in the advising order, handle a Life Event, then pitch your plan.</p>
+    <ul>
+      <li><b>Days 40–42:</b> Team Plan &amp; Pitch (16 points) + your own Advisor Memo (16 points, your own grade).</li>
+      <li><b>Days 43–44:</b> Classroom Poster (16 points).</li>
+      <li><b>The advising order:</b> stop the bleeding → a starter cushion → free money (the match) → bigger goals.</li>
+    </ul>
+    <p style="margin:10px 0 0"><a class="btn primary" href="/client-file/">Practice with Client File</a> <a class="btn" href="/units/unit-10/">Unit 10 page</a></p>
+  </section>
+</div>
+<script src="/case-bank.js"></script>
+<script>
+const DUE={"1": [3, "Jan 11", "Jan 12", "/lessons/day-3/"], "2": [9, "Jan 28", "Jan 29", "/lessons/day-9/"], "3": [13, "Feb 9", "Feb 10", "/lessons/day-13/"], "4": [16, "Feb 19", "Feb 22", "/lessons/day-16/"], "5": [20, "Mar 3", "Mar 4", "/lessons/day-20/"], "6": [26, "Mar 19", "Mar 29", "/lessons/day-26/"], "7": [31, "Apr 13", "Apr 14", "/lessons/day-31/"], "8": [34, "Apr 21", "Apr 22", "/lessons/day-34/"], "9": [39, "May 5", "May 6", "/lessons/day-39/"]};
+const NAMES={1:"The Power of Compounding",2:"Your Paycheck",3:"Budgeting",4:"Federal Taxes",5:"Banking",6:"Credit",7:"Big Purchases",8:"Insurance",9:"Investing, Retirement & Estate Planning"};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+let blk="a"; try{const s=localStorage.getItem("agenda-blk"); if(s==="b") blk="b";}catch{}
+document.getElementById("ucards").innerHTML=Object.keys(NAMES).map(u=>{ const d=DUE[u], cs=CASES.filter(c=>String(c.unit)===u);
+  return `<div class="uc"><h3>Unit ${u} · ${esc(NAMES[u])}</h3><div class="when">Day ${d[0]} · ${blk==="a"?d[1]+" (Blocks 1 & 3)":d[2]+" (Blocks 5 & 7)"}</div>
+  <ul><li><a href="${d[3]}">Day ${d[0]} lesson</a>: review and a practice case with model answers</li>
+  <li><a href="/make-the-call/?unit=${u}">Make the Call: Unit ${u}</a> (${cs.map(c=>esc(c.title)).join(", ")})</li>
+  <li><a href="/units/unit-${u}/">Unit page</a> · <a href="/glossary/?unit=${u}">word bank (Glossary)</a></li></ul></div>`; }).join("");
+</script>
+<script src="/fm-home.js" defer></script>
+</body></html>

@@ -46,7 +46,7 @@ const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { c
 function variants(term) { return term.replace(/\s*\((?!k\))[^)]*\)/g, "").split(/\s\/\s|,\s/).map(s => s.trim().toLowerCase()).filter(Boolean); }
 function usedWords(text, words) { const t = " " + text.toLowerCase().replace(/[’']/g, "'") + " "; return words.filter(w => variants(w).some(v => t.includes(v))); }
 
-let filter = "all", S = null;
+let filter = (() => { const u = new URLSearchParams(location.search).get("unit"); return u && CASE_UNITS[u] ? u : "all"; })(), S = null;
 let best = {}; try { best = JSON.parse(store.get("mtc-best")) || {}; } catch {}
 const saved = store.get("mtc-name"); if (saved) $("player").value = saved;
 $("player").oninput = e => store.set("mtc-name", e.target.value.trim());

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Readings · Personal Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="/fm-page.css">
+<style>
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.rd{display:grid;gap:4px;text-align:left;text-decoration:none;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--surface);color:inherit}
+.rd:hover{border-color:var(--uc)}
+.rd small{font-family:var(--mono);font-size:12px;color:var(--uc);letter-spacing:.06em;text-transform:uppercase}
+.rd b{font-family:var(--display);font-size:20px;line-height:1.2}
+.rd .st{font-size:14px;color:var(--muted)}
+.rd .st.done{color:var(--r3);font-weight:700}
+article.read{max-width:70ch;font-size:19px;line-height:1.65}
+article.read p{margin:0 0 14px}
+.big-text article.read{font-size:23px}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.q{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface);display:grid;gap:8px}
+.q .stem{font-weight:700}
+.q label{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--bg)}
+.q label:has(input:checked){border-color:var(--uc)}
+.q label.right{border-color:var(--r3);background:color-mix(in srgb,var(--r3) 12%,var(--surface))}
+.q label.wrong{border-color:var(--r1);background:color-mix(in srgb,var(--r1) 10%,var(--surface))}
+.q input{margin-top:4px;width:18px;height:18px;flex:none}
+.q .why{font-size:15px;color:var(--muted)}
+.result{border:3px solid var(--uc);border-radius:16px;padding:16px;text-align:center;background:var(--surface)}
+.result .score{font-family:var(--mono);font-size:56px;font-weight:600;color:var(--uc);line-height:1}
+</style>
+<link rel="stylesheet" href="/fm-nav.css"></head><body><nav class="snav" aria-label="Course menu"><a class="skip" href="#fm-content">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/">Start Here</a></li><li><a href="/readings/" aria-current="page">Readings</a></li><li><a href="/cases/">Case Studies</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/review/">Final Review</a></li><li><a href="/careers/">Careers</a></li><li><a href="/resources/">Resources</a></li><li><a href="/">Arcade</a></li></ul></nav><span id="fm-content" tabindex="-1"></span>
+<div class="wrap" id="app"></div>
+<script src="/readings/readings.js"></script>
+<script>
+const $=id=>document.getElementById(id), esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const store={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+const UN={1:"The Power of Compounding",2:"Your Paycheck",3:"Budgeting",4:"Federal Taxes",5:"Banking",6:"Credit",7:"Big Purchases",8:"Insurance",9:"Investing, Retirement & Estate Planning"};
+let best={}; try{best=JSON.parse(store.get("pf-reading-best"))||{}}catch{}
+function list(){
+  document.title="Readings · Personal Finance";
+  $("app").innerHTML=`<header class="head"><div class="eyebrow">Personal Finance · Units 1–9</div><h1>Readings</h1>
+    <p class="sub">One short reading for each unit (about 4–5 minutes), then a 5-question check. Answer, check, then show your result screen. Your best score is saved on this iPad only.</p></header>
+    <div class="list">${READINGS.map(r=>`<a class="rd" href="?u=${r.u}"><small>Unit ${r.u} · ${esc(UN[r.u])}</small><b>${esc(r.title)}</b><span class="st ${best[r.u]!=null?"done":""}">${best[r.u]!=null?`✓ Best check: ${best[r.u]}/5`:`${r.min} min read + 5 questions`}</span></a>`).join("")}</div>`;
+}
+function reader(r){
+  document.title=r.title+" · Readings";
+  const name=store.get("pf-reading-name")||"";
+  $("app").innerHTML=`<header class="head"><div class="eyebrow">Unit ${r.u} · ${esc(UN[r.u])} · Reading</div><h1>${esc(r.title)}</h1>
+    <p class="sub">About ${r.min} minutes. Then answer the 5 questions below.</p></header>
+    <div class="tools noprint"><a class="btn" href="./">← All readings</a><button class="btn" id="aloud">🔊 Read aloud</button><button class="btn" id="bigger" aria-pressed="false">A+ Bigger text</button><a class="btn" href="/units/unit-${r.u}/">Unit ${r.u} page</a><a class="btn" href="/glossary/?unit=${r.u}">Unit ${r.u} glossary</a></div>
+    <section class="card"><article class="read" id="text">${r.body.map(p=>`<p>${p}</p>`).join("")}</article></section>
+    <section class="card" style="display:grid;gap:12px"><h2 style="margin:0">Reading check</h2>
+      <label class="label" for="nm" style="margin:0">Your name (first name + last initial)</label><input type="text" id="nm" maxlength="30" value="${esc(name)}">
+      <form id="f" style="display:grid;gap:10px">${r.q.map((q,i)=>`<fieldset class="q" style="margin:0"><legend class="stem">${i+1}. ${esc(q[0])}</legend>
+        ${order[i].map(j=>`<label><input type="radio" name="q${i}" value="${j}"><span>${esc(q[1][j])}</span></label>`).join("")}<div class="why" id="why${i}" hidden></div></fieldset>`).join("")}
+        <button class="btn primary" type="submit" style="justify-self:start">Check my answers</button></form>
+      <div id="res"></div></section>`;
+  $("nm").oninput=()=>store.set("pf-reading-name",$("nm").value.trim());
+  $("bigger").onclick=()=>{ document.body.classList.toggle("big-text"); $("bigger").setAttribute("aria-pressed",document.body.classList.contains("big-text")); };
+  $("aloud").onclick=()=>{ if(!("speechSynthesis" in window)) return; if(speechSynthesis.speaking){ speechSynthesis.cancel(); $("aloud").textContent="🔊 Read aloud"; return; }
+    const u=new SpeechSynthesisUtterance(r.title+". "+$("text").innerText); u.lang="en-US"; u.rate=.95; u.onend=()=>$("aloud").textContent="🔊 Read aloud"; speechSynthesis.speak(u); $("aloud").textContent="■ Stop reading"; };
+  $("f").onsubmit=e=>{ e.preventDefault();
+    const picks=r.q.map((q,i)=>{const c=document.querySelector(`input[name=q${i}]:checked`);return c?+c.value:null;});
+    if(picks.includes(null)){ $("res").innerHTML=`<p class="note" style="margin:0">Answer all 5 questions first.</p>`; return; }
+    let n=0; r.q.forEach((q,i)=>{ const ok=picks[i]===q[2]; if(ok) n++;
+      document.querySelectorAll(`input[name=q${i}]`).forEach(inp=>{ const l=inp.closest("label"); inp.disabled=true; if(+inp.value===q[2]) l.classList.add("right"); else if(inp.checked) l.classList.add("wrong"); });
+      const w=$("why"+i); w.hidden=false; w.innerHTML=(ok?"✓ ":"✗ ")+esc(q[3]); });
+    best[r.u]=Math.max(best[r.u]??0,n); store.set("pf-reading-best",JSON.stringify(best));
+    $("f").querySelector("button[type=submit]").disabled=true;
+    const nm=$("nm").value.trim();
+    $("res").innerHTML=`<div class="result"><div class="label">${nm?esc(nm)+" · ":""}Unit ${r.u} reading check</div><div class="score">${n}/5</div>
+      <p style="margin:8px 0 0">${n===5?"Perfect! Show this screen to your teacher.":n>=4?"Strong. Read the ✗ explanation, then show this screen.":"Reread the reading, then try again."}</p>
+      <p class="muted" style="margin:6px 0 0">${new Date().toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</p>
+      <div class="tools noprint" style="justify-content:center;margin-top:10px"><button class="btn" id="again">Try again</button><a class="btn" href="./">All readings</a></div></div>`;
+    $("again").onclick=()=>{ order=r.q.map(q=>shuffle(q[1].map((_,j)=>j))); reader(r); window.scrollTo(0,document.getElementById("f").offsetTop-80); };
+    $("res").scrollIntoView({behavior:"smooth",block:"center"});
+  };
+}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+let order=[];
+const u=+new URLSearchParams(location.search).get("u"); const r=READINGS.find(x=>x.u===u);
+if(r){ order=r.q.map(q=>shuffle(q[1].map((_,j)=>j))); reader(r); } else list();
+window.addEventListener("pagehide",()=>{ try{speechSynthesis.cancel()}catch{} });
+</script>
+<script src="/fm-home.js" defer></script>
+</body></html>
