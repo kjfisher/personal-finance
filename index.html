@@ -1,5 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Future Millionaires Arcade</title>
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="stylesheet" href="/fm-nav.css"></head><body><nav class="snav" aria-label="Course menu"><a class="skip" href="#fm-content">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/">Start Here</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/warm-ups/">Warm-Ups</a></li><li><a href="/exit-tickets/">Exit Tickets</a></li><li><a href="/resources/">Resources</a></li><li><a href="/passport/">Passport</a></li><li><a href="/" aria-current="page">Arcade</a></li></ul></nav><span id="fm-content" tabindex="-1"></span>
+<title>Personal Finance · Future Millionaires Arcade</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,11 +79,13 @@ main .inner { padding-block:24px 48px; display:grid; gap:30px; }
 .tip p { margin:6px 0 0; line-height:1.45; }
 footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 30px; }
 .empty { color:var(--muted); }
+.filter-note { margin:-6px 0 18px; padding:10px 14px; border-radius:12px; background:var(--surface); border:2px solid var(--gold); font-size:16px; }
+.filter-note button { font:inherit; font-weight:700; color:var(--ink); background:var(--gold); border:0; border-radius:999px; padding:6px 14px; margin-left:6px; cursor:pointer; }
 @media (prefers-reduced-motion: reduce) { .card { transition:none; } .card:hover { transform:none; } }
 </style>
 
 <header class="hero"><div class="inner">
-  <div class="eyebrow">Personal Finance - Review Games</div>
+  <div class="eyebrow">Personal Finance · D214 · Semester 2</div>
   <h1>Future Millionaires <span class="tag">Arcade</span></h1>
   <p>Practice the money skills from class, from compounding and paychecks to budgets, taxes, banking, credit, cars, housing, insurance and investing. Pick a game on your iPad, challenge a partner, and walk into the quiz ready.</p>
   <a class="agenda-btn" href="/daily-agenda/" target="_blank" rel="noopener"><span class="lbl">Today in class</span><b>Daily Agenda</b><span class="go">Learning target, plan &amp; today's games ↗</span></a>
@@ -99,6 +101,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
     <button class="chip" data-f="all" aria-pressed="true">All games</button>
     <button class="chip" data-f="u1" aria-pressed="false">Unit 1: Compounding</button><button class="chip" data-f="u2" aria-pressed="false">Unit 2: Your Paycheck</button><button class="chip" data-f="u3" aria-pressed="false">Unit 3: Budgeting</button><button class="chip" data-f="u4" aria-pressed="false">Unit 4: Taxes</button><button class="chip" data-f="u5" aria-pressed="false">Unit 5: Banking</button><button class="chip" data-f="mid" aria-pressed="false">Midterm</button><button class="chip" data-f="u6" aria-pressed="false">Unit 6: Credit</button><button class="chip" data-f="u7" aria-pressed="false">Unit 7: Big Purchases</button><button class="chip" data-f="u8" aria-pressed="false">Unit 8: Insurance</button><button class="chip" data-f="u9" aria-pressed="false">Unit 9: Investing, Retirement &amp; Estate Planning</button><button class="chip" data-f="u10" aria-pressed="false">Unit 10: Final Case Study</button><button class="chip" data-f="fin" aria-pressed="false">Final Exam</button><button class="chip" data-f="cs" aria-pressed="false">Case Studies</button>
   </div>
+  <p class="filter-note" id="filterNote" role="status" hidden></p>
 
   <section class="shelf" aria-labelledby="solo-h">
     <div class="shelf-h"><h2 id="solo-h">Play on your own</h2><p>Grab your iPad. These work anytime, in class or at home.</p></div>
@@ -124,7 +127,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding-block:0 
     </div>
   </section>
 
-  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span>New: Paycheck to Paycheck, Swipe It, Insurance Roulette, Market Time Machine, Money Would You Rather</span></span></div>
+  <div class="soon"><div><b>More games coming</b><div class="empty">New games are added with every unit.</div></div><span class="meta"><span id="newList"></span></span></div>
 </div></main>
 <footer>Personal Finance - Future Millionaires Arcade</footer>
 
@@ -323,10 +326,18 @@ function card(g){ return `<article class="card">
   <div class="body"><h3>${esc(g.name)}</h3><div class="meta">${g.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div><p>${esc(g.d)}</p>
   ${g.blooket?`<div class="blooket"><span class="code">Your teacher will give you the game code.</span><a class="play alt" href="${g.url}" target="_blank" rel="noopener">Join on Blooket</a></div>`
     :`<a class="play" href="${g.url}" target="_blank" rel="noopener" data-slug="${g.url.replace(/\//g,'')}">Play ${esc(g.name)}</a>${played(g)?`<span class="played">✓ In your passport</span>`:""}`}</div></article>`; }
+// NEW badge: only these games show "NEW" (newest first). Edit this list when you add games.
+const NEWEST=["/client-file/","/make-the-call/","/grade-it/","/case-showdown/","/final-math-sprint/"];
+GAMES.forEach(g=>{ g.isNew = NEWEST.includes(g.url); });
 const UO={u1:1,u2:2,u3:3,u4:4,u5:5,mid:6,u6:7,u7:8,u8:9,u9:10,u10:11,fin:12,cs:13};
 let filter="all";
 try{ const s=localStorage.getItem("arcade-filter"); if(s&&document.querySelector(`.chip[data-f="${s}"]`)) filter=s; }catch(e){}
 function render(){
+  const note=document.getElementById("filterNote");
+  if(note){ const chip=document.querySelector(`.chip[data-f="${filter}"]`);
+    note.hidden = filter==="all";
+    if(filter!=="all") note.innerHTML=`Showing <b>${esc(chip?chip.textContent:"one unit")}</b> games only. <button type="button" id="showAll">Show all games</button>`;
+    const sa=document.getElementById("showAll"); if(sa) sa.onclick=()=>{ filter="all"; try{ localStorage.setItem("arcade-filter","all"); }catch(e){} render(); }; }
   document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed", String(c.dataset.f===filter)));
   ["solo","partner","class"].forEach(w=>{ const list=GAMES.filter(g=>g.where===w && (filter==="all"||g.f===filter)).sort((a,b)=>UO[a.f]-UO[b.f]);
     document.getElementById(w).innerHTML = list.length ? list.map(card).join("") : `<p class="empty">No games here for this filter.</p>`; });
@@ -334,6 +345,7 @@ function render(){
 document.addEventListener("click",e=>{const a=e.target.closest("a.play[data-slug]");if(!a)return;FMP.stamp(a.dataset.slug);if(Object.keys(FMP.get().s).length===1)FMP.badge("first-stamp","First Stamp");setTimeout(render,300);});
 document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{ filter=c.dataset.f; try{ localStorage.setItem("arcade-filter",filter); }catch(e){} render(); });
 render();
+(()=>{ const el=document.getElementById("newList"); if(el) el.textContent="Newest: "+NEWEST.map(u=>(GAMES.find(g=>g.url===u)||{}).name).filter(Boolean).join(", "); })();
 </script>
 
 </body></html>
